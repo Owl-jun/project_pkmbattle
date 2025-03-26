@@ -117,7 +117,7 @@ public:
         sf::Vector2f birdtextureSize = static_cast<sf::Vector2f>(birdTex.getSize());
         sf::Vector2f windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         birdTime += dt;
-        if (birdPos.x <= -200) {
+        if (birdPos.x <= -300) {
             birdPos.x = windowSize.x + 100;
         }
         birdPos.x += speed * dt * birdDir;
