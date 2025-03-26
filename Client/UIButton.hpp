@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "BaseUI.hpp"
 #include <functional>
 
@@ -7,40 +7,60 @@ private:
     sf::RectangleShape shape;
     sf::Text text;
     std::function<void()> onClick;
-    sf::Font font;
+    sf::Color defaultColor;
 
 public:
 
-    UIButton(const sf::Vector2f& pos, const sf::Vector2f& size, const std::string& label, std::function<void()> clickFunc)
-        : onClick(clickFunc) , font("C:/Windows/Fonts/arial.ttf") , text(font,label,24)
+    UIButton(const sf::Vector2f& pos, 
+            const sf::Vector2f& size, 
+            const std::string& label, 
+            sf::Color Color, 
+            sf::Font& sharedFont,
+            std::function<void()> clickFunc)
+        : onClick(clickFunc) 
+        , text(sharedFont,label,24)
+        , defaultColor(Color)
     {
         shape.setPosition(pos);
         shape.setSize(size);
-        shape.setFillColor(sf::Color::Blue);
+        shape.setFillColor(Color);
 
-        font.openFromFile("C:/Windows/Fonts/arial.ttf"); 
+        //font.openFromFile("C:/Windows/Fonts/arial.ttf"); 
         //text.setFont(font);
         //text.setString(label);
         //text.setCharacterSize(24);
-        text.setFillColor(sf::Color::White);
-        text.setPosition({ pos.x + 10, pos.y + 10 });
+        text.setFillColor(sf::Color::Black);
+        const auto bounds = text.getLocalBounds();  // sf::FloatRect
+        text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });
+        text.setPosition(
+            { shape.getPosition().x + shape.getSize().x / 2.f,
+            shape.getPosition().y + shape.getSize().y / 2.f }
+        );
     }
 
-    void handleEvent(const sf::Event& event) override {
+    void handleEvent(const sf::Event& event, sf::RenderWindow& window) override {
+        std::cout << "[DEBUG] handleEvent í˜¸ì¶œë¨\n";
+
         if (event.is<sf::Event::MouseButtonPressed>()) {
             const auto* mouse = event.getIf<sf::Event::MouseButtonPressed>();
-            if (mouse) {
-                sf::Vector2f mousePos(static_cast<float>(mouse->position.x), static_cast<float>(mouse->position.y));
-                if (shape.getGlobalBounds().contains(mousePos)) {
-                    if (onClick)
-                        onClick();
-                }
+            if (mouse && mouse->button == sf::Mouse::Button::Left) {
+                std::cout << "ì”¨ë°œìƒˆë¼ì•¼" << std::endl;
+                SceneManager::getInstance().changeScene(new LoginScene());
             }
         }
     }
 
-    void update() override {
-        // hover È¿°ú µîÀ» ³ªÁß¿¡ Ãß°¡ÇÒ ¼ö ÀÖÀ½
+
+
+    void update(sf::RenderWindow& window) override {
+        sf::Vector2i pixelPos = sf::Mouse::getPosition(window);  // ðŸ§  ì—¬ê¸° ì¤‘ìš”! window ê¸°ì¤€ìœ¼ë¡œ ê°€ì ¸ì˜´
+        sf::Vector2f mousePos = window.mapPixelToCoords(pixelPos);
+        if (shape.getGlobalBounds().contains(mousePos)) {
+            shape.setFillColor(sf::Color::Cyan); // hover ìƒ‰ìƒ
+        }
+        else {
+            shape.setFillColor(defaultColor); // ì›ëž˜ ìƒ‰ìƒ
+        }
     }
 
     void render(sf::RenderWindow& window) override {

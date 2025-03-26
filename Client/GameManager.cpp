@@ -5,10 +5,11 @@
 #include "TitleScene.hpp"
 
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE")
+    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
 {
 }
 
+// 싱글톤
 GameManager& GameManager::getInstance() {
     static GameManager instance;
     return instance;
@@ -18,7 +19,7 @@ void GameManager::init() {
     SceneManager::getInstance().changeScene(new TitleScene());
 }
 
-void GameManager::update() {
+void GameManager::update() {    // 정보를 최신화
     while (const std::optional<sf::Event> event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>())
             window.close();
@@ -28,7 +29,7 @@ void GameManager::update() {
     SceneManager::getInstance().update(window);
 }
 
-void GameManager::render() {
+void GameManager::render() {    // 화면에그리기
     window.clear();
     SceneManager::getInstance().render(window);
     window.display();

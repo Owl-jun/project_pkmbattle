@@ -11,14 +11,14 @@ public:
         uiElements.push_back(element);
     }
 
-    void handleEvent(const sf::Event& event) {
+    void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         for (auto& elem : uiElements)
-            elem->handleEvent(event);
+            elem->handleEvent(event, window);
     }
 
-    void update() {
+    void update(sf::RenderWindow& window) {
         for (auto& elem : uiElements)
-            elem->update();
+            elem->update(window);
     }
 
     void render(sf::RenderWindow& window) {
