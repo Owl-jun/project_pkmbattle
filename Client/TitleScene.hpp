@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
@@ -16,11 +16,11 @@ public:
     TitleScene() : font("C:/Windows/Fonts/arial.ttf"), title(font, "THIS IS TITLE", 60) {}
 
     void init() override {
-        std::cout << "TitleScene::init() È£ÃâµÊ\n";
+        std::cout << "TitleScene::init() í˜¸ì¶œë¨\n";
         uiManager.addElement(new UIButton(
-            { 300,400 },    // ¹öÆ° À§Ä¡ 
-            { 200,50 },     // ¹öÆ° Å©±â
-            "Start",        // ¹öÆ° ÅØ½ºÆ®
+            { 300,400 },    // ë²„íŠ¼ ìœ„ì¹˜ 
+            { 200,50 },     // ë²„íŠ¼ í¬ê¸°
+            "Start1",        // ë²„íŠ¼ í…ìŠ¤íŠ¸
             []() { SceneManager::getInstance().changeScene(new LoginScene()); } // command
         ));
 
