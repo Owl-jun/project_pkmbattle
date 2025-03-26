@@ -77,5 +77,11 @@
     <ClInclude Include="UIButton.hpp">
       <Filter>UIManager</Filter>
     </ClInclude>
+    <ClInclude Include="UITextBox.hpp">
+      <Filter>UIManager</Filter>
+    </ClInclude>
+    <ClInclude Include="worldScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

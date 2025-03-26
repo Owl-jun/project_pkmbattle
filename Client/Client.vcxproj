@@ -124,6 +124,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,6 +155,8 @@
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UIButton.hpp" />
     <ClInclude Include="UIManager.hpp" />
+    <ClInclude Include="UITextBox.hpp" />
+    <ClInclude Include="worldScene.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

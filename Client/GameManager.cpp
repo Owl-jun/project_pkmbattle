@@ -15,6 +15,11 @@ GameManager& GameManager::getInstance() {
     return instance;
 }
 
+sf::RenderWindow& GameManager::getWindow()
+{
+    return window;
+}
+
 void GameManager::init() {
     SceneManager::getInstance().changeScene(new TitleScene());
 }
@@ -25,6 +30,7 @@ void GameManager::update() {    // 정보를 최신화
             window.close();
 
         KeyManager::getInstance().handleEvent(*event);
+        SceneManager::getInstance().update(window);
     }
     SceneManager::getInstance().update(window);
 }

@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "BaseScene.hpp"
 
+
 class SceneManager {
 private:
     BaseScene* currentScene = nullptr;

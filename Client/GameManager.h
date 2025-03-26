@@ -13,7 +13,7 @@ private:
 
 public:
     static GameManager& getInstance();
-
+    sf::RenderWindow& getWindow();
     void init();
     void update();
     void render();
