@@ -25,7 +25,6 @@ void GameManager::update() {
 
         KeyManager::getInstance().handleEvent(*event);
     }
-
     SceneManager::getInstance().update(window);
 }
 

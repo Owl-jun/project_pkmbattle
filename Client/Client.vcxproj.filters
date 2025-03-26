@@ -37,6 +37,9 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{70398283-154b-4279-acd8-f0a3f2006567}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UIManager">
+      <UniqueIdentifier>{a8e5a843-5bdb-47e7-bdc0-258fe4246aa0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Image Include="D:\작업\drawing\test.jpg">
@@ -61,6 +64,18 @@
     </ClInclude>
     <ClInclude Include="TitleScene.hpp">
       <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="LoginScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseUI.hpp">
+      <Filter>UIManager</Filter>
+    </ClInclude>
+    <ClInclude Include="UIManager.hpp">
+      <Filter>UIManager</Filter>
+    </ClInclude>
+    <ClInclude Include="UIButton.hpp">
+      <Filter>UIManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
