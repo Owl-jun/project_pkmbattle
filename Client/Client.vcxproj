@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fix.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="main.cpp" />
@@ -142,9 +143,8 @@
     <ClCompile Include="SceneManager.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="D:\작업\drawing\test.jpg" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="AnimatedObject.hpp" />
+    <ClInclude Include="AnimationManager.hpp" />
     <ClInclude Include="baseScene.hpp" />
     <ClInclude Include="BaseUI.hpp" />
     <ClInclude Include="GameManager.h" />
@@ -152,6 +152,7 @@
     <ClInclude Include="LoginScene.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="TimeManager.hpp" />
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UIButton.hpp" />
     <ClInclude Include="UIManager.hpp" />

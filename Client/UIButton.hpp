@@ -26,7 +26,7 @@ public:
         shape.setFillColor(Color);
 
         text.setFillColor(sf::Color::Black);
-        const auto bounds = text.getLocalBounds();  // sf::FloatRect
+        const auto bounds = text.getLocalBounds();  
         text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });
         text.setPosition(
             { shape.getPosition().x + shape.getSize().x / 2.f,
@@ -54,10 +54,10 @@ public:
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);  
         sf::Vector2f mousePos = window.mapPixelToCoords(pixelPos);
         if (shape.getGlobalBounds().contains(mousePos)) {
-            shape.setFillColor(sf::Color::White); // hover 색상
+            shape.setFillColor(sf::Color::White);
         }
         else {
-            shape.setFillColor(defaultColor); // 원래 색상
+            shape.setFillColor(defaultColor); 
         }
     }
 

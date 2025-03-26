@@ -17,6 +17,7 @@
     <ClCompile Include="SceneManager.hpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="fix.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="assets">
@@ -40,11 +41,12 @@
     <Filter Include="UIManager">
       <UniqueIdentifier>{a8e5a843-5bdb-47e7-bdc0-258fe4246aa0}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="D:\작업\drawing\test.jpg">
-      <Filter>assets</Filter>
-    </Image>
+    <Filter Include="TimeManager">
+      <UniqueIdentifier>{eced138d-5174-4b7a-8f45-e2983e28d206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AnimationManager">
+      <UniqueIdentifier>{7947735a-dccf-4471-ac0a-9f656d84cbf9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyManager.h">
@@ -82,6 +84,15 @@
     </ClInclude>
     <ClInclude Include="worldScene.hpp">
       <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.hpp">
+      <Filter>TimeManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationManager.hpp">
+      <Filter>AnimationManager</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedObject.hpp">
+      <Filter>AnimationManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
