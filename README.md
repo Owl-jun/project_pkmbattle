@@ -3,10 +3,12 @@
 
 ## 1일차
 
-
+프로토타입 영상
 https://github.com/user-attachments/assets/87abd840-3464-4a6f-be2d-cfca46fe8132
 
 
+클라이언트부 설계 구현
+<img src="./개발일지소스/2025-03-26 21 클라이언트 설계.png">
 
 ## 개발 환경설정
 
