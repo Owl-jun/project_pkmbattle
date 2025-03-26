@@ -19,9 +19,6 @@ public:
         shape.setFillColor(sf::Color::Blue);
 
         font.openFromFile("C:/Windows/Fonts/arial.ttf"); 
-        //text.setFont(font);
-        //text.setString(label);
-        //text.setCharacterSize(24);
         text.setFillColor(sf::Color::White);
         text.setPosition({ pos.x + 10, pos.y + 10 });
     }
