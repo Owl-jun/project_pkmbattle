@@ -1,7 +1,9 @@
 #pragma once
 #include "TimeManager.hpp"
+
 #include "pch.h"
 #include <cmath>
+#include <functional>
 
 class AnimatedObject {
 private:
@@ -13,6 +15,12 @@ private:
     float amplitude = 0.f;
     float freq = 0.f;
     int direction;
+
+    float alpha = 0.f;
+    bool fadingIn = true;
+    float timer = 0.f;
+
+    bool finished = false;
     sf::Vector2f m_pos;
 
 public:
@@ -38,7 +46,40 @@ public:
         m_pos = sprite->getPosition();
     }
 
-    void update(float dt,float windowWidth = 800.f) {
+    void update(std::function<void(AnimatedObject&, float)> func, float dt) {
+        func(*this, dt);
+    }
+
+    // ø¿«¡¥◊æ¿ √≥∏ÆøÎ --------------------
+    void intro(float dt) {
+        sprite->setColor(sf::Color(255, 255, 255, alpha));
+        timer += dt;
+
+        // ∆‰¿ÃµÂ ¿Œ
+        if (fadingIn && (alpha < 255.f)) {
+            alpha += dt * speed;
+            if (alpha >= 255.f) {
+                alpha = 255.f;
+                fadingIn = false;
+                timer = 0.f;
+            }
+            sprite->setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(alpha)));
+        }
+
+        // ∆‰¿ÃµÂ æ∆øÙ »ƒ æ¿ ¿¸»Ø
+        if (!fadingIn && (timer > 1.5f)) {
+            alpha -= dt * speed;
+            sprite->setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(alpha)));
+            if(alpha <= 0.f)
+            {
+                finished = true;
+            }
+        }
+    }
+    bool isFinished() { return finished; }
+    // ------------------------------------
+
+    void move(float dt,float windowWidth = 800.f) {
         time += dt;
         if (speed != 0.f) {
             m_pos.x += speed * dt * direction;

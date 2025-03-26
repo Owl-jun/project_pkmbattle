@@ -16,8 +16,6 @@ private:
     std::optional<sf::Sprite> background;
     sf::Vector2f bgtextureSize;
     sf::Vector2f windowSize;
-    AnimatedObject text1;
-    AnimatedObject text2;
     AnimationManager aniManager;
     UIManager uiManager;
 
@@ -46,11 +44,12 @@ public:
         bird.setScale({ 0.25,0.25 });
         bird.setOriginCenter();
 
-        text1 = AnimatedObject("C:/Source/project_pkmbattle/Client/assets/kstext.png",
+        AnimatedObject text1("C:/Source/project_pkmbattle/Client/assets/kstext.png",
             { windowSize.x/2.f, 36 },
             100.f, 0.f, 0.f, 1
         );
-        text2 = AnimatedObject("C:/Source/project_pkmbattle/Client/assets/hjtext.png",
+
+        AnimatedObject text2("C:/Source/project_pkmbattle/Client/assets/hjtext.png",
             { windowSize.x / 2.f, 89 },
             100.f, 0.f, 0.f, -1
         );
@@ -60,7 +59,21 @@ public:
         text1.setOriginCenter();
         text2.setOriginCenter();
 
-        aniManager.add(std::move(bird));
+        aniManager.add(std::move(bird), [](AnimatedObject& obj, float dt) 
+            {
+                obj.move(dt, 800.f);
+            }
+        );
+        aniManager.add(std::move(text1), [](AnimatedObject& obj, float dt)
+            {
+                obj.bounce(dt, 35, 90);
+            }
+        );
+        aniManager.add(std::move(text2), [](AnimatedObject& obj, float dt)
+            {
+                obj.bounce(dt, 35, 90);
+            }
+        );
 
         uiManager.addElement(new UIButton(
             { 300,400 },        // 버튼 위치 
@@ -73,16 +86,12 @@ public:
 
     }
 
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        uiManager.handleEvent(event, window);
+    }
+
     void update(sf::RenderWindow& window) override {
-        while (const std::optional<sf::Event> event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>())
-                window.close();
-            KeyManager::getInstance().handleEvent(*event);
-            uiManager.handleEvent(*event,window);
-        }
-        aniManager.updateAll(TimeManager::getInstance().getDeltaTime(),800.f);
-        text1.bounce(TimeManager::getInstance().getDeltaTime(),35, 90);
-        text2.bounce(TimeManager::getInstance().getDeltaTime(),35, 90);
+        aniManager.updateAll(TimeManager::getInstance().getDeltaTime());
         uiManager.update(window);
     }
 
@@ -90,8 +99,6 @@ public:
     void render(sf::RenderWindow& window) override {
         window.draw(*background);
         aniManager.renderAll(window);
-        text1.draw(window);
-        text2.draw(window);
         uiManager.render(window);
     }
 

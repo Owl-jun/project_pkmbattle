@@ -150,6 +150,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LoginScene.hpp" />
+    <ClInclude Include="OpeningScene.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TimeManager.hpp" />

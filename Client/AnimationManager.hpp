@@ -5,16 +5,23 @@
 class AnimationManager {
 private:
     std::vector<AnimatedObject> objects;
+    std::vector<std::function<void(AnimatedObject&, float)>> updateFuncs;
 
 public:
-    void add(const AnimatedObject&& obj) {
+    void add(const AnimatedObject&& obj, std::function<void(AnimatedObject&, float)> updateFunc) {
         objects.push_back(obj);
+        updateFuncs.push_back(updateFunc);
     }
 
-    void updateAll(float dt,float windowWidth = 0.f) {
-        for (auto& obj : objects) {
-            obj.update(dt, windowWidth);
+    bool updateAll(float dt) {
+        bool anyFinished = false;
+        for (size_t i = 0; i < objects.size(); ++i) {
+            updateFuncs[i](objects[i], dt);
+            if (objects[i].isFinished()) {
+                anyFinished = true;
+            }
         }
+        return anyFinished;
     }
 
     void renderAll(sf::RenderWindow& window) {

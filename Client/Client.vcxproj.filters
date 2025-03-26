@@ -94,5 +94,8 @@
     <ClInclude Include="AnimatedObject.hpp">
       <Filter>AnimationManager</Filter>
     </ClInclude>
+    <ClInclude Include="OpeningScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

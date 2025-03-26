@@ -26,6 +26,10 @@ public:
         
     }
 
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+
+    }
+
     void update(sf::RenderWindow& window) override {
 
     }

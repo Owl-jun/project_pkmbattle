@@ -6,6 +6,7 @@
 class SceneManager {
 private:
     BaseScene* currentScene = nullptr;
+    BaseScene* pendingScene = nullptr;
 
     SceneManager() = default;
     SceneManager(const SceneManager&) = delete;
@@ -18,15 +19,27 @@ public:
     }
 
     void changeScene(BaseScene* newScene) {
+        pendingScene = newScene;
+    }
+
+    void applyPendingScene() {
+        if (pendingScene) {
+            if (currentScene) delete currentScene;
+            currentScene = pendingScene;
+            currentScene->init();
+            pendingScene = nullptr;
+        }
+    }
+
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) {
         if (currentScene)
-            delete currentScene;
-        currentScene = newScene;
-        currentScene->init();
+            currentScene->handleInput(event, window);  // 새로 추가
     }
 
     void update(sf::RenderWindow& window) {
         if (currentScene)
             currentScene->update(window);
+        applyPendingScene();
     }
 
     void render(sf::RenderWindow& window) {

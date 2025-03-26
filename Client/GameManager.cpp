@@ -2,7 +2,7 @@
 #include "GameManager.h"
 #include "KeyManager.h"
 #include "SceneManager.hpp"
-#include "TitleScene.hpp"
+#include "OpeningScene.hpp"
 #include "TimeManager.hpp"
 
 GameManager::GameManager()
@@ -22,21 +22,22 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    SceneManager::getInstance().changeScene(new TitleScene());
+    SceneManager::getInstance().changeScene(new OpeningScene());
 }
 
-void GameManager::update() {    // 정보를 최신화
+void GameManager::update() { 
     TimeManager::getInstance().update();
+    KeyManager::getInstance().update();
     while (const std::optional<sf::Event> event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>())
             window.close();
         KeyManager::getInstance().handleEvent(*event);
-        SceneManager::getInstance().update(window);
+        SceneManager::getInstance().handleInput(*event, window);
     }
     SceneManager::getInstance().update(window);
 }
 
-void GameManager::render() {    // 화면에그리기
+void GameManager::render() {  
     window.clear();
     SceneManager::getInstance().render(window);
     window.display();

@@ -60,13 +60,11 @@ public:
         ));
     }
 
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        uiManager.handleEvent(event, window);
+    }
+
     void update(sf::RenderWindow& window) override {
-        while (const std::optional<sf::Event> event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>())
-                window.close();
-            KeyManager::getInstance().handleEvent(*event);
-            uiManager.handleEvent(*event, window);
-        }
         uiManager.update(window);
     }
 
