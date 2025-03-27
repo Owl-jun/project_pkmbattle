@@ -5,6 +5,8 @@
 #include "OpeningScene.hpp"
 #include "TimeManager.hpp"
 
+#include "endingScene.hpp"
+
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
 {
@@ -22,7 +24,7 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    SceneManager::getInstance().changeScene(new OpeningScene());
+    SceneManager::getInstance().changeScene(new endingScene());    // 초기화면 설정
 }
 
 void GameManager::update() { 

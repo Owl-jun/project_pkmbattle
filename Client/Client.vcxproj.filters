@@ -97,7 +97,7 @@
     <ClInclude Include="OpeningScene.hpp">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="testScene.hpp">
+    <ClInclude Include="endingScene.hpp">
       <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>
