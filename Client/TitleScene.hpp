@@ -59,17 +59,17 @@ public:
         text1.setOriginCenter();
         text2.setOriginCenter();
 
-        aniManager.add(std::move(bird), [](AnimatedObject& obj, float dt) 
+        aniManager.add(bird, [](AnimatedObject& obj, float dt) 
             {
                 obj.move(dt, 800.f);
             }
         );
-        aniManager.add(std::move(text1), [](AnimatedObject& obj, float dt)
+        aniManager.add(text1, [](AnimatedObject& obj, float dt)
             {
                 obj.bounce(dt, 35, 90);
             }
         );
-        aniManager.add(std::move(text2), [](AnimatedObject& obj, float dt)
+        aniManager.add(text2, [](AnimatedObject& obj, float dt)
             {
                 obj.bounce(dt, 35, 90);
             }

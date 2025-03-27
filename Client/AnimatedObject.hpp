@@ -19,6 +19,9 @@ private:
     float alpha = 0.f;
     bool fadingIn = true;
     float timer = 0.f;
+    float elapsed = 0.f;
+    float delay;
+    bool started = false;
 
     bool finished = false;
     sf::Vector2f m_pos;
@@ -27,15 +30,17 @@ public:
     AnimatedObject() = default;
 
     AnimatedObject(const std::string& texPath, sf::Vector2f pos,
-        float speed = 0.f, 
-        float amplitude = 0.f, 
-        float freq = 0.f, 
+        float speed = 0.f,
+        float delay = 0.f,
+        float amplitude = 0.f,
+        float freq = 0.f,
         int dir = -1)
         : basePos(pos)
         , speed(speed)
+        , delay(delay)
         , amplitude(amplitude)
         , freq(freq)
-        , direction(dir) 
+        , direction(dir)
     {
         texture = std::make_shared<sf::Texture>();
         if (!texture->loadFromFile(texPath)) {
@@ -52,10 +57,18 @@ public:
 
     // ø¿«¡¥◊æ¿ √≥∏ÆøÎ --------------------
     void intro(float dt) {
+        elapsed += dt;
+        if (!started) {
+            if (elapsed >= delay) {
+                started = true;
+                elapsed = 0.f; 
+            }
+            else return;
+        }
+
         sprite->setColor(sf::Color(255, 255, 255, alpha));
         timer += dt;
 
-        // ∆‰¿ÃµÂ ¿Œ
         if (fadingIn && (alpha < 255.f)) {
             alpha += dt * speed;
             if (alpha >= 255.f) {
@@ -66,12 +79,10 @@ public:
             sprite->setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(alpha)));
         }
 
-        // ∆‰¿ÃµÂ æ∆øÙ »ƒ æ¿ ¿¸»Ø
-        if (!fadingIn && (timer > 1.5f)) {
+        if (!fadingIn && (timer > 0.f)) {
             alpha -= dt * speed;
             sprite->setColor(sf::Color(255, 255, 255, static_cast<uint8_t>(alpha)));
-            if(alpha <= 0.f)
-            {
+            if (alpha <= -20.f) {
                 finished = true;
             }
         }
