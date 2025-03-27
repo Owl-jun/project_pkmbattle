@@ -7,7 +7,8 @@
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
-#include "SceneManager.h"
+#include "SceneManager.hpp"
+#include "TitleScene.hpp"
 #include "LoginScene.hpp"
 #include "UIButton.hpp"
 #include "UIManager.hpp"
@@ -24,8 +25,7 @@ private:
     float yOffset = 600.f;     // 시작 위치
     float spacing = 50.f;      // 줄 사이 간격
 
-    AnimationManager aniManager;         // 애니메이션 매니저
-    AnimatedObject* logo = nullptr;     // 로고 객체넣고
+    AnimationManager aniManager;
 
 public:
     endingScene()
@@ -95,11 +95,21 @@ public:
 
         }
 
-        //// 애니메이션 이미지 로딩
-        //hoculman = new AnimatedObject("C:/Source/project_pkmbattle/Client/assets/HoCulman.png", { 300.f, 550.f });
-        //hoculman->setScale({ 2.f, 2.f });   // 필요 시 크기 조절
-        //hoculman->setAlpha(0);              // 페이드인 시작
-        //aniManager.add(hoculman);
+        // HoCulman 애니메이션 등록 (값 복사 방식)
+        AnimatedObject hoculman(
+            "C:/Source/project_pkmbattle/Client/assets/HoCulman.png",
+            sf::Vector2f(300.f, 500.f),
+            20.f // fade-in 속도
+        );
+        hoculman.setScale({ 2.f, 2.f });
+
+        aniManager.add(hoculman, [this](AnimatedObject& obj, float dt) {
+            obj.fadein(dt);
+
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
 
     }
 
@@ -111,9 +121,13 @@ public:
 
     void update(sf::RenderWindow& window) override {
         float delta = TimeManager::getInstance().getDeltaTime();
+        
         for (auto& text : credits) {
             text.move({ 0.f, -scrollSpeed * delta });
         }
+
+        aniManager.updateAll(delta);
+
     }
 
     void render(sf::RenderWindow& window) override {
@@ -121,5 +135,9 @@ public:
         for (auto& text : credits) {
             window.draw(text);
         }
+
+        aniManager.renderAll(window);
+
+
     }
 };
