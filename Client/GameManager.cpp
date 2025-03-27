@@ -22,11 +22,11 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    SceneManager::getInstance().changeScene(new OpeningScene());
+    SceneManager::getInstance().changeScene(new OpeningScene());    // 초기화면 설정
 }
 
 void GameManager::update() { 
-    TimeManager::getInstance().update();
+    TimeManager::getInstance().tick();
     KeyManager::getInstance().update();
     while (const std::optional<sf::Event> event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>())
