@@ -3,7 +3,7 @@
 #include "KeyManager.h"
 #include "BaseScene.hpp"
 #include "TitleScene.hpp"
-#include "SceneManager.h"
+#include "SceneManager.hpp"
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
 

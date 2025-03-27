@@ -1,16 +1,29 @@
 #pragma once
 
+enum class Direction {
+    Down,
+    Left,
+    Right,
+    Up,
+    None
+};
+
 class Player {
 private:
-    std::vector<sf::Texture> textures;
+    // 방향별 애니메이션 프레임
+    std::vector<sf::Texture> downFrames;
+    std::vector<sf::Texture> leftFrames;
+    std::vector<sf::Texture> rightFrames;
+    std::vector<sf::Texture> upFrames;
+
     std::optional<sf::Sprite> sprite;
 
     float speed = 100.f;
-    bool facingRight = true;
-
-    float frameTime = 0.1f; // 프레임당 지속 시간 (초)
+    float frameTime = 0.1f;
     float elapsedTime = 0.f;
     int currentFrame = 0;
+
+    Direction currentDirection = Direction::Down;
 
 public:
     Player();
@@ -23,6 +36,6 @@ public:
 
 private:
     void animate(float dt);
-    void moveLeft(float dt);
-    void moveRight(float dt);
+    void updateSpriteTexture();
+    std::vector<sf::Texture>* getCurrentFrameSet();
 };
