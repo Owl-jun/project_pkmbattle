@@ -8,6 +8,8 @@
 #include "UIManager.hpp"
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
+#include "ResourceManager.hpp"
+
 
 class TitleScene : public BaseScene {
 private:
@@ -21,7 +23,7 @@ private:
 
 public:
     TitleScene() 
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.ttf")
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
     {
     }
 
@@ -83,7 +85,7 @@ public:
             "START",            // 버튼 텍스트
             sf::Color(0,0,0,0),   // 버튼 색
             font,
-            []() { SceneManager::getInstance().changeScene(new LoginScene()); } // command
+            []() { SceneManager::getInstance().changeScene("login"); } // command
         ));
 
     }

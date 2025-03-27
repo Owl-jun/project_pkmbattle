@@ -13,6 +13,7 @@
 #include "UIManager.hpp"
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
+#include "ResourceManager.hpp"
 
 class testScene : public BaseScene {
 private:
@@ -22,7 +23,7 @@ private:
 
 public:
     testScene()
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.ttf")
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
     {
     }
 

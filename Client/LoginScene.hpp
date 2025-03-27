@@ -11,6 +11,8 @@
 #include "UITextBox.hpp"
 #include "UIManager.hpp"
 #include "Player.h"
+#include "ResourceManager.hpp"
+
 
 class LoginScene : public BaseScene {
 private:
@@ -28,7 +30,7 @@ private:
 
 public:
     LoginScene() 
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF")
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , id(font, "ID", 30) 
         , pswd(font,"PASSWORD",30) 
     {}
@@ -78,12 +80,19 @@ public:
                 pw.erase(remove(pw.begin(), pw.end(),'\n'),pw.end());
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
+                // DB 연동 ---------------------------------------
+                // DB 연동 ---------------------------------------
+                // DB 연동 ---------------------------------------
                 if (id == "admin" && pw == "1234") {
-                    SceneManager::getInstance().changeScene(new worldScene());
+                    SceneManager::getInstance().changeScene("world");
                 }
                 else {
                     std::cerr << "로그인 실패!\n";
                 }
+                // DB 연동 ---------------------------------------
+                // DB 연동 ---------------------------------------
+                // DB 연동 ---------------------------------------
+
             }
         ));
         

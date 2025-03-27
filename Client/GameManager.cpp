@@ -3,14 +3,22 @@
 #include "KeyManager.h"
 #include "SceneManager.hpp"
 #include "OpeningScene.hpp"
+#include "TitleScene.hpp"
+#include "worldScene.hpp"
+#include "OpeningScene.hpp"
 #include "TimeManager.hpp"
+#include "ResourceManager.hpp"
+#include "SoundManager.hpp"
 
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
 {
 }
 
-// 싱글톤
+Player& GameManager::getPlayer() {
+    return *player;
+}
+
 GameManager& GameManager::getInstance() {
     static GameManager instance;
     return instance;
@@ -22,7 +30,14 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    SceneManager::getInstance().changeScene(new OpeningScene());    // 초기화면 설정
+    SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // 사운드매니저
+    ResourceManager::getInstance().init();
+    player = std::make_unique<Player>();
+    SceneManager::getInstance().registerScene("opening", new OpeningScene());
+    SceneManager::getInstance().registerScene("title", new TitleScene());
+    SceneManager::getInstance().registerScene("login", new LoginScene());
+    SceneManager::getInstance().registerScene("world", new worldScene());
+    SceneManager::getInstance().changeScene("opening");    // 초기화면 설정
 }
 
 void GameManager::update() { 

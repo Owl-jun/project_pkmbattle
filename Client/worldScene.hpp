@@ -7,7 +7,9 @@
 #include "UIButton.hpp"
 #include "UIManager.hpp"
 #include "TimeManager.hpp"
+#include "ResourceManager.hpp"
 #include "Player.h"
+#include "SettingsOverlay.hpp"
 
 class worldScene : public BaseScene {
 private:
@@ -17,15 +19,19 @@ private:
     sf::Texture bgTex;
     std::optional<sf::Sprite> bg;
     UIManager uiManager;
-    Player player;
+    Player& player;
     sf::View camera;
     std::vector<std::vector<int>> collisionMap;
+    SettingsOverlay settings;
+    float escCooldown = 0.f;
 
 public:
     worldScene()
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF")
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , deltatime("0")
-        , frame(font,deltatime, 24)
+        , frame(font, deltatime, 24)
+        , player(GameManager::getInstance().getPlayer())
+        , settings({800.f,600.f},font)
     {
     }
 
@@ -48,7 +54,7 @@ public:
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+            {1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -91,16 +97,27 @@ public:
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape) && escCooldown <= 0.f) {
+            settings.toggle();
+            std::cout << "Visible: " << settings.isVisible() << "\n";
+            escCooldown = 0.5f;
+        }
+        settings.handleEvent(event, window);
     }
 
     void update(sf::RenderWindow& window) override {
         float dt = TimeManager::getInstance().getDeltaTime();
+        escCooldown -= dt;
         int fps = static_cast<int>(1.f / dt);
         frame.setString("FPS: " + std::to_string(fps));
 
-        // 플레이어 + 카메라 이동
-        player.update(dt);
+        if (!settings.isVisible()) {
+            player.update(dt);  // 설정창 열리면 멈춤
+
+        }
         camera.setCenter(player.getPosition());
+        settings.setCenter(camera.getCenter());
+        settings.update(window);
         window.setView(camera);
 
         // frame을 카메라 기준 화면 좌상단에 배치
@@ -112,20 +129,11 @@ public:
     void render(sf::RenderWindow& window) override {
         // 카메라 뷰에서 맵/캐릭터 렌더링
         window.setView(camera);
-
-        for (int y = 0; y < collisionMap.size(); ++y) {
-            for (int x = 0; x < collisionMap[y].size(); ++x) {
-                sf::RectangleShape tile(sf::Vector2f(60.f, 60.f));
-                tile.setPosition({ x * 60.f, y * 60.f });
-
-                tile.setFillColor(collisionMap[y][x] == 1 ? sf::Color::Black : sf::Color(180, 220, 180));
-                window.draw(tile);
-            }
-        }
-
         if (bg.has_value()) window.draw(*bg);
         player.draw(window);
         window.draw(frame);  
+        
+        settings.render(window);
     }
 
 };
