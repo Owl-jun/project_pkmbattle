@@ -48,8 +48,6 @@ public:
         }
     }
 
-
-
     void update(sf::RenderWindow& window) override {
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);  
         sf::Vector2f mousePos = window.mapPixelToCoords(pixelPos);

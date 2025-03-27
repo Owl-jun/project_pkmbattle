@@ -97,5 +97,8 @@
     <ClInclude Include="OpeningScene.hpp">
       <Filter>Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="testScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

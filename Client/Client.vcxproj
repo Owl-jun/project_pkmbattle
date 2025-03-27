@@ -153,6 +153,7 @@
     <ClInclude Include="OpeningScene.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="testScene.hpp" />
     <ClInclude Include="TimeManager.hpp" />
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UIButton.hpp" />
