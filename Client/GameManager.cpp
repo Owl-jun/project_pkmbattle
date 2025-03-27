@@ -5,12 +5,14 @@
 #include "OpeningScene.hpp"
 #include "TimeManager.hpp"
 
+#include "endingScene.hpp"
+
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // À©µµ¿ì Å¸ÀÌÆ² ¹× ÇØ»óµµ¼³Á¤
+    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // ìœˆë„ìš° íƒ€ì´í‹€ ë° í•´ìƒë„ì„¤ì •
 {
 }
 
-// ½Ì±ÛÅæ
+// ì‹±ê¸€í†¤
 GameManager& GameManager::getInstance() {
     static GameManager instance;
     return instance;
@@ -22,7 +24,9 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    SceneManager::getInstance().changeScene(new OpeningScene());    // ÃÊ±âÈ­¸é ¼³Á¤
+
+    SceneManager::getInstance().changeScene(new OpeningScene());    // ì´ˆê¸°í™”ë©´ ì„¤ì •
+
 }
 
 void GameManager::update() { 
