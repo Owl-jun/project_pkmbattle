@@ -4,7 +4,6 @@
 #include "SceneManager.hpp"
 #include "OpeningScene.hpp"
 #include "TimeManager.hpp"
-
 #include "endingScene.hpp"
 
 GameManager::GameManager()
@@ -25,7 +24,7 @@ sf::RenderWindow& GameManager::getWindow()
 
 void GameManager::init() {
 
-    SceneManager::getInstance().changeScene(new OpeningScene());    // 초기화면 설정
+    SceneManager::getInstance().changeScene(new endingScene());    // 초기화면 설정
 
 }
 

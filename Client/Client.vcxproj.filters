@@ -18,6 +18,9 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="fix.cpp" />
+    <ClCompile Include="endingScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="assets">
@@ -97,8 +100,6 @@
     <ClInclude Include="OpeningScene.hpp">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="endingScene.hpp">
-      <Filter>Scenes</Filter>
-    </ClInclude>
+    <ClInclude Include="testScene.hpp" />
   </ItemGroup>
 </Project>

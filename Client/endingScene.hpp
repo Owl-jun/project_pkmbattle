@@ -29,7 +29,8 @@ private:
 
 public:
     endingScene()
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSK.TTF"){}
+        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSK.TTF") {
+    }
     void init() override {
         std::vector<std::wstring> lines = {
             L"Thanks for playing !",
@@ -77,7 +78,7 @@ public:
         };
 
         float currentY = yOffset;
-        
+
         for (size_t i = 0; i < lines.size(); ++i) {
             unsigned int size = (i < sizes.size()) ? sizes[i] : 24;
 
@@ -86,7 +87,7 @@ public:
 
             // 텍스트 가로 길이를 가져와서 가운데 정렬
             sf::FloatRect textBounds = text.getLocalBounds();
-            float centerX = ( 800.f - textBounds.size.x ) / 2.f; // 800은 화면 가로 너비
+            float centerX = (800.f - textBounds.size.x) / 2.f; // 800은 화면 가로 너비
             text.setPosition({ centerX, currentY });
 
             currentY += spacing;
@@ -94,11 +95,11 @@ public:
 
         }
 
-        // 애니메이션 이미지 로딩
-        hoculman = new AnimatedObject("C:/Source/project_pkmbattle/Client/assets/HoCulman.png", { 300.f, 550.f });
-        hoculman->setScale({ 2.f, 2.f });   // 필요 시 크기 조절
-        hoculman->setAlpha(0);              // 페이드인 시작
-        aniManager.add(hoculman);
+        //// 애니메이션 이미지 로딩
+        //hoculman = new AnimatedObject("C:/Source/project_pkmbattle/Client/assets/HoCulman.png", { 300.f, 550.f });
+        //hoculman->setScale({ 2.f, 2.f });   // 필요 시 크기 조절
+        //hoculman->setAlpha(0);              // 페이드인 시작
+        //aniManager.add(hoculman);
 
     }
 

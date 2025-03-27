@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="endingScene.hpp" />
     <ClCompile Include="fix.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="KeyManager.cpp" />

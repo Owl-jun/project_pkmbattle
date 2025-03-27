@@ -11,6 +11,7 @@
 #include "UITextBox.hpp"
 #include "UIManager.hpp"
 #include "Player.h"
+#include "GameManager.h"
 
 class LoginScene : public BaseScene {
 private:
