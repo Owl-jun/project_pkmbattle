@@ -8,7 +8,7 @@ private:
     std::vector<std::function<void(AnimatedObject&, float)>> updateFuncs;
 
 public:
-    void add(const AnimatedObject obj, std::function<void(AnimatedObject&, float)> updateFunc) {
+    void add(const AnimatedObject obj, std::function<void(AnimatedObject&, float)> updateFunc = nullptr) {
         objects.push_back(obj);
         updateFuncs.push_back(updateFunc);
     }

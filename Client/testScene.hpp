@@ -38,7 +38,13 @@ public:
             }
         );
 
+        AnimatedObject testImage(
+            "C:/Source/project_pkmbattle/Client/fonts/logo.png"
+            , { 10.f, 20.f }
+        );
+
         uiManager.addElement(&testButton);
+        aniManager.add(testImage);
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
