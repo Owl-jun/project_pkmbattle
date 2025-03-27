@@ -1,6 +1,15 @@
 # project_pkmbattle
 부경대학교 IOT 개발자과정 강황석준조 미니프로젝트 저장소
 
+## 2일차
+
+프토토타입 영상
+
+
+https://github.com/user-attachments/assets/6f484d2f-1846-4297-bd3e-3b4b2f093bc3
+
+
+
 ## 1일차
 
 프로토타입 영상
