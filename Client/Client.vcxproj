@@ -153,7 +153,9 @@
     <ClInclude Include="OpeningScene.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="endingScene.hpp" />
+    <ClInclude Include="testScene.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="TimeManager.hpp" />
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UIButton.hpp" />

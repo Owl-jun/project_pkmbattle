@@ -6,6 +6,7 @@
 #include "LoginScene.hpp"
 #include "UIButton.hpp"
 #include "UIManager.hpp"
+#include "TimeManager.hpp"
 #include "Player.h"
 
 class worldScene : public BaseScene {
@@ -13,6 +14,7 @@ private:
     sf::Font font;
     sf::Text title;
     UIManager uiManager;
+    Player player;
 
 public:
     worldScene() 
@@ -27,14 +29,14 @@ public:
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
-
     }
 
     void update(sf::RenderWindow& window) override {
-
+        player.update(TimeManager::getInstance().getDeltaTime());
     }
 
     void render(sf::RenderWindow& window) override {
+        player.draw(window);
         window.draw(title);
     }
 };

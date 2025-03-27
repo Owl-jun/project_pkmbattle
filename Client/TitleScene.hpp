@@ -38,6 +38,8 @@ public:
         AnimatedObject bird("C:/Source/project_pkmbattle/Client/assets/introbird.png",
             {windowSize.x/2, windowSize.y/2}, 
             850.f,
+            0.f,
+            255.f,
             50.f,
             7.f
         );
@@ -46,12 +48,12 @@ public:
 
         AnimatedObject text1("C:/Source/project_pkmbattle/Client/assets/kstext.png",
             { windowSize.x/2.f, 36 },
-            100.f, 0.f, 0.f, 1
+            100.f, 0.f, 255.f, 0.f,0.f,1
         );
 
         AnimatedObject text2("C:/Source/project_pkmbattle/Client/assets/hjtext.png",
             { windowSize.x / 2.f, 89 },
-            100.f, 0.f, 0.f, -1
+            100.f, 0.f, 255.f,0.f,0.f, -1
         );
 
         text1.setScale({ 0.2,0.2 });

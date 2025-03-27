@@ -46,6 +46,11 @@ public:
                     if (onClick) onClick();
             }
         }
+        if (event.is<sf::Event::KeyPressed>()) {
+            if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Enter)) {
+                if (onClick) onClick();
+            }
+        }
     }
 
     void update(sf::RenderWindow& window) override {

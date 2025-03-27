@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "KeyManager.h"
 
-#include "pch.h"
-#include "KeyManager.h"
 
 KeyManager& KeyManager::getInstance() {
     static KeyManager instance;

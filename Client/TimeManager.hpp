@@ -5,6 +5,7 @@ class TimeManager {
 private:
     sf::Clock clock;
     float deltaTime = 0.f;
+    const float targetFrameTime = 1.f / 15.f; // 15FRAME
     TimeManager() = default;
 
 public:
@@ -13,9 +14,21 @@ public:
         return instance;
     }
 
-    void update() {
-        deltaTime = clock.restart().asSeconds();
+    void tick() {
+        float frameStart = clock.getElapsedTime().asSeconds();
+        deltaTime = targetFrameTime;
+
+        float elapsed = clock.getElapsedTime().asSeconds() - frameStart;
+        float sleepTime = targetFrameTime - elapsed;
+        if (sleepTime > 0.f)
+            sf::sleep(sf::seconds(sleepTime));
+
+        clock.restart();
     }
+
+    //void update() {
+    //    deltaTime = clock.restart().asSeconds();
+    //}
 
     float getDeltaTime() const {
         return deltaTime;
