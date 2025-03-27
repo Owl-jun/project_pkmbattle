@@ -1,24 +1,23 @@
+// Player.cpp
 #include "pch.h"
 #include "Player.h"
 #include "KeyManager.h"
 #include <cmath>
-#include <iostream>
+
 
 Player::Player() {
     for (int i = 0; i <= 9; ++i) {
         sf::Texture tex;
         std::string path = "C:/Source/project_pkmbattle/Client/assets/player0" + std::to_string(i) + ".png";
-        if (!tex.loadFromFile(path)) {
-            std::cerr << "플레이어 이미지 로딩 실패: " << path << "\n";
-        }
+        tex.loadFromFile(path);
 
-        if (i <= 2) downFrames.push_back(tex);       // 00~02: 아래 걷기
-        else if (i <= 4) leftFrames.push_back(tex);  // 03~04: 왼쪽 걷기
-        else if (i <= 6) rightFrames.push_back(tex); // 05~06: 오른쪽 걷기
-        else upFrames.push_back(tex);                // 07~09: 위쪽 걷기
+        if (i <= 2) downFrames.push_back(tex);
+        else if (i <= 4) leftFrames.push_back(tex);
+        else if (i <= 6) rightFrames.push_back(tex);
+        else upFrames.push_back(tex);
     }
 
-    tilePos = { 5, 5 };
+    tilePos = { 2, 39 };
     targetWorldPos = sf::Vector2f(tilePos.x * tileSize, tilePos.y * tileSize);
 
     if (!downFrames.empty()) {
@@ -28,7 +27,31 @@ Player::Player() {
     }
 }
 
+void Player::setCollisionMap(std::vector<std::vector<int>>* map) {
+    collisionMap = map;
+}
+
+bool Player::canMoveTo(Direction dir) {
+    if (!collisionMap) return true;
+
+    sf::Vector2i nextTile = tilePos;
+    switch (dir) {
+    case Direction::Up:    nextTile.y -= 1; break;
+    case Direction::Down:  nextTile.y += 1; break;
+    case Direction::Left:  nextTile.x -= 1; break;
+    case Direction::Right: nextTile.x += 1; break;
+    default: return false;
+    }
+
+    if (nextTile.y < 0 || nextTile.y >= collisionMap->size()) return false;
+    if (nextTile.x < 0 || nextTile.x >= (*collisionMap)[0].size()) return false;
+
+    return (*collisionMap)[nextTile.y][nextTile.x] == 0;
+}
+
 void Player::tryMoveInDirection(Direction dir) {
+    if (!canMoveTo(dir)) return;
+
     currentDirection = dir;
     sf::Vector2i offset{ 0, 0 };
 
@@ -70,11 +93,12 @@ void Player::update(float dt) {
             isMoving = false;
 
             const auto& keyMgr = KeyManager::getInstance();
-            if (lastHeldDirection != Direction::None && keyMgr.isKeyPressed(getSfmlKey(lastHeldDirection))) {
+            if (lastHeldDirection != Direction::None &&
+                keyMgr.isKeyPressed(getSfmlKey(lastHeldDirection)) &&
+                canMoveTo(lastHeldDirection)) {
                 tryMoveInDirection(lastHeldDirection);
             }
         }
-
         else {
             sf::Vector2f norm = normalize(dir);
             sprite->move(norm * dist);
@@ -91,31 +115,21 @@ void Player::update(float dt) {
     else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right))  lastHeldDirection = Direction::Right;
     else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))     lastHeldDirection = Direction::Up;
     else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))   lastHeldDirection = Direction::Down;
-    else lastHeldDirection = Direction::None;
 
     if (lastHeldDirection != Direction::None) {
         currentDirection = lastHeldDirection;
-        sf::Vector2i offset{ 0, 0 };
 
-        switch (lastHeldDirection) {
-        case Direction::Up:    offset.y = -1; break;
-        case Direction::Down:  offset.y = 1; break;
-        case Direction::Left:  offset.x = -1; break;
-        case Direction::Right: offset.x = 1; break;
-        default: break;
+        if (canMoveTo(lastHeldDirection)) {
+            tryMoveInDirection(lastHeldDirection);
         }
-
-        tilePos += offset;
-        targetWorldPos = sf::Vector2f(tilePos.x * tileSize, tilePos.y * tileSize);
-        isMoving = true;
-        currentFrame = 0;
-        elapsedTime = 0.f;
-    }
-    else {
-        currentFrame = 0;
-        updateSpriteTexture();
+        else {
+            // 이동 불가능할 경우 방향만 전환
+            currentFrame = 0;
+            updateSpriteTexture();
+        }
     }
 }
+
 
 void Player::draw(sf::RenderWindow& window) {
     if (sprite.has_value())

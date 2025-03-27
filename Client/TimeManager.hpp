@@ -5,7 +5,7 @@ class TimeManager {
 private:
     sf::Clock clock;
     float deltaTime = 0.f;
-    const float targetFrameTime = 1.f / 15.f; // 15FRAME
+    const float targetFrameTime = 1.f / 30.f; // FRAME
     TimeManager() = default;
 
 public:
