@@ -20,6 +20,19 @@
 - 그 후 다른 기능 작업시 새로 branch 생성 후 작업합니다.
    
 
+## 3일차
+
+- 서버연동하여 소켓을 통한 로그인 체크로직 구현 (Asio)
+
+- 사운드 on/off UI 기능 구현
+
+- 게임 도중 `ESC` 키로 환경설정 ON/OFF , 환경설정 UI 구현중
+
+<img src="./개발일지소스/mute.png" width=300>
+<img src="./개발일지소스/un_mute.png" width=300>
+<img src="./개발일지소스/overlayUI.png" width=300>
+
+
 ## 2일차
 
 프토토타입 영상
