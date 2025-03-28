@@ -24,6 +24,9 @@
     <ClCompile Include="NetworkManager.cpp">
       <Filter>NetworkManager</Filter>
     </ClCompile>
+    <ClCompile Include="endingScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="assets">
