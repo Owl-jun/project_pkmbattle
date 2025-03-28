@@ -4,6 +4,7 @@
 class SoundManager {
 private:
     sf::Music music;    // 멤버
+    float volume = 50.f;
 
     // 싱글톤패턴
     SoundManager() = default;
@@ -18,7 +19,7 @@ public:
     }
 
     // 경로를 받아서 노래 틀어주는 함수
-    bool playMusic(const std::string& path, float volume = 50.f, bool loop = true) {
+    bool playMusic(const std::string& path, bool loop = true) {
         if (!music.openFromFile(path)) {
             std::cerr << "[SoundManager] Failed to load music: " << path << std::endl;
             return false;
@@ -31,6 +32,8 @@ public:
         music.play();
         return true;
     }
+
+    float getVolume() { return volume; }
 
     // 노래끄기기능
     void stopMusic() {
@@ -49,7 +52,12 @@ public:
     }
 
     // 볼륨조절기능
-    void setVolume(float volume) {
+    void setVolume(bool updown) {
+        if (volume >= 0 && volume <= 100) {
+            if (updown) { volume += 5; }
+            else { volume -= 5;}
+        }
+        else { return; }
         music.setVolume(volume);
     }
 

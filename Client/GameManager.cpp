@@ -5,13 +5,16 @@
 #include "OpeningScene.hpp"
 #include "TitleScene.hpp"
 #include "worldScene.hpp"
+#include "LoginScene.hpp"
 #include "OpeningScene.hpp"
 #include "TimeManager.hpp"
 #include "ResourceManager.hpp"
 #include "SoundManager.hpp"
+#include "NetworkManager.hpp"
 
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
+    , muteControl({ 720,500 })
 {
 }
 
@@ -45,10 +48,12 @@ void GameManager::init() {
 void GameManager::update() { 
     TimeManager::getInstance().tick();
     KeyManager::getInstance().update();
+    muteControl.update(window);
     while (const std::optional<sf::Event> event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>())
             window.close();
         KeyManager::getInstance().handleEvent(*event);
+        muteControl.handleEvent(*event,window);
         SceneManager::getInstance().handleInput(*event, window);
     }
     SceneManager::getInstance().update(window);
@@ -57,6 +62,7 @@ void GameManager::update() {
 void GameManager::render() {  
     window.clear();
     SceneManager::getInstance().render(window);
+    muteControl.render(window);
     window.display();
 }
 

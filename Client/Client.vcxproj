@@ -167,6 +167,7 @@
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UIButton.hpp" />
     <ClInclude Include="UIManager.hpp" />
+    <ClInclude Include="UImuteControl.hpp" />
     <ClInclude Include="UITextBox.hpp" />
     <ClInclude Include="worldScene.hpp" />
   </ItemGroup>

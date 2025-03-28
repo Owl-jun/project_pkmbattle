@@ -130,5 +130,8 @@
     <ClInclude Include="NetworkManager.hpp">
       <Filter>NetworkManager</Filter>
     </ClInclude>
+    <ClInclude Include="UImuteControl.hpp">
+      <Filter>UIManager</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

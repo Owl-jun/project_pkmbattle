@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "BaseUI.hpp"
 #include "KeyManager.h"
+#include "UImuteControl.hpp"
 #include <functional>
 
 class SettingsOverlay {
@@ -9,7 +10,6 @@ private:
     sf::RectangleShape background;
     sf::Text title;
     sf::Font font;
-
     std::vector<std::unique_ptr<BaseUI>> uiElements;
     bool visible = false;
 
@@ -44,8 +44,10 @@ public:
                 this->toggle();                  // SettingsOverlay 닫기
             }
         );
-        addElement(exitButton);
         /*----------------------------------------------------------------------*/
+        auto muteControl = new UImuteControl({ 720,10.f });
+        addElement(exitButton);
+        addElement(std::move(muteControl));
     }
 
     void toggle() {
@@ -59,21 +61,24 @@ public:
     void setCenter(const sf::Vector2f& center) {
         background.setPosition({ center - background.getSize() / 2.f });
         title.setPosition({ center.x - title.getLocalBounds().size.x / 2.f, center.y - background.getSize().y / 2.f + 20.f });
-        // 이후 버튼, 텍스트박스 등도 center 기준으로 조절
-        /*김찬수*/
-        /*----------------------------------------------------------------------*/
+
         for (auto& ui : uiElements) {
-            auto* exit = dynamic_cast<UIButton*>(ui.get());
-            if (exit) {
-                // 예시: 버튼을 오버레이 화면의 오른쪽 하단에 배치 (10px 여백)
+            if (auto* exit = dynamic_cast<UIButton*>(ui.get())) {
                 exit->setPosition({
-                    center.x + background.getSize().x / 2.f - exit->getSize().x - 10.f,  // 오른쪽 끝에서 10px 여백
-                    center.y + background.getSize().y / 2.f - exit->getSize().y - 10.f   // 아래쪽 끝에서 10px 여백
+                    center.x + background.getSize().x / 2.f - exit->getSize().x - 10.f,
+                    center.y + background.getSize().y / 2.f - exit->getSize().y - 10.f
+                    });
+            }
+
+            else if (auto* mute = dynamic_cast<UImuteControl*>(ui.get())) {
+                mute->setPosition({
+                    center.x + background.getSize().x / 2.f - 60.f,  // 아이콘 너비 고려해서 오른쪽 끝에서 살짝 안쪽
+                    center.y - background.getSize().y / 2.f  
                     });
             }
         }
-        /*----------------------------------------------------------------------*/
     }
+
 
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
@@ -97,7 +102,7 @@ public:
     }
 
     void addElement(BaseUI* ui) {
-        uiElements.emplace_back(ui);
+        uiElements.emplace_back(std::move(ui));
     }
 
     void clear() {

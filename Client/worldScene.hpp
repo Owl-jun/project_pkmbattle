@@ -31,7 +31,7 @@ public:
         , deltatime("0")
         , frame(font, deltatime, 24)
         , player(GameManager::getInstance().getPlayer())
-        , settings({800.f,600.f},font)
+        , settings({800.f,600.f},ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
     {
     }
 
