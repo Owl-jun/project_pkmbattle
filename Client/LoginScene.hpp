@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
-#include "SceneManager.h"
+#include "SceneManager.hpp"
 #include "LoginScene.hpp"
 #include "worldScene.hpp"
 #include "AnimatedObject.hpp"
@@ -11,7 +11,9 @@
 #include "UITextBox.hpp"
 #include "UIManager.hpp"
 #include "Player.h"
-#include "GameManager.h"
+#include "ResourceManager.hpp"
+#include "NetworkManager.hpp"
+
 
 class LoginScene : public BaseScene {
 private:
@@ -28,14 +30,15 @@ private:
     UITextBox* pwBox = nullptr;
 
 public:
-    LoginScene() 
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF")
-        , id(font, "ID", 30) 
-        , pswd(font,"PASSWORD",30) 
-    {}
+    LoginScene()
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
+        , id(font, "ID", 30)
+        , pswd(font, "PASSWORD", 30)
+    {
+    }
 
     void init() override {
-        bgTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/introbg.png");
+        bgTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/introbg.png");
         bgtextureSize = static_cast<sf::Vector2f>(bgTex.getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         bg.emplace(bgTex);
@@ -62,35 +65,48 @@ public:
         uiManager.addElement(idBox);
         uiManager.addElement(pwBox);
         
+        // 로그인 로직
         uiManager.addElement(new UIButton(
             { 505.f, 300.f },
             { 150.f, 56.f },
             "LOGIN",
-            sf::Color::White,
+            sf::Color::Color(0,0,0,20),
             font,
-            [this]() { 
+            [this]() {
                 std::string id = idBox->getInput();
                 std::string pw = pwBox->getInput();
-                id.erase(remove(id.begin(), id.end(),' '),id.end());
-                id.erase(remove(id.begin(), id.end(),'\t'),id.end());
-                id.erase(remove(id.begin(), id.end(),'\n'),id.end());
-                pw.erase(remove(pw.begin(), pw.end(),' '),pw.end());
-                pw.erase(remove(pw.begin(), pw.end(),'\t'),pw.end());
-                pw.erase(remove(pw.begin(), pw.end(),'\n'),pw.end());
+
+                auto clean = [](const std::string& str) {
+                    std::string result;
+                    for (char c : str) {
+                        if (!isspace(static_cast<unsigned char>(c)))
+                            result += c;
+                    }
+                    return result;
+                    };
+
+                id = clean(id);
+                pw = clean(pw);
+
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
-                if (id == "admin" && pw == "1234") {
-                    SceneManager::getInstance().changeScene(new worldScene());
+                std::string msg = id + "|" + pw + "\n";
+
+                NetworkManager::getInstance().send(msg);
+                std::string response = NetworkManager::getInstance().receive();
+                if (response == "TRUE") {
+                    std::cout << "login complete!\n";
+                    SceneManager::getInstance().changeScene("world");
                 }
                 else {
-                    std::cerr << "�α��� ����!\n";
+                    std::cout << "login failed!\n";
                 }
             }
         ));
-        
+
         AnimatedObject Seokjun(
             "C:/Source/project_pkmbattle/Client/assets/seokjun.png",
-            { 700, 100 }, 20.f, 0.f, 255.f , 1.f , 2.f , -1
+            { 700, 100 }, 20.f, 0.f, 255.f, 1.f, 2.f, -1
         );
         Seokjun.setScale({ 2.f,2.f });
         aniManager.add(Seokjun, [](AnimatedObject& obj, float dt) {
@@ -104,11 +120,15 @@ public:
         gugu.setScale({ 1.1f,1.1f });
         aniManager.add(gugu, [](AnimatedObject& obj, float dt) {
             obj.move(dt, 800.f);
-        });
+            });
 
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        // 서버연결없이 테스트용
+        if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::F5)) {
+            SceneManager::getInstance().changeScene("world");
+        }
         uiManager.handleEvent(event, window);
     }
 

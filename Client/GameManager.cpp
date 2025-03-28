@@ -3,15 +3,22 @@
 #include "KeyManager.h"
 #include "SceneManager.hpp"
 #include "OpeningScene.hpp"
+#include "TitleScene.hpp"
+#include "worldScene.hpp"
+#include "OpeningScene.hpp"
 #include "TimeManager.hpp"
-#include "endingScene.hpp"
+#include "ResourceManager.hpp"
+#include "SoundManager.hpp"
 
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // ìœˆë„ìš° íƒ€ì´í‹€ ë° í•´ìƒë„ì„¤ì •
+    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // À©µµ¿ì Å¸ÀÌÆ² ¹× ÇØ»óµµ¼³Á¤
 {
 }
 
-// ì‹±ê¸€í†¤
+Player& GameManager::getPlayer() {
+    return *player;
+}
+
 GameManager& GameManager::getInstance() {
     static GameManager instance;
     return instance;
@@ -23,9 +30,16 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-
-    SceneManager::getInstance().changeScene(new endingScene());    // ì´ˆê¸°í™”ë©´ ì„¤ì •
-
+    NetworkManager::getInstance();
+    //NetworkManager::getInstance().connect("210.119.12.77", "9000");   // ¿¬°á¹®Á¦ ÇØ°áµÇ¸é ÁÖ¼®ÇØÁ¦
+    SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // »ç¿îµå¸Å´ÏÀú
+    ResourceManager::getInstance().init();
+    player = std::make_unique<Player>();
+    SceneManager::getInstance().registerScene("opening", new OpeningScene());
+    SceneManager::getInstance().registerScene("title", new TitleScene());
+    SceneManager::getInstance().registerScene("login", new LoginScene());
+    SceneManager::getInstance().registerScene("world", new worldScene());
+    SceneManager::getInstance().changeScene("opening");    // ÃÊ±âÈ­¸é ¼³Á¤
 }
 
 void GameManager::update() { 

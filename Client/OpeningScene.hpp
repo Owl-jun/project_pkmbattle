@@ -3,9 +3,11 @@
 #include "KeyManager.h"
 #include "BaseScene.hpp"
 #include "TitleScene.hpp"
-#include "SceneManager.h"
+#include "SceneManager.hpp"
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
+#include "ResourceManager.hpp"
+
 
 class OpeningScene : public BaseScene {
 private:
@@ -17,7 +19,7 @@ private:
     
 public:
     OpeningScene()
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF")
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , text(font,"SKIP : ESC", 24)
     {};
 
@@ -89,14 +91,14 @@ public:
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
         if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Escape)) {
-            SceneManager::getInstance().changeScene(new TitleScene());
+            SceneManager::getInstance().changeScene("title");
         }
     }
 
     void update(sf::RenderWindow& window) override {
         bool shouldChange = aniManager.updateAll(TimeManager::getInstance().getDeltaTime());
         if (shouldChange) {
-            SceneManager::getInstance().changeScene(new TitleScene());
+            SceneManager::getInstance().changeScene("title");
         }
     }
 

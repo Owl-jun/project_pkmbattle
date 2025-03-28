@@ -1,13 +1,13 @@
 #pragma once
 #include "TimeManager.hpp"
+#include "ResourceManager.hpp"
 
 #include "pch.h"
 #include <cmath>
 #include <functional>
-
 class AnimatedObject {
 private:
-    std::shared_ptr<sf::Texture> texture;
+    const sf::Texture* texture = nullptr;
     std::optional<sf::Sprite> sprite;
     sf::Vector2f basePos;
     float time = 0.f;
@@ -45,10 +45,7 @@ public:
         , direction(dir)
         , fadingIn(true)
     {
-        texture = std::make_shared<sf::Texture>();
-        if (!texture->loadFromFile(texPath)) {
-            std::cerr << "이미지 로딩 실패: " << texPath << "\n";
-        }
+        texture = &ResourceManager::getInstance().getTexture(texPath);
         sprite.emplace(*texture);
         sprite->setPosition(pos);
         sprite->setColor(sf::Color(255, 255, 255, alpha));

@@ -2,12 +2,14 @@
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
-#include "SceneManager.h"
+#include "SceneManager.hpp"
 #include "LoginScene.hpp"
 #include "UIButton.hpp"
 #include "UIManager.hpp"
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
+#include "ResourceManager.hpp"
+
 
 class TitleScene : public BaseScene {
 private:
@@ -21,14 +23,12 @@ private:
 
 public:
     TitleScene() 
-        : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.ttf")
+        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
     {
     }
 
     void init() override {
-        if (!backgroundTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/introbg.png")) {
-            std::cerr << "배경 이미지 로딩 실패!\n";
-        }
+        backgroundTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/introbg.png");
         bgtextureSize = static_cast<sf::Vector2f>(backgroundTex.getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         background.emplace(backgroundTex);
@@ -83,7 +83,7 @@ public:
             "START",            // 버튼 텍스트
             sf::Color(0,0,0,0),   // 버튼 색
             font,
-            []() { SceneManager::getInstance().changeScene(new LoginScene()); } // command
+            []() { SceneManager::getInstance().changeScene("login"); } // command
         ));
 
     }
