@@ -138,6 +138,7 @@
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NetworkManager.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LoginScene.hpp" />
+    <ClInclude Include="NetworkManager.hpp" />
     <ClInclude Include="OpeningScene.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />

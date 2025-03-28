@@ -21,6 +21,9 @@
     <ClCompile Include="SceneManager.hpp">
       <Filter>Scenes\manage</Filter>
     </ClCompile>
+    <ClCompile Include="NetworkManager.cpp">
+      <Filter>NetworkManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="assets">
@@ -58,6 +61,9 @@
     </Filter>
     <Filter Include="UIManager\Overlays">
       <UniqueIdentifier>{b7ebb9e8-cb78-4aa5-b676-76ae4d093509}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetworkManager">
+      <UniqueIdentifier>{576055e2-92af-4140-b9db-9e0cb3f700a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -120,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="SettingsOverlay.hpp">
       <Filter>UIManager\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkManager.hpp">
+      <Filter>NetworkManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
