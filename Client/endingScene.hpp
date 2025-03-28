@@ -21,7 +21,7 @@ class endingScene : public BaseScene {
 private:
     sf::Font font;
     std::vector<sf::Text> credits;
-    float scrollSpeed = 40.0f; // 픽셀/초
+    float scrollSpeed = 30.0f; // 픽셀/초
     float yOffset = 600.f;     // 시작 위치
     float spacing = 50.f;      // 줄 사이 간격
 
@@ -95,22 +95,82 @@ public:
 
         }
 
-        // HoCulman 애니메이션 등록 (값 복사 방식)
+        // 첫 번째 애니메이션: HoCulman
         AnimatedObject hoculman(
             "C:/Source/project_pkmbattle/Client/assets/HoCulman.png",
             sf::Vector2f(300.f, 500.f),
-            20.f // fade-in 속도
+            20.f
         );
         hoculman.setScale({ 2.f, 2.f });
 
         aniManager.add(hoculman, [this](AnimatedObject& obj, float dt) {
             obj.fadein(dt);
-
             auto pos = obj.getSprite().getPosition();
             pos.y -= scrollSpeed * dt;
             obj.setPosition(pos);
             });
 
+        // 두 번째 애니메이션: CreditsDoll (예시)
+        AnimatedObject doll(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon.png",
+            sf::Vector2f(50.f, 700.f),  // 등장 위치 조절 가능
+            20.f
+        );
+        doll.setScale({ 2.f, 2.f });
+
+        aniManager.add(doll, [this](AnimatedObject& obj, float dt) {
+            static float delay = 4.0f; // HoCulman이 먼저 나오게 약간의 지연
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
+        // 세 번째 애니메이션
+        AnimatedObject doll2(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon2.png",
+            sf::Vector2f(330.f, 700.f),  // 등장 위치 조절 가능
+            20.f
+        );
+        doll2.setScale({ 2.f, 2.f });
+
+        aniManager.add(doll2, [this](AnimatedObject& obj, float dt) {
+            static float delay = 10.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
+
+        // 네번째 이미지
+        AnimatedObject doll3(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon3.png",
+            sf::Vector2f(50.f, 700.f),
+            20.f
+        );
+        doll3.setScale({ 2.f, 2.f });
+
+        aniManager.add(doll3, [this](AnimatedObject& obj, float dt) {
+            static float delay = 18.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
