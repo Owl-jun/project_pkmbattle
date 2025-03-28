@@ -34,6 +34,24 @@ public:
         );
     }
 
+    /*김찬수*/
+    /*----------------------------------------------------------------------*/
+    sf::Vector2f getSize() const {
+        return shape.getSize();
+    }
+
+    // setPosition 메서드 추가
+    void setPosition(const sf::Vector2f& position) {
+        shape.setPosition(position);
+        // 텍스트 위치 갱신
+        text.setPosition(
+            { shape.getPosition().x + shape.getSize().x / 2.f,
+            shape.getPosition().y + shape.getSize().y / 2.f }
+        );
+
+    }
+    /*----------------------------------------------------------------------*/
+
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) override {
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
         sf::Vector2f mousePos = window.mapPixelToCoords(pixelPos);
