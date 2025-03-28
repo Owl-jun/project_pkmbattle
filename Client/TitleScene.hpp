@@ -28,9 +28,7 @@ public:
     }
 
     void init() override {
-        if (!backgroundTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/introbg.png")) {
-            std::cerr << "배경 이미지 로딩 실패!\n";
-        }
+        backgroundTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/introbg.png");
         bgtextureSize = static_cast<sf::Vector2f>(backgroundTex.getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         background.emplace(backgroundTex);
