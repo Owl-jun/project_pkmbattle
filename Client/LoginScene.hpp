@@ -50,8 +50,19 @@ public:
                 pw.erase(remove(pw.begin(), pw.end(),' '),pw.end());
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
+<<<<<<< Updated upstream
                 if (id == "admin" && pw == "1234") {
                     SceneManager::getInstance().changeScene(new worldScene());
+=======
+                std::string msg = id + "|" + pw + "\n";
+
+                //NetworkManager::getInstance().connect("210.119.12.77", "9000");
+                NetworkManager::getInstance().send(msg);
+                std::string response = NetworkManager::getInstance().receive();
+                if (response == "TRUE") {
+                    std::cout << "login complete!\n";
+                    SceneManager::getInstance().changeScene("world");
+>>>>>>> Stashed changes
                 }
                 else {
                     std::cerr << "로그인 실패!\n";

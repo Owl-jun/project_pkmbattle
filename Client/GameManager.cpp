@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "GameManager.h"
 #include "KeyManager.h"
 #include "SceneManager.hpp"
@@ -6,7 +6,7 @@
 #include "TimeManager.hpp"
 
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // ������ Ÿ��Ʋ �� �ػ󵵼���
+    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
 {
 }
 
@@ -22,7 +22,20 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
+<<<<<<< Updated upstream
     SceneManager::getInstance().changeScene(new OpeningScene());
+=======
+    NetworkManager::getInstance();
+    NetworkManager::getInstance().connect("210.119.12.77", "9000");   // 연결문제 해결되면 주석해제
+    SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // 사운드매니저
+    ResourceManager::getInstance().init();
+    player = std::make_unique<Player>();
+    SceneManager::getInstance().registerScene("opening", new OpeningScene());
+    SceneManager::getInstance().registerScene("title", new TitleScene());
+    SceneManager::getInstance().registerScene("login", new LoginScene());
+    SceneManager::getInstance().registerScene("world", new worldScene());
+    SceneManager::getInstance().changeScene("opening");    // 초기화면 설정
+>>>>>>> Stashed changes
 }
 
 void GameManager::update() { 
