@@ -61,7 +61,7 @@ public:
             { 200.f, 28.f },
             font
         );
-
+        idBox->setFocus(true);
         uiManager.addElement(idBox);
         uiManager.addElement(pwBox);
         

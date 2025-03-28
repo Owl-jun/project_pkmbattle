@@ -22,10 +22,20 @@ public:
 
     void registerScene(const std::string& key, BaseScene* scene) {
         scenes[key] = scene;
+        scene->init();
     }
 
     void changeScene(const std::string& key) {
         pendingSceneKey = key;
+    }
+
+    BaseScene* getScene(const std::string& key) {
+        auto it = scenes.find(key);
+        return (it != scenes.end()) ? it->second : nullptr;
+    }
+
+    BaseScene* getCurScene() {
+        return currentScene;
     }
 
     void applyPendingScene() {
@@ -33,9 +43,7 @@ public:
             auto it = scenes.find(pendingSceneKey);
             if (it != scenes.end()) {
                 currentScene = it->second;
-                currentScene->init();  // 필요 없으면 제거 가능
             }
-            pendingSceneKey.clear();
         }
     }
 

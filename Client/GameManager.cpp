@@ -34,7 +34,7 @@ sf::RenderWindow& GameManager::getWindow()
 
 void GameManager::init() {
     NetworkManager::getInstance();
-    //NetworkManager::getInstance().connect("210.119.12.77", "9000");   // 연결문제 해결되면 주석해제
+    NetworkManager::getInstance().connect("localhost", "9000");   // 연결문제 해결되면 주석해제
     SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // 사운드매니저
     ResourceManager::getInstance().init();
     player = std::make_unique<Player>();
@@ -62,7 +62,10 @@ void GameManager::update() {
 void GameManager::render() {  
     window.clear();
     SceneManager::getInstance().render(window);
-    muteControl.render(window);
+    if (!(SceneManager::getInstance().getCurScene() == SceneManager::getInstance().getScene("world")))
+    {
+        muteControl.render(window);
+    }
     window.display();
 }
 

@@ -33,14 +33,13 @@ public:
 
     void setPosition(const sf::Vector2f& pos);
     sf::Vector2f getPosition() const;
-    void setCollisionMap(std::vector<std::vector<int>>* map);
-    sf::Keyboard::Key getSfmlKey(Direction dir) const;
+    void setTargetTilePosition(const sf::Vector2i& pos);
+    void sendDirectionToServer(Direction dir);
     sf::Vector2f normalize(const sf::Vector2f& v);
 
 private:
     void animate(float dt);
     void updateSpriteTexture();
     std::vector<sf::Texture>* getCurrentFrameSet();
-    void tryMoveInDirection(Direction dir);
-    bool canMoveTo(Direction dir);
+
 };

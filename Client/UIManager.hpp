@@ -17,7 +17,6 @@ public:
             focusStep(shiftHeld ? -1 : 1);  // shift 누르면 역방향
             return;
         }
-
         for (auto& elem : uiElements)
             elem->handleEvent(event, window);
     }
