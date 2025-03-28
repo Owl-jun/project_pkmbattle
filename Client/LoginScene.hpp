@@ -1,4 +1,4 @@
-#pragma once
+癤�#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
@@ -12,6 +12,7 @@
 #include "UIManager.hpp"
 #include "Player.h"
 #include "ResourceManager.hpp"
+#include "NetworkManager.hpp"
 
 
 class LoginScene : public BaseScene {
@@ -29,11 +30,12 @@ private:
     UITextBox* pwBox = nullptr;
 
 public:
-    LoginScene() 
+    LoginScene()
         : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
-        , id(font, "ID", 30) 
-        , pswd(font,"PASSWORD",30) 
-    {}
+        , id(font, "ID", 30)
+        , pswd(font, "PASSWORD", 30)
+    {
+    }
 
     void init() override {
         bgTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/introbg.png");
@@ -62,43 +64,54 @@ public:
 
         uiManager.addElement(idBox);
         uiManager.addElement(pwBox);
-        
+
         uiManager.addElement(new UIButton(
             { 505.f, 300.f },
             { 150.f, 56.f },
             "LOGIN",
             sf::Color::White,
             font,
-            [this]() { 
+            [this]() {
                 std::string id = idBox->getInput();
                 std::string pw = pwBox->getInput();
-                id.erase(remove(id.begin(), id.end(),' '),id.end());
-                id.erase(remove(id.begin(), id.end(),'\t'),id.end());
-                id.erase(remove(id.begin(), id.end(),'\n'),id.end());
-                pw.erase(remove(pw.begin(), pw.end(),' '),pw.end());
-                pw.erase(remove(pw.begin(), pw.end(),'\t'),pw.end());
-                pw.erase(remove(pw.begin(), pw.end(),'\n'),pw.end());
+
+                auto clean = [](const std::string& str) {
+                    std::string result;
+                    for (char c : str) {
+                        if (!isspace(static_cast<unsigned char>(c)))
+                            result += c;
+                    }
+                    return result;
+                    };
+
+                id = clean(id);
+                pw = clean(pw);
+
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
-                // DB 연동 ---------------------------------------
-                // DB 연동 ---------------------------------------
-                // DB 연동 ---------------------------------------
-                if (id == "admin" && pw == "1234") {
+                std::string msg = id + "|" + pw + "\n";
+
+
+                NetworkManager::getInstance().connect("210.119.12.77", "9000");
+                NetworkManager::getInstance().send(msg);
+                std::string response = NetworkManager::getInstance().receive();
+                if (response == "TRUE") {
+                    std::cout << "login complete!\n";
                     SceneManager::getInstance().changeScene("world");
                 }
                 else {
-                    std::cerr << "로그인 실패!\n";
+                    std::cout << "login failed!\n";
                 }
-                // DB 연동 ---------------------------------------
-                // DB 연동 ---------------------------------------
-                // DB 연동 ---------------------------------------
+
+                // ~~~
+
 
             }
         ));
-        
+
         AnimatedObject Seokjun(
             "C:/Source/project_pkmbattle/Client/assets/seokjun.png",
-            { 700, 100 }, 20.f, 0.f, 255.f , 1.f , 2.f , -1
+            { 700, 100 }, 20.f, 0.f, 255.f, 1.f, 2.f, -1
         );
         Seokjun.setScale({ 2.f,2.f });
         aniManager.add(Seokjun, [](AnimatedObject& obj, float dt) {
@@ -112,7 +125,7 @@ public:
         gugu.setScale({ 1.1f,1.1f });
         aniManager.add(gugu, [](AnimatedObject& obj, float dt) {
             obj.move(dt, 800.f);
-        });
+            });
 
     }
 
