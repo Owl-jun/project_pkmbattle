@@ -53,6 +53,7 @@ https://github.com/user-attachments/assets/87abd840-3464-4a6f-be2d-cfca46fe8132
     .\vcpkg integrate install   ## visual studio 연동
 
     vcpkg install SFML:x64-windows     ## SFML 설치
+    vcpkg install asio.hpp             ## asio 설치
     ```
 
 ## 개요
