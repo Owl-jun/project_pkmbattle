@@ -8,7 +8,6 @@ NetworkManager* NetworkManager::instance = nullptr;
 
 NetworkManager::NetworkManager() {
     socket = std::make_shared<tcp::socket>(io_context);
-    std::cout << "서버 연결 완료\n";
 }
 
 NetworkManager& NetworkManager::getInstance() {
@@ -19,16 +18,24 @@ NetworkManager& NetworkManager::getInstance() {
 }
 
 void NetworkManager::connect(const std::string& ip, const std::string& port) {
-    /*tcp::resolver resolver(io_context);
-    auto endpoints = resolver.resolve(ip, port);
-    asio::connect(*socket, endpoints);
-    std::cout << "서버 연결 완료\n";*/
-
-    socket = std::make_shared<tcp::socket>(io_context); // 소켓 새로 생성
+    socket = std::make_shared<tcp::socket>(io_context);
     tcp::resolver resolver(io_context);
-    auto endpoints = resolver.resolve(ip, port);
-    asio::connect(*socket, endpoints);
+    asio::error_code ec;
+    auto endpoints = resolver.resolve(ip, port, ec);
+    if (ec) {
+        std::cerr << "[Connect Error] resolve 실패: " << ec.message() << "\n";
+        return;
+    }
+
+    asio::connect(*socket, endpoints, ec);
+    if (ec) {
+        std::cerr << "[Connect Error] 연결 실패: " << ec.message() << "\n";
+    }
+    else {
+        std::cout << "[Connect] 서버 연결 성공!\n";
+    }
 }
+
 
 void NetworkManager::send(const std::string& data) {
     asio::write(*socket, asio::buffer(data));

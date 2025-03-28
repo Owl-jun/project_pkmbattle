@@ -39,7 +39,7 @@ public:
         frame.setFont(font);
         frame.setPosition({0.f,10.f});
         frame.setFillColor(sf::Color::White);
-        bgTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/worldMap.png");
+        bgTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/worldMap.png");
         bg.emplace(bgTex);
         bg->setPosition({60.f,60.f});
 

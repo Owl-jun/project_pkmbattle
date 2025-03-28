@@ -38,7 +38,7 @@ public:
     }
 
     void init() override {
-        bgTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/introbg.png");
+        bgTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/introbg.png");
         bgtextureSize = static_cast<sf::Vector2f>(bgTex.getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         bg.emplace(bgTex);
@@ -64,12 +64,13 @@ public:
 
         uiManager.addElement(idBox);
         uiManager.addElement(pwBox);
-
+        
+        // 로그인 로직
         uiManager.addElement(new UIButton(
             { 505.f, 300.f },
             { 150.f, 56.f },
             "LOGIN",
-            sf::Color::White,
+            sf::Color::Color(0,0,0,20),
             font,
             [this]() {
                 std::string id = idBox->getInput();
@@ -91,8 +92,6 @@ public:
 
                 std::string msg = id + "|" + pw + "\n";
 
-
-                NetworkManager::getInstance().connect("210.119.12.77", "9000");
                 NetworkManager::getInstance().send(msg);
                 std::string response = NetworkManager::getInstance().receive();
                 if (response == "TRUE") {
@@ -102,10 +101,6 @@ public:
                 else {
                     std::cout << "login failed!\n";
                 }
-
-                // ~~~
-
-
             }
         ));
 
@@ -130,6 +125,10 @@ public:
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        // 서버연결없이 테스트용
+        if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::F5)) {
+            SceneManager::getInstance().changeScene("world");
+        }
         uiManager.handleEvent(event, window);
     }
 
