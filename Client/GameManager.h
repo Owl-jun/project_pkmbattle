@@ -5,13 +5,14 @@
 class GameManager {
 private:
     sf::RenderWindow window;
-    Player player;
+    std::unique_ptr<Player> player;
 
     GameManager();
     GameManager(const GameManager&) = delete;
     GameManager& operator=(const GameManager&) = delete;
 
 public:
+    Player& getPlayer();
     static GameManager& getInstance();
     sf::RenderWindow& getWindow();
     void init();

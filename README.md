@@ -1,6 +1,34 @@
 # project_pkmbattle
 부경대학교 IOT 개발자과정 강황석준조 미니프로젝트 저장소
 
+## 2일차
+
+프토토타입 영상
+
+
+https://github.com/user-attachments/assets/6f484d2f-1846-4297-bd3e-3b4b2f093bc3
+
+
+- 장면전환시 딜레이가 점점 커지는 이슈발생
+  - 해결을 위한 행동
+    - 리소스매니저 구현
+      - 리소스들을 씬 생성 init과 동시에 생성하지말고 게임시작과 동시에 생성하여 필요할때마다 꺼내쓰기로 결정
+    - 씬매니저 리팩토링
+      - 기존 씬이 넘어갈때마다 동적할당 해제 후 새로 생성하던 방식을 게임시작과 동시에 미리 생성 후 포인터만 변경해주는 방식으로 변경
+      - 오버헤드가 줄어들것으로 예상
+
+- 인트로 애니메이션 구현
+- 사운드매니저 구현
+- 월드맵 충돌 구현
+- 캐릭터 움직임 구현
+
+**조원 참고용**
+- 3일차부터 해결할 문제들
+  - 형우, 석준 , 찬수 : LoginScene.hpp 83행쯤 보면 주석으로 표시한 로그인 로직 서버구현 후 DB데이터 기반으로 로직 짜기
+  - 보정, 동관 :
+    - font 사용방법변경됨.  기존) 매번 새로 생성자호출 -> 변경) ResourceManager::getInstance().getFont("경로") 로 만들어져있는 폰트 가져와서 사용할 것.
+    - SettingsOverlay.hpp 파일 주석처리된 곳에 볼륨조절 버튼 추가해보기
+    
 ## 1일차
 
 프로토타입 영상
@@ -25,6 +53,7 @@ https://github.com/user-attachments/assets/87abd840-3464-4a6f-be2d-cfca46fe8132
     .\vcpkg integrate install   ## visual studio 연동
 
     vcpkg install SFML:x64-windows     ## SFML 설치
+    vcpkg install asio.hpp             ## asio 설치
     ```
 
 ## 개요

@@ -14,15 +14,16 @@ public:
     }
 
     bool updateAll(float dt) {
-        bool anyFinished = false;
+        bool allFinished = true; 
         for (size_t i = 0; i < objects.size(); ++i) {
             updateFuncs[i](objects[i], dt);
-            if (objects[i].isFinished()) {
-                anyFinished = true;
+            if (!objects[i].isFinished()) {
+                allFinished = false; 
             }
         }
-        return anyFinished;
+        return allFinished;
     }
+
 
     void renderAll(sf::RenderWindow& window) {
         for (auto& obj : objects) {
@@ -33,4 +34,5 @@ public:
     std::vector<AnimatedObject>& getObjects() {
         return objects;
     }
+
 };
