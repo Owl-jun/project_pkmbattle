@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
@@ -27,7 +27,7 @@ public:
 
     void init() override {
         if (!backgroundTex.loadFromFile("C:/Source/project_pkmbattle/Client/assets/introbg.png")) {
-            std::cerr << "¹è°æ ÀÌ¹ÌÁö ·Îµù ½ÇÆĞ!\n";
+            std::cerr << "ë°°ê²½ ì´ë¯¸ì§€ ë¡œë”© ì‹¤íŒ¨!\n";
         }
         bgtextureSize = static_cast<sf::Vector2f>(backgroundTex.getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
@@ -76,10 +76,10 @@ public:
         );
 
         uiManager.addElement(new UIButton(
-            { 300,400 },        // ¹öÆ° À§Ä¡ 
-            { 200,50 },         // ¹öÆ° Å©±â
-            "START",            // ¹öÆ° ÅØ½ºÆ®
-            sf::Color(0,0,0,0),   // ¹öÆ° »ö
+            { 300,400 },        // ë²„íŠ¼ ìœ„ì¹˜ 
+            { 200,50 },         // ë²„íŠ¼ í¬ê¸°
+            "START",            // ë²„íŠ¼ í…ìŠ¤íŠ¸
+            sf::Color(0,0,0,0),   // ë²„íŠ¼ ìƒ‰
             font,
             []() { SceneManager::getInstance().changeScene(new LoginScene()); } // command
         ));
