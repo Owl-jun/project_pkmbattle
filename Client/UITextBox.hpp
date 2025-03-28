@@ -44,7 +44,11 @@ public:
                 }
                 else if (textEntered->unicode < 128) {
                     // ASCII 문자만 처리
-                    input += static_cast<char>(textEntered->unicode);
+                    if (textEntered->unicode != 9)
+                    {
+                        input += static_cast<char>(textEntered->unicode);
+                    }
+                    
                 }
                 text.setString(input);
             }
@@ -69,11 +73,15 @@ public:
         text.setString("");
     }
 
-    void setFocus(bool value) {
-        focused = value;
+    bool isFocusable() const override { return true; }
+    bool isFocused() const override { return focused; }
+
+    void setFocus(bool focus) override { 
+        focused = focus; 
+        if (focused)
+            box.setFillColor(sf::Color::Yellow); 
+        else
+            box.setFillColor(sf::Color::White);
     }
 
-    bool isFocused() const {
-        return focused;
-    }
 };
