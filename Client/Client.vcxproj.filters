@@ -3,7 +3,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="KeyManager.cpp">
-      <Filter>KeyManager</Filter>
+      <Filter>MANAGERS\KeyManager</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Player</Filter>
@@ -12,25 +12,22 @@
       <Filter>headers</Filter>
     </ClCompile>
     <ClCompile Include="GameManager.cpp">
-      <Filter>GameManager</Filter>
+      <Filter>MANAGERS\GameManager</Filter>
     </ClCompile>
     <ClCompile Include="fix.cpp" />
     <ClCompile Include="ResourceManager.cpp">
-      <Filter>ResourceManager</Filter>
+      <Filter>MANAGERS\ResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="SceneManager.hpp">
-      <Filter>Scenes\manage</Filter>
+      <Filter>MANAGERS\SceneManager</Filter>
     </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
-      <Filter>NetworkManager</Filter>
+      <Filter>MANAGERS\NetworkManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="assets">
       <UniqueIdentifier>{906df396-0157-4b2b-9732-68e21f0dd85d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="KeyManager">
-      <UniqueIdentifier>{0ccbf35d-87e2-4836-af80-b080d16b5e6d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Player">
       <UniqueIdentifier>{9c630083-e297-4fa3-8339-122ebf917456}</UniqueIdentifier>
@@ -38,37 +35,49 @@
     <Filter Include="headers">
       <UniqueIdentifier>{bb2c070f-78d3-4e7a-a505-76489b7973a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GameManager">
-      <UniqueIdentifier>{aaad3b4f-8a6d-4e48-9c6d-64899595db43}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Scenes">
       <UniqueIdentifier>{70398283-154b-4279-acd8-f0a3f2006567}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UIManager">
-      <UniqueIdentifier>{a8e5a843-5bdb-47e7-bdc0-258fe4246aa0}</UniqueIdentifier>
+    <Filter Include="MANAGERS">
+      <UniqueIdentifier>{3dd853b3-2f0d-4d8d-8e3c-472e53c3929d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TimeManager">
-      <UniqueIdentifier>{eced138d-5174-4b7a-8f45-e2983e28d206}</UniqueIdentifier>
+    <Filter Include="MANAGERS\NetworkManager">
+      <UniqueIdentifier>{576055e2-92af-4140-b9db-9e0cb3f700a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AnimationManager">
+    <Filter Include="MANAGERS\KeyManager">
+      <UniqueIdentifier>{0ccbf35d-87e2-4836-af80-b080d16b5e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MANAGERS\GameManager">
+      <UniqueIdentifier>{aaad3b4f-8a6d-4e48-9c6d-64899595db43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MANAGERS\AnimationManager">
       <UniqueIdentifier>{7947735a-dccf-4471-ac0a-9f656d84cbf9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ResourceManager">
+    <Filter Include="MANAGERS\ResourceManager">
       <UniqueIdentifier>{e99d05fe-fd29-4572-bf0e-eaa97c3f2847}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scenes\manage">
+    <Filter Include="MANAGERS\SceneManager">
       <UniqueIdentifier>{0c25b507-e595-41b7-a907-17e7d1a518ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UIManager\Overlays">
+    <Filter Include="MANAGERS\TimeManager">
+      <UniqueIdentifier>{eced138d-5174-4b7a-8f45-e2983e28d206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MANAGERS\SoundManager">
+      <UniqueIdentifier>{bb60aed8-dd16-40d1-a278-1529435aa0ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{a8e5a843-5bdb-47e7-bdc0-258fe4246aa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Overlays">
       <UniqueIdentifier>{b7ebb9e8-cb78-4aa5-b676-76ae4d093509}</UniqueIdentifier>
     </Filter>
-    <Filter Include="NetworkManager">
-      <UniqueIdentifier>{576055e2-92af-4140-b9db-9e0cb3f700a5}</UniqueIdentifier>
+    <Filter Include="MANAGERS\UIManager">
+      <UniqueIdentifier>{e75d37b2-eea7-4870-811a-6d5bd500cbea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyManager.h">
-      <Filter>KeyManager</Filter>
+      <Filter>MANAGERS\KeyManager</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
       <Filter>Player</Filter>
@@ -77,7 +86,7 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="GameManager.h">
-      <Filter>GameManager</Filter>
+      <Filter>MANAGERS\GameManager</Filter>
     </ClInclude>
     <ClInclude Include="TitleScene.hpp">
       <Filter>Scenes</Filter>
@@ -86,28 +95,25 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="BaseUI.hpp">
-      <Filter>UIManager</Filter>
-    </ClInclude>
-    <ClInclude Include="UIManager.hpp">
-      <Filter>UIManager</Filter>
+      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="UIButton.hpp">
-      <Filter>UIManager</Filter>
+      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="UITextBox.hpp">
-      <Filter>UIManager</Filter>
+      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="worldScene.hpp">
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="TimeManager.hpp">
-      <Filter>TimeManager</Filter>
+      <Filter>MANAGERS\TimeManager</Filter>
     </ClInclude>
     <ClInclude Include="AnimationManager.hpp">
-      <Filter>AnimationManager</Filter>
+      <Filter>MANAGERS\AnimationManager</Filter>
     </ClInclude>
     <ClInclude Include="AnimatedObject.hpp">
-      <Filter>AnimationManager</Filter>
+      <Filter>MANAGERS\AnimationManager</Filter>
     </ClInclude>
     <ClInclude Include="OpeningScene.hpp">
       <Filter>Scenes</Filter>
@@ -116,22 +122,25 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.hpp">
-      <Filter>ResourceManager</Filter>
-    </ClInclude>
-    <ClInclude Include="baseScene.hpp">
-      <Filter>Scenes\manage</Filter>
-    </ClInclude>
-    <ClInclude Include="SoundManager.hpp">
-      <Filter>ResourceManager</Filter>
+      <Filter>MANAGERS\ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="SettingsOverlay.hpp">
-      <Filter>UIManager\Overlays</Filter>
+      <Filter>UI\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="NetworkManager.hpp">
-      <Filter>NetworkManager</Filter>
+      <Filter>MANAGERS\NetworkManager</Filter>
     </ClInclude>
     <ClInclude Include="UImuteControl.hpp">
-      <Filter>UIManager</Filter>
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="baseScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.hpp">
+      <Filter>MANAGERS\SoundManager</Filter>
+    </ClInclude>
+    <ClInclude Include="UIManager.hpp">
+      <Filter>MANAGERS\UIManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
