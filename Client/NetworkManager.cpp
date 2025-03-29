@@ -35,7 +35,8 @@ void NetworkManager::connect(const std::string& ip, const std::string& port) {
         std::cout << "[Connect] 서버 연결 성공!\n";
     }
 }
-
+void NetworkManager::setMyId(int _id) { myId = _id; }
+int NetworkManager::getMyId() const { return myId; }
 
 void NetworkManager::send(const std::string& data) {
     asio::write(*socket, asio::buffer(data));

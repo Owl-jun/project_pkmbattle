@@ -4,10 +4,12 @@
 #include <unordered_map>
 #include <sstream>
 #include <vector>
+#include <thread>
+#include <mutex>
 
 using asio::ip::tcp;
 
-// ---- [1] Collision Map 정의 ----
+// ---- Collision Map ----
 const std::vector<std::vector<int>> collisionMap = {
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
             {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -56,7 +58,7 @@ const std::vector<std::vector<int>> collisionMap = {
 const int MAP_WIDTH = collisionMap[0].size();
 const int MAP_HEIGHT = collisionMap.size();
 
-// ---- [2] 방향 매핑 ----
+// --- 방향 정의 ---
 std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
     {"UP", {0, -1}},
     {"DOWN", {0, 1}},
@@ -64,79 +66,130 @@ std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
     {"RIGHT", {1, 0}}
 };
 
-// ---- [3] Player 구조체 ---- (DB에서 저장된 위치정보 가져오기)
-int _x = 2;
-int _y = 39;
+// --- 플레이어 구조체 ---
 struct Player {
-    int x = _x;
-    int y = _y;
+    int x;
+    int y;
 };
 
-Player player;
+// --- 글로벌 상태 ---
+std::unordered_map<int, Player> players;
+std::unordered_map<int, std::shared_ptr<tcp::socket>> clientSockets;
+std::mutex playerMutex;
+int nextPlayerId = 1;
 
-// ---- [4] 충돌 판정 함수 ----
+// --- 이동 가능 여부 확인 ---
 bool canMoveTo(int x, int y) {
     return (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && collisionMap[y][x] == 0);
 }
 
-// ---- [5] 메시지 처리 ----
-void processMessage(const std::string& msg, tcp::socket& socket) {
+// --- 메시지 처리 ---
+void processMessage(const std::string& msg, int playerId) {
     std::istringstream iss(msg);
     std::string command, dir;
     iss >> command >> dir;
 
     if (command == "MOVE" && directionOffset.count(dir)) {
-        int nx = player.x + directionOffset[dir].first;
-        int ny = player.y + directionOffset[dir].second;
+        std::lock_guard<std::mutex> lock(playerMutex);
+        auto& p = players[playerId];
+        int nx = p.x + directionOffset[dir].first;
+        int ny = p.y + directionOffset[dir].second;
 
-        if (canMoveTo(nx, ny)) {
-            player.x = nx;
-            player.y = ny;
-            std::string response = "POS " + std::to_string(player.x) + " " + std::to_string(player.y) + "\n";
-            asio::write(socket, asio::buffer(response));
-            std::cout << "[Server] 이동 허용 -> " << response;
+        // 플레이어 간 충돌 검사
+        bool blocked = false;
+        for (const auto& [otherId, otherPlayer] : players) {
+            if (otherId != playerId && otherPlayer.x == nx && otherPlayer.y == ny) {
+                blocked = true;
+                break;
+            }
         }
-        else {
-            std::string response = "POS " + std::to_string(player.x) + " " + std::to_string(player.y) + "\n";
-            asio::write(socket, asio::buffer(response));
-            std::cout << "[Server] 충돌 감지. 위치 고정: " << response;
+
+        bool moved = false;
+        if (!blocked && canMoveTo(nx, ny)) {
+            p.x = nx;
+            p.y = ny;
+            moved = true;
         }
-    }
-    else {
-        std::cout << "[Server] 알 수 없는 메시지: " << msg;
+
+        if (moved) {
+            std::string response = "PLAYERS\n";
+            for (const auto& [id, player] : players) {
+                response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + "\n";
+            }
+
+            for (const auto& [id, sock] : clientSockets) {
+                asio::write(*sock, asio::buffer(response));
+            }
+        }
     }
 }
 
-// ---- [6] 메인 ----
+// --- 클라이언트 처리 스레드 ---
+void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
+    char temp[128];
+    std::string buffer;
+
+    try {
+        // 클라이언트에게 본인 ID 전송
+        std::string idMsg = "ID " + std::to_string(playerId) + "\n";
+        asio::write(*socket, asio::buffer(idMsg));
+
+        while (true) {
+            asio::error_code ec;
+            size_t len = socket->read_some(asio::buffer(temp), ec);
+            if (ec == asio::error::eof) break;
+            if (ec) throw asio::system_error(ec);
+
+            buffer.append(temp, len);
+            size_t pos;
+            while ((pos = buffer.find('\n')) != std::string::npos) {
+                std::string line = buffer.substr(0, pos + 1);
+                buffer.erase(0, pos + 1);
+                processMessage(line, playerId);
+            }
+        }
+    }
+    catch (std::exception& e) {
+        std::cerr << "[Server] Player " << playerId << " disconnected: " << e.what() << "\n";
+        // 연결 종료 시 클린업
+        std::lock_guard<std::mutex> lock(playerMutex);
+        players.erase(playerId);
+        clientSockets.erase(playerId);
+    }
+
+    std::string response = "PLAYERS\n";
+    {
+        std::lock_guard<std::mutex> lock(playerMutex);
+        for (const auto& [id, player] : players) {
+            response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + "\n";
+        }
+    }
+    for (const auto& [id, sock] : clientSockets) {
+        asio::write(*sock, asio::buffer(response));
+    }
+
+}
+
+// --- 서버 메인 ---
 int main() {
     try {
         asio::io_context io;
         tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 9000));
         std::cout << "[Server] 대기 중...\n";
 
-        tcp::socket socket(io);
-        acceptor.accept(socket);
-        std::cout << "[Server] 클라이언트 연결됨!\n";
-
-        std::string buffer;
-        char temp[128];
-
         while (true) {
-            asio::error_code ec;
-            size_t len = socket.read_some(asio::buffer(temp), ec);
-            if (ec == asio::error::eof) break;
-            else if (ec) throw asio::system_error(ec);
+            auto socket = std::make_shared<tcp::socket>(io);
+            acceptor.accept(*socket);
 
-            buffer.append(temp, len);
+            std::lock_guard<std::mutex> lock(playerMutex);
+            int id = nextPlayerId++;
+            players[id] = { 2, 39 };  // 초기 위치
+            clientSockets[id] = socket;
 
-            size_t pos;
-            while ((pos = buffer.find('\n')) != std::string::npos) {
-                std::string line = buffer.substr(0, pos + 1);
-                buffer.erase(0, pos + 1);
-                processMessage(line, socket);
-            }
+            std::cout << "[Server] Player " << id << " 접속!\n";
+
+            std::thread(handleClient, id, socket).detach();
         }
-
     }
     catch (std::exception& e) {
         std::cerr << "[Server 오류] " << e.what() << "\n";

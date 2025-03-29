@@ -9,7 +9,10 @@
 Player::Player() {
     for (int i = 0; i <= 9; ++i) {
         std::string path = "C:/Source/project_pkmbattle/Client/assets/player0" + std::to_string(i) + ".png";
-        sf::Texture& tex = ResourceManager::getInstance().getTexture(path);
+        std::shared_ptr<sf::Texture> tex = std::make_shared<sf::Texture>(
+            ResourceManager::getInstance().getTexture(path)
+        );
+
 
         if (i <= 2) downFrames.push_back(tex);
         else if (i <= 4) leftFrames.push_back(tex);
@@ -21,10 +24,14 @@ Player::Player() {
     targetWorldPos = static_cast<sf::Vector2f>(tilePos) * static_cast<float>(tileSize);
 
     if (!downFrames.empty()) {
-        sprite.emplace(downFrames[0]);
+        sprite.emplace(*downFrames[0]);
         sprite->setPosition(targetWorldPos);
         sprite->setScale({ 1.f, 1.f });
     }
+}
+
+sf::Vector2i Player::getTilePosition() const {
+    return tilePos;
 }
 
 void Player::setTargetTilePosition(const sf::Vector2i& pos) {
@@ -43,10 +50,16 @@ void Player::setTargetTilePosition(const sf::Vector2i& pos) {
         currentDirection = (dir.x > 0) ? Direction::Right : Direction::Left;
     else
         currentDirection = (dir.y > 0) ? Direction::Down : Direction::Up;
+
+    // 디버깅 로그 출력 
+    std::cout << "[Client] 이동 명령 수신: (" << pos.x << ", " << pos.y << ")\n";
+
 }
 
-void Player::update(float dt) {
+void Player::update(float dt, bool isLocalPlayer) {
     if (!sprite.has_value()) return;
+
+    moveCooldown -= dt;
 
     if (isMoving) {
         sf::Vector2f pos = sprite->getPosition();
@@ -66,22 +79,28 @@ void Player::update(float dt) {
         return;
     }
 
-    currentFrame = 0;
-    updateSpriteTexture();
-
     const auto& keyMgr = KeyManager::getInstance();
     lastHeldDirection = Direction::None;
 
-    if (keyMgr.isKeyPressed(sf::Keyboard::Key::Left))      lastHeldDirection = Direction::Left;
-    else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right)) lastHeldDirection = Direction::Right;
-    else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))    lastHeldDirection = Direction::Up;
-    else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
+    if (!isMoving) {
+        if (keyMgr.isKeyPressed(sf::Keyboard::Key::Left))      lastHeldDirection = Direction::Left;
+        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right)) lastHeldDirection = Direction::Right;
+        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))    lastHeldDirection = Direction::Up;
+        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
 
-    if (lastHeldDirection != Direction::None) {
-        currentDirection = lastHeldDirection;
-        sendDirectionToServer(currentDirection);
-        animate(dt);
+        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
+            if (isLocalPlayer)
+            { 
+                currentDirection = lastHeldDirection;
+                sendDirectionToServer(currentDirection);
+                moveCooldown = 0.15f;
+            }
+            animate(dt);
+        }
     }
+
+    currentFrame = 0;
+    updateSpriteTexture();
 }
 
 void Player::draw(sf::RenderWindow& window) {
@@ -106,17 +125,17 @@ void Player::animate(float dt) {
     if (elapsedTime >= frameTime) {
         elapsedTime = 0.f;
         currentFrame = (currentFrame + 1) % frames->size();
-        sprite->setTexture((*frames)[currentFrame]);
+        sprite->setTexture(*(*frames)[currentFrame]);
     }
 }
 
 void Player::updateSpriteTexture() {
     auto* frames = getCurrentFrameSet();
     if (!frames || frames->empty()) return;
-    sprite->setTexture((*frames)[currentFrame]);
+    sprite->setTexture(*(*frames)[currentFrame]);
 }
 
-std::vector<sf::Texture>* Player::getCurrentFrameSet() {
+std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet() {
     switch (currentDirection) {
     case Direction::Down:  return &downFrames;
     case Direction::Left:  return &leftFrames;
