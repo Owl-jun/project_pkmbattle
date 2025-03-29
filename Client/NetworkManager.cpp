@@ -43,14 +43,14 @@ void NetworkManager::send(const std::string& data) {
 }
 
 std::string NetworkManager::receive() {
-    socket->non_blocking(true);  // 👈 논블로킹 설정
+    socket->non_blocking(true); 
 
     char buffer[1024];
     asio::error_code ec;
     size_t len = socket->read_some(asio::buffer(buffer), ec);
 
     if (ec == asio::error::would_block) {
-        return "";  // 데이터 없음
+        return ""; 
     }
     if (ec && ec != asio::error::eof) {
         std::cerr << "[Network Error] receive 실패: " << ec.message() << "\n";
