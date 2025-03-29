@@ -90,7 +90,7 @@ public:
 
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
-                std::string msg = id + "|" + pw + "\n";
+                std::string msg = "LOGIN " + id + " " + pw + "\n";
 
                 NetworkManager::getInstance().send(msg);
                 std::string response = NetworkManager::getInstance().receive();
