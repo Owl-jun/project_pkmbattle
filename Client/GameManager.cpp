@@ -12,6 +12,11 @@
 #include "SoundManager.hpp"
 #include "NetworkManager.hpp"
 
+
+// test
+
+
+
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
     , muteControl({ 720,500 })
