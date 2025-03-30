@@ -7,7 +7,7 @@
 class SceneManager {
 private:
     std::unordered_map<std::string, BaseScene*> scenes;
-    BaseScene* currentScene = nullptr;
+    BaseScene* currentScene = nullptr;  //
     std::string pendingSceneKey;
 
     SceneManager() = default;
@@ -25,6 +25,7 @@ public:
         scene->init();
     }
 
+    // < 씬 바꾸는 함수 == 장면을 바꾼다.>
     void changeScene(const std::string& key) {
         pendingSceneKey = key;
     }

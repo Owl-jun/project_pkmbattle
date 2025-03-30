@@ -17,6 +17,8 @@
 
 class LoginScene : public BaseScene {
 private:
+    // - 화면에 표시할 것들임 -
+    // 이미지 -> sf::Texture(경로) , std::optional<sf::Sprite>
     sf::Texture bgTex;
     std::optional<sf::Sprite> bg;
     sf::Vector2f bgtextureSize;
@@ -38,9 +40,10 @@ public:
     }
 
     void init() override {
-        bgTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/introbg.png");
         bgtextureSize = static_cast<sf::Vector2f>(bgTex.getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
+        // 이미지 생성 예시 , 리소스매니저에서 받고 , emplace 
+        bgTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/introbg.png");
         bg.emplace(bgTex);
         bg->setScale({ (windowSize.x / bgtextureSize.x), (windowSize.y / bgtextureSize.y) });
         bg->setPosition({ 0.f, 0.f });

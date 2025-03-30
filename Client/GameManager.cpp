@@ -2,7 +2,6 @@
 #include "GameManager.h"
 #include "KeyManager.h"
 #include "SceneManager.hpp"
-#include "OpeningScene.hpp"
 #include "TitleScene.hpp"
 #include "worldScene.hpp"
 #include "LoginScene.hpp"
@@ -11,11 +10,6 @@
 #include "ResourceManager.hpp"
 #include "SoundManager.hpp"
 #include "NetworkManager.hpp"
-
-
-// test
-
-
 
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
@@ -64,10 +58,12 @@ void GameManager::init() {
     SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // 사운드매니저
     ResourceManager::getInstance().init();
     player = std::make_unique<Player>();
+    // 주의할 점. 절대 같은 씬 또 만들면 안됨
     SceneManager::getInstance().registerScene("opening", new OpeningScene());
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());
     SceneManager::getInstance().registerScene("world", new worldScene());
+    // --------------------------------------
     SceneManager::getInstance().changeScene("opening");    // 초기화면 설정
 }
 
@@ -80,9 +76,9 @@ void GameManager::update() {
             window.close();
         KeyManager::getInstance().handleEvent(*event);
         muteControl.handleEvent(*event,window);
-        SceneManager::getInstance().handleInput(*event, window);
+        SceneManager::getInstance().handleInput(*event, window);    
     }
-    SceneManager::getInstance().update(window);
+    SceneManager::getInstance().update(window);                    
 }
 
 void GameManager::render() {  
@@ -98,7 +94,7 @@ void GameManager::render() {
 void GameManager::run() {
     init();
     while (window.isOpen()) {
-        update();
-        render();
+        update();   // 정보를 최신화
+        render();   // 화면에 출력하는 기능.
     }
 }
