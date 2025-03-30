@@ -149,6 +149,8 @@
     <ClInclude Include="AnimationManager.hpp" />
     <ClInclude Include="baseScene.hpp" />
     <ClInclude Include="BaseUI.hpp" />
+    <ClInclude Include="BattleManager.hpp" />
+    <ClInclude Include="battleScene.hpp" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LoginScene.hpp" />
@@ -157,6 +159,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceManager.hpp" />
+    <ClInclude Include="SelectOverlay.hpp" />
     <ClInclude Include="SettingsOverlay.hpp" />
     <ClInclude Include="SoundManager.hpp" />
     <ClInclude Include="testScene.hpp">

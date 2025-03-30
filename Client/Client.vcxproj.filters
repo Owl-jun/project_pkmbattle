@@ -74,6 +74,9 @@
     <Filter Include="MANAGERS\UIManager">
       <UniqueIdentifier>{e75d37b2-eea7-4870-811a-6d5bd500cbea}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MANAGERS\BattleManager">
+      <UniqueIdentifier>{410620b2-eaa0-4561-b208-4a91aa17b9b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyManager.h">
@@ -141,6 +144,15 @@
     </ClInclude>
     <ClInclude Include="UIManager.hpp">
       <Filter>MANAGERS\UIManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectOverlay.hpp">
+      <Filter>UI\Overlays</Filter>
+    </ClInclude>
+    <ClInclude Include="battleScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleManager.hpp">
+      <Filter>MANAGERS\BattleManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
