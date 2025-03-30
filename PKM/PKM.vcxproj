@@ -24,6 +24,7 @@
     <ProjectGuid>{9eb1e500-c8c5-46f1-8b09-138b43af3e93}</ProjectGuid>
     <RootNamespace>PKM</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>exe</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
