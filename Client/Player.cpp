@@ -30,8 +30,9 @@ Player::Player() {
     }
 }
 
-sf::Vector2i Player::getTilePosition() const {
-    return tilePos;
+void Player::setPosition(const sf::Vector2f& pos) {
+    if (sprite.has_value())
+        sprite->setPosition(pos);
 }
 
 void Player::setTargetTilePosition(const sf::Vector2i& pos) {
@@ -54,6 +55,14 @@ void Player::setTargetTilePosition(const sf::Vector2i& pos) {
     // 디버깅 로그 출력 
     std::cout << "[Client] 이동 명령 수신: (" << pos.x << ", " << pos.y << ")\n";
 
+}
+
+sf::Vector2i Player::getTilePosition() const {
+    return tilePos;
+}
+
+sf::Vector2f Player::getPosition() const {
+    return sprite.has_value() ? sprite->getPosition() : sf::Vector2f{ 0.f, 0.f };
 }
 
 void Player::update(float dt, bool isLocalPlayer) {
@@ -90,7 +99,9 @@ void Player::update(float dt, bool isLocalPlayer) {
 
         if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             if (isLocalPlayer)
-            { 
+            {   
+                // 현재 캐릭터가 움직이지않고 방향만 바뀔때 본인 캐릭터만 바뀌는 현상
+                // 의심지점 , 해결방법 ? 서버에서 방향도 전송?
                 currentDirection = lastHeldDirection;
                 sendDirectionToServer(currentDirection);
                 moveCooldown = 0.15f;
@@ -101,38 +112,6 @@ void Player::update(float dt, bool isLocalPlayer) {
 
     currentFrame = 0;
     updateSpriteTexture();
-}
-
-void Player::draw(sf::RenderWindow& window) {
-    if (sprite.has_value())
-        window.draw(*sprite);
-}
-
-void Player::setPosition(const sf::Vector2f& pos) {
-    if (sprite.has_value())
-        sprite->setPosition(pos);
-}
-
-sf::Vector2f Player::getPosition() const {
-    return sprite.has_value() ? sprite->getPosition() : sf::Vector2f{ 0.f, 0.f };
-}
-
-void Player::animate(float dt) {
-    elapsedTime += dt;
-    auto* frames = getCurrentFrameSet();
-    if (!frames || frames->empty()) return;
-
-    if (elapsedTime >= frameTime) {
-        elapsedTime = 0.f;
-        currentFrame = (currentFrame + 1) % frames->size();
-        sprite->setTexture(*(*frames)[currentFrame]);
-    }
-}
-
-void Player::updateSpriteTexture() {
-    auto* frames = getCurrentFrameSet();
-    if (!frames || frames->empty()) return;
-    sprite->setTexture(*(*frames)[currentFrame]);
 }
 
 std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet() {
@@ -158,6 +137,29 @@ void Player::sendDirectionToServer(Direction dir) {
 
     std::string msg = "MOVE " + directionStr + "\n";
     NetworkManager::getInstance().send(msg);
+}
+
+void Player::draw(sf::RenderWindow& window) {
+    if (sprite.has_value())
+        window.draw(*sprite);
+}
+
+void Player::animate(float dt) {
+    elapsedTime += dt;
+    auto* frames = getCurrentFrameSet();
+    if (!frames || frames->empty()) return;
+
+    if (elapsedTime >= frameTime) {
+        elapsedTime = 0.f;
+        currentFrame = (currentFrame + 1) % frames->size();
+        sprite->setTexture(*(*frames)[currentFrame]);
+    }
+}
+
+void Player::updateSpriteTexture() {
+    auto* frames = getCurrentFrameSet();
+    if (!frames || frames->empty()) return;
+    sprite->setTexture(*(*frames)[currentFrame]);
 }
 
 sf::Vector2f Player::normalize(const sf::Vector2f& v) {

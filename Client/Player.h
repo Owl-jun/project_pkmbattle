@@ -26,7 +26,6 @@ private:
 
 public:
     Player();
-    sf::Vector2i getTilePosition() const;
     Player(const Player& other)
         : downFrames(other.downFrames),
         leftFrames(other.leftFrames),
@@ -48,7 +47,6 @@ public:
             sprite->setScale({ 1.f, 1.f });
         }
     }
-
     Player& operator=(const Player& other) {
         if (this == &other) return *this;
 
@@ -79,13 +77,13 @@ public:
         return *this;
     }
 
+    void sendDirectionToServer(Direction dir);
     void update(float dt,bool isLocalPlayer);
     void draw(sf::RenderWindow& window);
-
     void setPosition(const sf::Vector2f& pos);
-    sf::Vector2f getPosition() const;
     void setTargetTilePosition(const sf::Vector2i& pos);
-    void sendDirectionToServer(Direction dir);
+    sf::Vector2f getPosition() const;
+    sf::Vector2i getTilePosition() const;
     sf::Vector2f normalize(const sf::Vector2f& v);
 
 private:
