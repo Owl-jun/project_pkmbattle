@@ -10,6 +10,7 @@
 #include "ResourceManager.hpp"
 #include "Player.h"
 #include "SettingsOverlay.hpp"
+#include "NetworkManager.hpp"
 
 class worldScene : public BaseScene {
 private:
@@ -19,9 +20,12 @@ private:
     sf::Texture bgTex;
     std::optional<sf::Sprite> bg;
     UIManager uiManager;
+
     Player& player;
+    std::unordered_map<int, Player> otherPlayers;
+    int myId;
+
     sf::View camera;
-    std::vector<std::vector<int>> collisionMap;
     SettingsOverlay settings;
     float escCooldown = 0.f;
 
@@ -31,8 +35,11 @@ public:
         , deltatime("0")
         , frame(font, deltatime, 24)
         , player(GameManager::getInstance().getPlayer())
-        , settings({800.f,600.f},font)
+        , settings({ 800.f,600.f }, ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
+        , myId(-1)
     {
+        myId = NetworkManager::getInstance().getMyId();
+        std::cout << "my id : " << myId << std::endl;
     }
 
     void init() override {
@@ -47,53 +54,6 @@ public:
         camera.setSize({ 800.f, 600.f });
         camera.setCenter(player.getPosition());
 
-        // 충돌 맵 초기화 
-        collisionMap = {
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-        };
-
-        player.setCollisionMap(&collisionMap);
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
@@ -111,9 +71,69 @@ public:
         int fps = static_cast<int>(1.f / dt);
         frame.setString("FPS: " + std::to_string(fps));
 
-        if (!settings.isVisible()) {
-            player.update(dt);  // 설정창 열리면 멈춤
+        // 서버 응답 받아서 위치 반영
+        std::string response = NetworkManager::getInstance().receive();
 
+        if (!response.empty()) {
+            std::istringstream iss(response);
+            std::string type;
+            iss >> type;
+
+            if (type == "PLAYERS")
+            {
+                int id, x, y;
+                while (iss >> id >> x >> y)
+                {
+                    if (id == myId)
+                    {
+                        sf::Vector2i serverTile = { x, y };
+                        if (serverTile != player.getTilePosition()) {
+                            player.setTargetTilePosition(serverTile); // 변경된 경우에만!
+                        }
+                    }
+                    else
+                    {
+                        auto it = otherPlayers.find(id);
+                        if (it != otherPlayers.end())
+                        {
+                            // 이미 존재하면 위치만 갱신
+                            it->second.setTargetTilePosition({ x, y });
+                        }
+                        else
+                        {
+                            // 처음 등장한 플레이어
+                            Player newPlayer;
+                            newPlayer.setTargetTilePosition({ x, y });
+                            otherPlayers[id] = newPlayer;
+                        }
+                    }
+                }
+                // 접속 종료한 플레이어 제거
+                std::unordered_set<int> activeIds;
+                iss.clear(); iss.seekg(0); std::string dummy; iss >> dummy; // 다시 읽기 위해 rewind
+                while (iss >> id >> x >> y) activeIds.insert(id);
+
+                for (auto it = otherPlayers.begin(); it != otherPlayers.end(); ) 
+                {
+                    if (activeIds.find(it->first) == activeIds.end()) {
+                        it = otherPlayers.erase(it);
+                    }
+                    else {
+                        ++it;
+                    }
+                }
+            }
+
+            else {
+                std::cout << "[Client] Unknown server response: " << response << "\n";
+            }
+        }
+
+        if (!settings.isVisible()) {
+            player.update(dt,true);  // 설정창 열리면 멈춤
+        }
+        for (auto& [id, p] : otherPlayers) {
+            p.update(dt,false);  
         }
         camera.setCenter(player.getPosition());
         settings.setCenter(camera.getCenter());
@@ -129,8 +149,15 @@ public:
     void render(sf::RenderWindow& window) override {
         // 카메라 뷰에서 맵/캐릭터 렌더링
         window.setView(camera);
+
         if (bg.has_value()) window.draw(*bg);
+        
         player.draw(window);
+
+        for (auto& [id, p] : otherPlayers) {
+            p.draw(window);
+        }
+
         window.draw(frame);  
         
         settings.render(window);

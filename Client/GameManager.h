@@ -1,11 +1,13 @@
 #pragma once
+#include "UImuteControl.hpp"
 #include "Player.h"
-#include <SFML/Graphics.hpp>
+
 
 class GameManager {
 private:
     sf::RenderWindow window;
     std::unique_ptr<Player> player;
+    UImuteControl muteControl;
 
     GameManager();
     GameManager(const GameManager&) = delete;

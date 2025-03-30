@@ -31,7 +31,9 @@ void ResourceManager::init() {
         "C:/Source/project_pkmbattle/Client/assets/player06.png",
         "C:/Source/project_pkmbattle/Client/assets/player07.png",
         "C:/Source/project_pkmbattle/Client/assets/player08.png",
-        "C:/Source/project_pkmbattle/Client/assets/player09.png"
+        "C:/Source/project_pkmbattle/Client/assets/player09.png",
+        "C:/Source/project_pkmbattle/Client/assets/unmute_icon.png",
+        "C:/Source/project_pkmbattle/Client/assets/mute_icon.png"
     };
 
     for (const auto& path : texturesToLoad) {

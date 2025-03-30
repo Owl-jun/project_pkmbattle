@@ -11,12 +11,13 @@ private:
     asio::io_context io_context;
     std::shared_ptr<asio::ip::tcp::socket> socket;
     static NetworkManager* instance;
-
+    int myId = -1;
     NetworkManager(); // 생성자 private
 
 public:
     static NetworkManager& getInstance();
-
+    void setMyId(int);
+    int getMyId() const;
     void connect(const std::string& ip, const std::string& port);
     void send(const std::string& data);
     std::string receive();
