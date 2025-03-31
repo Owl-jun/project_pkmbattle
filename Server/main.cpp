@@ -85,6 +85,21 @@ bool canMoveTo(int x, int y) {
     return (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && collisionMap[y][x] == 0);
 }
 
+// --- 브로드캐스트 ---
+void broadcastPlayerStates() {
+    std::string response = "PLAYERS\n";
+    {
+        std::lock_guard<std::mutex> lock(playerMutex);
+        for (const auto& [id, player] : players) {
+            response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + " DOWN" + '\n';
+        }
+    }
+    for (const auto& [id, sock] : clientSockets) {
+        std::cout << "broadcast: " << response;
+        asio::write(*sock, asio::buffer(response));
+    }
+}
+
 
 // --- 메시지 처리 ---
 void processMessage(const std::string& msg, int playerId) {
@@ -97,22 +112,23 @@ void processMessage(const std::string& msg, int playerId) {
     // 로그인 로직추가
     if (command == "LOGIN") {
         iss >> id >> password;
+        std::cout << id << password << std::endl;
         string response;
         if(DBM.canLogin(id, password)){
-
             Player player = DBM.loadPlayer(id);
-            if (player.isEmpty()) {
-                std::cout << "DB 혹은 서버에서 플레이어 정보 로드 실패" << std::endl;
+            if (!player.isEmpty()) {
+                {
+                    std::lock_guard<std::mutex> lock(playerMutex);
+                    players[playerId] = player;
+                }
+
+                response = "LOGIN TRUE " + std::to_string(player.x) + ' ' + std::to_string(player.y) + '\n';
+                asio::write(*clientSockets[playerId], asio::buffer(response));
+                broadcastPlayerStates();
             }
-            else {
-                players[playerId] = player;
-            }
-            response = "LOGIN TRUE " + std::to_string(player.x) + ' ' + std::to_string(player.y) + '\n';
-            cout << response << endl;
-            asio::write(*clientSockets[playerId], asio::buffer(response));
         }
         else {
-            response = "LOGIN FALSE";
+            response = "LOGIN FALSE\n";
             cout << response << endl;
             asio::write(*clientSockets[playerId], asio::buffer(response));
         }
@@ -124,6 +140,7 @@ void processMessage(const std::string& msg, int playerId) {
         if (directionOffset.count(dir)) {
             std::lock_guard<std::mutex> lock(playerMutex);
             auto& p = players[playerId];
+            p.dir = dir;
             int nx = p.x + directionOffset[dir].first;
             int ny = p.y + directionOffset[dir].second;
 
@@ -136,26 +153,25 @@ void processMessage(const std::string& msg, int playerId) {
                 }
             }
 
-            bool moved = false;
             if (!blocked && canMoveTo(nx, ny)) {
                 p.x = nx;
                 p.y = ny;
-                moved = true;
             }
 
-            if (moved) {
-                std::string response = "PLAYERS\n";
-                for (const auto& [id, player] : players) {
-                    cout << player.x << " , " << player.y << endl;
-                    response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + "\n";
-                }
-
-                for (const auto& [id, sock] : clientSockets) {
-                    asio::write(*sock, asio::buffer(response));
-                }
+            std::string response;
+            response = "PLAYERS\n";
+            for (const auto& [id, player] : players) {
+                cout << player.x << " , " << player.y << endl;
+                response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + " " + player.dir + "\n";
             }
+
+            for (const auto& [id, sock] : clientSockets) {
+                asio::write(*sock, asio::buffer(response));
+            }
+
         }
     }
+    iss.clear();
 }
 
 
@@ -218,7 +234,7 @@ int main() {
 
             std::lock_guard<std::mutex> lock(playerMutex);
             int id = nextPlayerId++;
-            players[id] = { 99,99 };  // 깡통
+            
             clientSockets[id] = socket;
 
             std::cout << "[Server] Player " << id << " 접속!\n";

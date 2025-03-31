@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "BaseScene.hpp"
+#include "Player.h"
 #include <unordered_map>
 #include <string>
 
@@ -9,7 +10,7 @@ private:
     std::unordered_map<std::string, BaseScene*> scenes;
     BaseScene* currentScene = nullptr;  //
     std::string pendingSceneKey;
-
+    std::unique_ptr<Player> player;
     SceneManager() = default;
     SceneManager(const SceneManager&) = delete;
     SceneManager& operator=(const SceneManager&) = delete;
@@ -25,8 +26,17 @@ public:
         scene->init();
     }
 
+    void make_Player(int x, int y) {
+        player = std::make_unique<Player>(x,y);
+    }
+
+    Player& getPlayer() {
+        return *player;
+    }
+
     // < 씬 바꾸는 함수 == 장면을 바꾼다.>
     void changeScene(const std::string& key) {
+        
         pendingSceneKey = key;
     }
 

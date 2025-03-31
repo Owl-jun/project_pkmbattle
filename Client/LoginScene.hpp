@@ -30,6 +30,10 @@ private:
     UITextBox* idBox = nullptr;
     UITextBox* pwBox = nullptr;
 
+    bool loginCompleted = false;
+    std::thread receiveThread;
+
+
 public:
     LoginScene()
         : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
@@ -51,7 +55,6 @@ public:
         pswd.setFillColor(sf::Color::Black);
         id.setPosition({ 270, 277.f });
         pswd.setPosition({ 180, 305.f });
-
 
         idBox = new UITextBox(
             { 300.f, (272.f + 28.f) },
@@ -95,29 +98,16 @@ public:
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
                 NetworkManager::getInstance().send(msg);
 
-                std::string tag, response , x , y;
-                std::string line = NetworkManager::getInstance().receive_line();
-                std::cout << line << std::endl;
-                std::istringstream iss(line);
-                iss >> tag >> response >> x >> y;
-                std::cout << tag << response << x << y << std::endl;
-                
-                if (tag == "LOGIN") {
-                    std::cout << "로그인 태그 받음" << std::endl;
-                    if (response == "TRUE") {
-                        std::cout << "login complete!\n";            
-                        sf::Vector2f pos = { std::stoi(x)*60.f, std::stoi(y) * 60.f };
-                        std::cout << pos.x << pos.y << std::endl;
-                        GameManager::getInstance().getPlayer().setPosition(pos);
-                        std::cout << "setTile 실행" << std::endl;
-                        SceneManager::getInstance().changeScene("world");
+                receiveThread = std::thread([this]() {
+                    while (!loginCompleted) {
+                        std::string line = NetworkManager::getInstance().receive_block();
+                        if (!line.empty() && line.starts_with("LOGIN")) {
+                            handleLoginResponse(line);
+                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     }
-                    else {
-                        std::cout << "login failed!\n";
-                        return;
-                    }
-                }
-                else { return; }
+                    });
+                receiveThread.detach();
             }
         ));
 
@@ -161,4 +151,25 @@ public:
         window.draw(pswd);
         uiManager.render(window);
     }
+
+    void handleLoginResponse(const std::string& line) {
+        std::istringstream iss(line);
+        std::string tag, response, x, y;
+        iss >> tag >> response >> x >> y;
+
+        if (tag == "LOGIN") {
+            if (response == "TRUE") {
+                std::cout << "로그인 성공!\n";
+                loginCompleted = true;
+                SceneManager::getInstance().make_Player(stoi(x), stoi(y));
+                SceneManager::getInstance().registerScene("world", new worldScene());
+                SceneManager::getInstance().changeScene("world");
+            }
+            else {
+                std::cout << "로그인 실패!\n";
+                // 실패 메시지 띄우는 UI 로직이 있으면 여기에 추가
+            }
+        }
+    }
+
 };

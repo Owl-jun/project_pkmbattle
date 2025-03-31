@@ -35,7 +35,7 @@ public:
         : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , deltatime("0")
         , frame(font, deltatime, 24)
-        , player(GameManager::getInstance().getPlayer())
+        , player(SceneManager::getInstance().getPlayer())
         , settings({ 800.f,600.f }, ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , myId(-1)
     {
@@ -54,7 +54,6 @@ public:
         // 카메라 설정
         camera.setSize({ 800.f, 600.f });
         camera.setCenter(player.getPosition());
-
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
@@ -74,7 +73,6 @@ public:
 
         // 서버 응답 받아서 위치 반영
         std::string response = NetworkManager::getInstance().receive();
-
         if (!response.empty()) {
             std::istringstream iss(response);
             std::string type;
@@ -83,7 +81,8 @@ public:
             if (type == "PLAYERS")
             {
                 int id, x, y;
-                while (iss >> id >> x >> y)
+                std::string d;
+                while (iss >> id >> x >> y >> d)
                 {
                     if (id == myId)
                     {
@@ -99,14 +98,13 @@ public:
                         if (it != otherPlayers.end())
                         {
                             // 이미 존재하면 위치만 갱신
-                            it->second.setTile(otherTile);
                             it->second.setTargetTilePosition({ x, y });
+                            it->second.setCurDir(d);
                         }
-                        else
+                        else 
                         {
                             // 처음 등장한 플레이어
-                            Player newPlayer;
-                            newPlayer.setTile(otherTile);
+                            Player newPlayer(otherTile.x, otherTile.y);
                             newPlayer.setTargetTilePosition({ x, y });
                             otherPlayers[id] = newPlayer;
                         }
@@ -115,7 +113,7 @@ public:
                 // 접속 종료한 플레이어 제거
                 std::unordered_set<int> activeIds;
                 iss.clear(); iss.seekg(0); std::string dummy; iss >> dummy; // 다시 읽기 위해 rewind
-                while (iss >> id >> x >> y) activeIds.insert(id);
+                while (iss >> id >> x >> y >> d) activeIds.insert(id);
 
                 for (auto it = otherPlayers.begin(); it != otherPlayers.end(); ) 
                 {

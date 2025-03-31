@@ -6,7 +6,7 @@
 #include "NetworkManager.hpp"
 #include <cmath>
 
-Player::Player() {
+Player::Player(int x, int y) {
     for (int i = 0; i <= 9; ++i) {
         std::string path = "C:/Source/project_pkmbattle/Client/assets/player0" + std::to_string(i) + ".png";
         std::shared_ptr<sf::Texture> tex = std::make_shared<sf::Texture>(
@@ -20,7 +20,7 @@ Player::Player() {
         else upFrames.push_back(tex);
     }
 
-    tilePos = { 2, 39 };
+    tilePos = { x, y };
     targetWorldPos = static_cast<sf::Vector2f>(tilePos) * static_cast<float>(tileSize);
 
     if (!downFrames.empty()) {
@@ -61,6 +61,16 @@ void Player::setTargetTilePosition(const sf::Vector2i& pos) {
 
 }
 
+void Player::setCurDir(std::string d) {
+    if (!d.empty()) {
+        if (d == "UP") { currentDirection = Direction::Up; }
+        else if (d == "DOWN") { currentDirection = Direction::Down; }
+        else if (d == "RIGHT") { currentDirection = Direction::Right; }
+        else if (d == "LEFT") { currentDirection = Direction::Left; }
+    }
+    updateSpriteTexture();
+}
+
 sf::Vector2i Player::getTilePosition() const {
     return tilePos;
 }
@@ -96,20 +106,19 @@ void Player::update(float dt, bool isLocalPlayer) {
     lastHeldDirection = Direction::None;
 
     if (!isMoving) {
-        if (keyMgr.isKeyPressed(sf::Keyboard::Key::Left))      lastHeldDirection = Direction::Left;
-        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right)) lastHeldDirection = Direction::Right;
-        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))    lastHeldDirection = Direction::Up;
-        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
+        if (isLocalPlayer) {
+            if (keyMgr.isKeyPressed(sf::Keyboard::Key::Left))      lastHeldDirection = Direction::Left;
+            else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right)) lastHeldDirection = Direction::Right;
+            else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))    lastHeldDirection = Direction::Up;
+            else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
+        }
 
-        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
-            if (isLocalPlayer)
-            {   
-                // 현재 캐릭터가 움직이지않고 방향만 바뀔때 본인 캐릭터만 바뀌는 현상
-                // 의심지점 , 해결방법 ? 서버에서 방향도 전송?
-                currentDirection = lastHeldDirection;
-                sendDirectionToServer(currentDirection);
-                moveCooldown = 0.15f;
-            }
+        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {  
+            // 현재 캐릭터가 움직이지않고 방향만 바뀔때 본인 캐릭터만 바뀌는 현상
+            // 의심지점 , 해결방법 ? 서버에서 방향도 전송?
+            currentDirection = lastHeldDirection;
+            sendDirectionToServer(currentDirection);
+            moveCooldown = 0.05f;
             animate(dt);
         }
     }

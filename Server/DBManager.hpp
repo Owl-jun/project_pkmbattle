@@ -25,19 +25,20 @@ struct Poketmon {
 struct Player{
 	string id;
 	string password;
-	int x = 99;
-	int y = 99;
+	int x = 2;
+	int y = 39;
 	string name;
 	int win;
 	int lose;
 	int level;
 	double EXP;
+	string dir;
 
 	Player() {}
-	Player(int x, int y)
-		: x(x), y(y)
+	Player(int x, int y, string dir = "DOWN")
+		: x(x), y(y), dir(dir)
 	{}
-	Player(string id, string password, int x, int y, string name, int win, int lose, int level, double EXP)
+	Player(string id, string password, int x, int y, string name, int win, int lose, int level, double EXP, string dir = "DOWN")
 		: id(id)
 		, password(password)
 		, x(x)
@@ -47,6 +48,7 @@ struct Player{
 		, lose(lose)
 		, level(level)
 		, EXP(EXP)
+		, dir(dir)
 	{
 	}
 	bool isEmpty() {
@@ -66,7 +68,6 @@ public:
 	DBManager()
 	{
 		try {
-
 			mysql::MySQL_Driver* driver = mysql::get_mysql_driver_instance();
 			conn = unique_ptr<Connection>(driver->connect(SERVER_IP, USERNAME, PASSWORD));
 			conn->setSchema(DATABASE);

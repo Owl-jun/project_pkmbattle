@@ -6,7 +6,6 @@
 class GameManager {
 private:
     sf::RenderWindow window;
-    std::unique_ptr<Player> player;
     UImuteControl muteControl;
 
     GameManager();

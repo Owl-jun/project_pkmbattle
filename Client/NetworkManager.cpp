@@ -61,17 +61,14 @@ std::string NetworkManager::receive() {
     return std::string(buffer, len);
 }
 
-std::string NetworkManager::receive_line() {
-    socket->non_blocking(true);
+std::string NetworkManager::receive_block() {
+    socket->non_blocking(false);
     asio::streambuf buf;
     asio::error_code ec;
 
     // \n까지 읽기
     size_t len = asio::read_until(*socket, buf, "\n", ec);
 
-    if (ec == asio::error::would_block) {
-        return "";
-    }
     if (ec && ec != asio::error::eof) {
         std::cerr << "[Network Error] receive 실패: " << ec.message() << "\n";
         return "";
