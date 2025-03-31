@@ -37,7 +37,18 @@ struct Player{
 	Player(int x, int y)
 		: x(x), y(y)
 	{}
-
+	Player(string id, string password, int x, int y, string name, int win, int lose, int level, double EXP)
+		: id(id)
+		, password(password)
+		, x(x)
+		, y(y)
+		, name(name)
+		, win(win)
+		, lose(lose)
+		, level(level)
+		, EXP(EXP)
+	{
+	}
 	bool isEmpty() {
 		return id.empty();
 	}
@@ -45,9 +56,7 @@ struct Player{
 
 class DBManager {
 private:
-	// 클라에서 요청받은  id/ pswd 저장 멤버
-	string id;
-	string password;
+
 	// 기본 정보 로딩
 	vector<Player> Players;
 	vector<Poketmon> POKETMONS;
@@ -73,52 +82,53 @@ public:
 		cout << "MySQL Disconnect\n" << endl;
 	}
 
-	void setIdPassword(string _id , string _pswd) {
-		id = _id;
-		password = _pswd;
-	}
 
-	bool canLogin() {
-		try {
+	bool canLogin(string _id, string _pswd) {
+		try 
+		{
 			unique_ptr<Statement> stmt(conn->createStatement());
-			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM Player WHERE Login_ID = '" + id + "'"));
-			res->next();
-			if (res->getString("Login_password") == password) {
-				return true;
+			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM Player WHERE Login_ID = '" + _id + "'"));
+
+			if (res->next()) {
+				if (!res->isNull("Login_password")) {
+					string db_pw = res->getString("Login_password");
+					if (db_pw == _pswd) {
+						return true;
+					}
+				}
 			}
-			else { return false; }
 		}
 		catch (SQLException& e) {
 			cout << "Query failed: " << e.what() << endl;
 		}
+		return false;
 	}
 
-	/*Player loadPlayer(string _id) {
+	Player loadPlayer(string _id) {
 		try {
 			unique_ptr<Statement> stmt(conn->createStatement());
-			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM player WHERE login_id = '" + _id + "'"));
-			string p_id, p_password, p_name;
-			int x, y, win, lose, level;
-			double EXP;
-			while (res->next())
-			{
-				p_id = res->getString("id");
-				p_password = res->getString("password");
-				x = res->getInt("x");
-				y = res->getInt("y");
-				p_name = res->getString("name");
-				win = res->getInt("win");
-				lose = res->getInt("lose");
-				level = res->getInt("level");
-				EXP = res->getDouble("EXP");
+			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM Player WHERE Login_ID = '" + _id + "'"));
+
+			if (res->next()) {
+				string p_id = res->getString("Login_ID");
+				string p_password = res->getString("Login_password");
+				int x = res->getInt("player_x");
+				int y = res->getInt("player_y");
+				string p_name = res->getString("Player_name");
+				int win = res->getInt("Win");
+				int lose = res->getInt("Lose");
+				int level = res->getInt("Level");
+				double EXP = res->getDouble("EXP");
+
+				return Player(p_id, p_password, x, y, p_name, win, lose, level, EXP);
 			}
-			return Player(p_id, p_password, x, y, p_name, win, lose, level, EXP);
 		}
 		catch (SQLException& e) {
 			cout << "Query failed: " << e.what() << endl;
 		}
-		return Player();
-	}*/
+		return Player(); // 빈 플레이어 리턴
+	}
+
 
 };
 

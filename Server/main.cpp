@@ -97,26 +97,26 @@ void processMessage(const std::string& msg, int playerId) {
     // 로그인 로직추가
     if (command == "LOGIN") {
         iss >> id >> password;
-        DBM.setIdPassword(id, password);
         string response;
-        if(DBM.canLogin()){
-            response = "LOGIN TRUE\n";
+        if(DBM.canLogin(id, password)){
 
-            // 해결해야할것
-            // DB 테이블 구축 후 정보받아서 플레이어 생성
-            // 클라측 플레이어한테 좌표보내기
-            /*Player player = DBM.loadPlayer(id);
+            Player player = DBM.loadPlayer(id);
             if (player.isEmpty()) {
                 std::cout << "DB 혹은 서버에서 플레이어 정보 로드 실패" << std::endl;
             }
             else {
                 players[playerId] = player;
-            }*/
+            }
+            response = "LOGIN TRUE " + std::to_string(player.x) + ' ' + std::to_string(player.y) + '\n';
+            cout << response << endl;
+            asio::write(*clientSockets[playerId], asio::buffer(response));
         }
         else {
-            response = "LOGIN FALSE\n";
+            response = "LOGIN FALSE";
+            cout << response << endl;
+            asio::write(*clientSockets[playerId], asio::buffer(response));
         }
-        asio::write(*clientSockets[playerId], asio::buffer(response));
+        
     }
 
     if (command == "MOVE") {
@@ -218,7 +218,7 @@ int main() {
 
             std::lock_guard<std::mutex> lock(playerMutex);
             int id = nextPlayerId++;
-            players[id] = {2, 39};  // 깡통
+            players[id] = { 99,99 };  // 깡통
             clientSockets[id] = socket;
 
             std::cout << "[Server] Player " << id << " 접속!\n";

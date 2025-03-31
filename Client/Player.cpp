@@ -30,6 +30,10 @@ Player::Player() {
     }
 }
 
+void Player::setTile(sf::Vector2i& pos) {
+    tilePos = pos;
+}
+
 void Player::setPosition(const sf::Vector2f& pos) {
     if (sprite.has_value())
         sprite->setPosition(pos);

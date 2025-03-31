@@ -95,15 +95,18 @@ public:
                     else
                     {
                         auto it = otherPlayers.find(id);
+                        sf::Vector2i otherTile = { x , y };
                         if (it != otherPlayers.end())
                         {
                             // 이미 존재하면 위치만 갱신
+                            it->second.setTile(otherTile);
                             it->second.setTargetTilePosition({ x, y });
                         }
                         else
                         {
                             // 처음 등장한 플레이어
                             Player newPlayer;
+                            newPlayer.setTile(otherTile);
                             newPlayer.setTargetTilePosition({ x, y });
                             otherPlayers[id] = newPlayer;
                         }

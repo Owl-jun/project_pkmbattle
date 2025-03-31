@@ -95,28 +95,29 @@ public:
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
                 NetworkManager::getInstance().send(msg);
 
-                std::string tag, response;
+                std::string tag, response , x , y;
                 std::string line = NetworkManager::getInstance().receive_line();
-
-                while (line.empty())
-                {
-                    line = NetworkManager::getInstance().receive_line();
-                }
+                std::cout << line << std::endl;
                 std::istringstream iss(line);
-                iss >> tag >> response;
-
-                std::cout << tag << " , " << response << std::endl;
+                iss >> tag >> response >> x >> y;
+                std::cout << tag << response << x << y << std::endl;
                 
                 if (tag == "LOGIN") {
                     std::cout << "로그인 태그 받음" << std::endl;
                     if (response == "TRUE") {
-                        std::cout << "login complete!\n";
+                        std::cout << "login complete!\n";            
+                        sf::Vector2f pos = { std::stoi(x)*60.f, std::stoi(y) * 60.f };
+                        std::cout << pos.x << pos.y << std::endl;
+                        GameManager::getInstance().getPlayer().setPosition(pos);
+                        std::cout << "setTile 실행" << std::endl;
                         SceneManager::getInstance().changeScene("world");
                     }
                     else {
                         std::cout << "login failed!\n";
+                        return;
                     }
                 }
+                else { return; }
             }
         ));
 

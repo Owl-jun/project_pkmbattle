@@ -76,7 +76,7 @@ public:
 
         return *this;
     }
-
+    void setTile(sf::Vector2i& pos);
     void sendDirectionToServer(Direction dir);
     void update(float dt,bool isLocalPlayer);
     void draw(sf::RenderWindow& window);
