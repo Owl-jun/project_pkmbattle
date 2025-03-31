@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "SettingsOverlay.hpp"
 #include "NetworkManager.hpp"
+#include "GameManager.h"
 
 class worldScene : public BaseScene {
 private:

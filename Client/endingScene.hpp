@@ -175,7 +175,7 @@ public:
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
         if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Escape)) {
-            SceneManager::getInstance().changeScene(new TitleScene());
+            SceneManager::getInstance().changeScene("title");
         }
     }
 
