@@ -21,6 +21,7 @@ public:
     void connect(const std::string& ip, const std::string& port);
     void send(const std::string& data);
     std::string receive();
+    std::string receive_line();
 
     std::shared_ptr<asio::ip::tcp::socket> getSocket();
 };

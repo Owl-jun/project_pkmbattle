@@ -93,15 +93,29 @@ public:
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
-
                 NetworkManager::getInstance().send(msg);
-                std::string response = NetworkManager::getInstance().receive();
-                if (response == "TRUE") {
-                    std::cout << "login complete!\n";
-                    SceneManager::getInstance().changeScene("world");
+
+                std::string tag, response;
+                std::string line = NetworkManager::getInstance().receive_line();
+
+                while (line.empty())
+                {
+                    line = NetworkManager::getInstance().receive_line();
                 }
-                else {
-                    std::cout << "login failed!\n";
+                std::istringstream iss(line);
+                iss >> tag >> response;
+
+                std::cout << tag << " , " << response << std::endl;
+                
+                if (tag == "LOGIN") {
+                    std::cout << "로그인 태그 받음" << std::endl;
+                    if (response == "TRUE") {
+                        std::cout << "login complete!\n";
+                        SceneManager::getInstance().changeScene("world");
+                    }
+                    else {
+                        std::cout << "login failed!\n";
+                    }
                 }
             }
         ));
