@@ -23,12 +23,24 @@ struct Poketmon {
 };
 
 struct Player{
-	int x, y;
+	string id;
+	string password;
+	int x = 99;
+	int y = 99;
 	string name;
 	int win;
 	int lose;
 	int level;
 	double EXP;
+
+	Player() {}
+	Player(int x, int y)
+		: x(x), y(y)
+	{}
+
+	bool isEmpty() {
+		return id.empty();
+	}
 };
 
 class DBManager {
@@ -80,5 +92,33 @@ public:
 			cout << "Query failed: " << e.what() << endl;
 		}
 	}
+
+	/*Player loadPlayer(string _id) {
+		try {
+			unique_ptr<Statement> stmt(conn->createStatement());
+			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM player WHERE login_id = '" + _id + "'"));
+			string p_id, p_password, p_name;
+			int x, y, win, lose, level;
+			double EXP;
+			while (res->next())
+			{
+				p_id = res->getString("id");
+				p_password = res->getString("password");
+				x = res->getInt("x");
+				y = res->getInt("y");
+				p_name = res->getString("name");
+				win = res->getInt("win");
+				lose = res->getInt("lose");
+				level = res->getInt("level");
+				EXP = res->getDouble("EXP");
+			}
+			return Player(p_id, p_password, x, y, p_name, win, lose, level, EXP);
+		}
+		catch (SQLException& e) {
+			cout << "Query failed: " << e.what() << endl;
+		}
+		return Player();
+	}*/
+
 };
 

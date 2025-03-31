@@ -1,4 +1,4 @@
-// Player.cpp
+ï»¿// Player.cpp
 #include "pch.h"
 #include "Player.h"
 #include "KeyManager.h"
@@ -52,8 +52,8 @@ void Player::setTargetTilePosition(const sf::Vector2i& pos) {
     else
         currentDirection = (dir.y > 0) ? Direction::Down : Direction::Up;
 
-    // µð¹ö±ë ·Î±× Ãâ·Â 
-    std::cout << "[Client] ÀÌµ¿ ¸í·É ¼ö½Å: (" << pos.x << ", " << pos.y << ")\n";
+    // ë””ë²„ê¹… ë¡œê·¸ ì¶œë ¥ 
+    std::cout << "[Client] ì´ë™ ëª…ë ¹ ìˆ˜ì‹ : (" << pos.x << ", " << pos.y << ")\n";
 
 }
 
@@ -100,8 +100,8 @@ void Player::update(float dt, bool isLocalPlayer) {
         if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             if (isLocalPlayer)
             {   
-                // ÇöÀç Ä³¸¯ÅÍ°¡ ¿òÁ÷ÀÌÁö¾Ê°í ¹æÇâ¸¸ ¹Ù²ð¶§ º»ÀÎ Ä³¸¯ÅÍ¸¸ ¹Ù²î´Â Çö»ó
-                // ÀÇ½ÉÁöÁ¡ , ÇØ°á¹æ¹ý ? ¼­¹ö¿¡¼­ ¹æÇâµµ Àü¼Û?
+                // í˜„ìž¬ ìºë¦­í„°ê°€ ì›€ì§ì´ì§€ì•Šê³  ë°©í–¥ë§Œ ë°”ë€”ë•Œ ë³¸ì¸ ìºë¦­í„°ë§Œ ë°”ë€ŒëŠ” í˜„ìƒ
+                // ì˜ì‹¬ì§€ì  , í•´ê²°ë°©ë²• ? ì„œë²„ì—ì„œ ë°©í–¥ë„ ì „ì†¡?
                 currentDirection = lastHeldDirection;
                 sendDirectionToServer(currentDirection);
                 moveCooldown = 0.15f;

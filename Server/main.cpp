@@ -98,10 +98,25 @@ void processMessage(const std::string& msg, int playerId) {
     if (command == "LOGIN") {
         iss >> id >> password;
         DBM.setIdPassword(id, password);
+        string response;
         if(DBM.canLogin()){
-            string response = "LOGIN TRUE\n";
-            asio::write(*clientSockets[playerId], asio::buffer(response));
+            response = "LOGIN TRUE\n";
+
+            // 해결해야할것
+            // DB 테이블 구축 후 정보받아서 플레이어 생성
+            // 클라측 플레이어한테 좌표보내기
+            /*Player player = DBM.loadPlayer(id);
+            if (player.isEmpty()) {
+                std::cout << "DB 혹은 서버에서 플레이어 정보 로드 실패" << std::endl;
+            }
+            else {
+                players[playerId] = player;
+            }*/
         }
+        else {
+            response = "LOGIN FALSE\n";
+        }
+        asio::write(*clientSockets[playerId], asio::buffer(response));
     }
 
     if (command == "MOVE") {
@@ -203,7 +218,7 @@ int main() {
 
             std::lock_guard<std::mutex> lock(playerMutex);
             int id = nextPlayerId++;
-            players[id] = { 2, 39 };  // 초기 위치
+            players[id] = {2, 39};  // 깡통
             clientSockets[id] = socket;
 
             std::cout << "[Server] Player " << id << " 접속!\n";

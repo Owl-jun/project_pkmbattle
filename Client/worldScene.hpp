@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "SettingsOverlay.hpp"
 #include "NetworkManager.hpp"
+#include "GameManager.h"
 
 class worldScene : public BaseScene {
 private:
@@ -50,7 +51,7 @@ public:
         bg.emplace(bgTex);
         bg->setPosition({60.f,60.f});
 
-        // Ä«¸Ş¶ó ¼³Á¤
+        // ì¹´ë©”ë¼ ì„¤ì •
         camera.setSize({ 800.f, 600.f });
         camera.setCenter(player.getPosition());
 
@@ -71,7 +72,7 @@ public:
         int fps = static_cast<int>(1.f / dt);
         frame.setString("FPS: " + std::to_string(fps));
 
-        // ¼­¹ö ÀÀ´ä ¹Ş¾Æ¼­ À§Ä¡ ¹İ¿µ
+        // ì„œë²„ ì‘ë‹µ ë°›ì•„ì„œ ìœ„ì¹˜ ë°˜ì˜
         std::string response = NetworkManager::getInstance().receive();
 
         if (!response.empty()) {
@@ -88,7 +89,7 @@ public:
                     {
                         sf::Vector2i serverTile = { x, y };
                         if (serverTile != player.getTilePosition()) {
-                            player.setTargetTilePosition(serverTile); // º¯°æµÈ °æ¿ì¿¡¸¸!
+                            player.setTargetTilePosition(serverTile); // ë³€ê²½ëœ ê²½ìš°ì—ë§Œ!
                         }
                     }
                     else
@@ -96,21 +97,21 @@ public:
                         auto it = otherPlayers.find(id);
                         if (it != otherPlayers.end())
                         {
-                            // ÀÌ¹Ì Á¸ÀçÇÏ¸é À§Ä¡¸¸ °»½Å
+                            // ì´ë¯¸ ì¡´ì¬í•˜ë©´ ìœ„ì¹˜ë§Œ ê°±ì‹ 
                             it->second.setTargetTilePosition({ x, y });
                         }
                         else
                         {
-                            // Ã³À½ µîÀåÇÑ ÇÃ·¹ÀÌ¾î
+                            // ì²˜ìŒ ë“±ì¥í•œ í”Œë ˆì´ì–´
                             Player newPlayer;
                             newPlayer.setTargetTilePosition({ x, y });
                             otherPlayers[id] = newPlayer;
                         }
                     }
                 }
-                // Á¢¼Ó Á¾·áÇÑ ÇÃ·¹ÀÌ¾î Á¦°Å
+                // ì ‘ì† ì¢…ë£Œí•œ í”Œë ˆì´ì–´ ì œê±°
                 std::unordered_set<int> activeIds;
-                iss.clear(); iss.seekg(0); std::string dummy; iss >> dummy; // ´Ù½Ã ÀĞ±â À§ÇØ rewind
+                iss.clear(); iss.seekg(0); std::string dummy; iss >> dummy; // ë‹¤ì‹œ ì½ê¸° ìœ„í•´ rewind
                 while (iss >> id >> x >> y) activeIds.insert(id);
 
                 for (auto it = otherPlayers.begin(); it != otherPlayers.end(); ) 
@@ -130,7 +131,7 @@ public:
         }
 
         if (!settings.isVisible()) {
-            player.update(dt,true);  // ¼³Á¤Ã¢ ¿­¸®¸é ¸ØÃã
+            player.update(dt,true);  // ì„¤ì •ì°½ ì—´ë¦¬ë©´ ë©ˆì¶¤
         }
         for (auto& [id, p] : otherPlayers) {
             p.update(dt,false);  
@@ -140,14 +141,14 @@ public:
         settings.update(window);
         window.setView(camera);
 
-        // frameÀ» Ä«¸Ş¶ó ±âÁØ È­¸é ÁÂ»ó´Ü¿¡ ¹èÄ¡
+        // frameì„ ì¹´ë©”ë¼ ê¸°ì¤€ í™”ë©´ ì¢Œìƒë‹¨ì— ë°°ì¹˜
         sf::Vector2f topLeft = camera.getCenter() - camera.getSize() / 2.f;
         frame.setPosition(topLeft + sf::Vector2f(10.f, 10.f));
     }
 
 
     void render(sf::RenderWindow& window) override {
-        // Ä«¸Ş¶ó ºä¿¡¼­ ¸Ê/Ä³¸¯ÅÍ ·»´õ¸µ
+        // ì¹´ë©”ë¼ ë·°ì—ì„œ ë§µ/ìºë¦­í„° ë Œë”ë§
         window.setView(camera);
 
         if (bg.has_value()) window.draw(*bg);
