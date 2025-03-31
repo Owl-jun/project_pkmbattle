@@ -81,9 +81,9 @@ public:
 	bool canLogin() {
 		try {
 			unique_ptr<Statement> stmt(conn->createStatement());
-			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM player WHERE login_id = '" + id + "'"));
+			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM Player WHERE Login_ID = '" + id + "'"));
 			res->next();
-			if (res->getString("login_pw") == password) {
+			if (res->getString("Login_password") == password) {
 				return true;
 			}
 			else { return false; }
