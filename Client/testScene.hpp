@@ -14,6 +14,8 @@
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
 #include "ResourceManager.hpp"
+#include "GameManager.h"
+
 
 class testScene : public BaseScene {
 private:

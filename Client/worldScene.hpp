@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
@@ -11,6 +11,8 @@
 #include "Player.h"
 #include "SettingsOverlay.hpp"
 #include "NetworkManager.hpp"
+#include "SelectOverlay.hpp"
+#include "GameManager.h"
 
 class worldScene : public BaseScene {
 private:
@@ -27,7 +29,9 @@ private:
 
     sf::View camera;
     SettingsOverlay settings;
+    SelectOverlay selectOverlay;
     float escCooldown = 0.f;
+    float selectCooldown = 0.f;
 
 public:
     worldScene()
@@ -36,6 +40,7 @@ public:
         , frame(font, deltatime, 24)
         , player(GameManager::getInstance().getPlayer())
         , settings({ 800.f,600.f }, ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
+        , selectOverlay({ 400.f, 200.f }, ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , myId(-1)
     {
         myId = NetworkManager::getInstance().getMyId();
@@ -44,16 +49,15 @@ public:
 
     void init() override {
         frame.setFont(font);
-        frame.setPosition({0.f,10.f});
+        frame.setPosition({ 0.f,10.f });
         frame.setFillColor(sf::Color::White);
         bgTex = ResourceManager::getInstance().getTexture("C:/Source/project_pkmbattle/Client/assets/worldMap.png");
         bg.emplace(bgTex);
-        bg->setPosition({60.f,60.f});
+        bg->setPosition({ 60.f,60.f });
 
-        // Ä«¸Ş¶ó ¼³Á¤
+        // ì¹´ë©”ë¼ ì„¤ì •
         camera.setSize({ 800.f, 600.f });
         camera.setCenter(player.getPosition());
-
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
@@ -62,16 +66,31 @@ public:
             std::cout << "Visible: " << settings.isVisible() << "\n";
             escCooldown = 0.5f;
         }
-        settings.handleEvent(event, window);
+
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Num1) && selectCooldown <= 0.f) {
+            selectOverlay.toggle();
+            selectOverlay.setCenter(camera.getCenter());
+            std::cout << "SelectOverlay Visible: " << selectOverlay.isVisible() << "\n";
+            selectCooldown = 0.5f;
+        }
+
+        if (selectOverlay.isVisible()) {
+            selectOverlay.handleEvent(event, window);
+        }
+        else {
+            settings.handleEvent(event, window);
+        }
     }
+
 
     void update(sf::RenderWindow& window) override {
         float dt = TimeManager::getInstance().getDeltaTime();
         escCooldown -= dt;
+        selectCooldown -= dt;
         int fps = static_cast<int>(1.f / dt);
         frame.setString("FPS: " + std::to_string(fps));
 
-        // ¼­¹ö ÀÀ´ä ¹Ş¾Æ¼­ À§Ä¡ ¹İ¿µ
+        // ì„œë²„ ì‘ë‹µ ë°›ì•„ì„œ ìœ„ì¹˜ ë°˜ì˜
         std::string response = NetworkManager::getInstance().receive();
 
         if (!response.empty()) {
@@ -88,7 +107,7 @@ public:
                     {
                         sf::Vector2i serverTile = { x, y };
                         if (serverTile != player.getTilePosition()) {
-                            player.setTargetTilePosition(serverTile); // º¯°æµÈ °æ¿ì¿¡¸¸!
+                            player.setTargetTilePosition(serverTile); // ë³€ê²½ëœ ê²½ìš°ì—ë§Œ!
                         }
                     }
                     else
@@ -96,24 +115,24 @@ public:
                         auto it = otherPlayers.find(id);
                         if (it != otherPlayers.end())
                         {
-                            // ÀÌ¹Ì Á¸ÀçÇÏ¸é À§Ä¡¸¸ °»½Å
+                            // ì´ë¯¸ ì¡´ì¬í•˜ë©´ ìœ„ì¹˜ë§Œ ê°±ì‹ 
                             it->second.setTargetTilePosition({ x, y });
                         }
                         else
                         {
-                            // Ã³À½ µîÀåÇÑ ÇÃ·¹ÀÌ¾î
+                            // ì²˜ìŒ ë“±ì¥í•œ í”Œë ˆì´ì–´
                             Player newPlayer;
                             newPlayer.setTargetTilePosition({ x, y });
                             otherPlayers[id] = newPlayer;
                         }
                     }
                 }
-                // Á¢¼Ó Á¾·áÇÑ ÇÃ·¹ÀÌ¾î Á¦°Å
+                // ì ‘ì† ì¢…ë£Œí•œ í”Œë ˆì´ì–´ ì œê±°
                 std::unordered_set<int> activeIds;
-                iss.clear(); iss.seekg(0); std::string dummy; iss >> dummy; // ´Ù½Ã ÀĞ±â À§ÇØ rewind
+                iss.clear(); iss.seekg(0); std::string dummy; iss >> dummy; // ë‹¤ì‹œ ì½ê¸° ìœ„í•´ rewind
                 while (iss >> id >> x >> y) activeIds.insert(id);
 
-                for (auto it = otherPlayers.begin(); it != otherPlayers.end(); ) 
+                for (auto it = otherPlayers.begin(); it != otherPlayers.end(); )
                 {
                     if (activeIds.find(it->first) == activeIds.end()) {
                         it = otherPlayers.erase(it);
@@ -129,38 +148,44 @@ public:
             }
         }
 
-        if (!settings.isVisible()) {
-            player.update(dt,true);  // ¼³Á¤Ã¢ ¿­¸®¸é ¸ØÃã
+        if (!settings.isVisible() && !selectOverlay.isVisible()) {
+            player.update(dt, true);  // ì„¤ì •ì°½ ì—´ë¦¬ë©´ ë©ˆì¶¤
         }
         for (auto& [id, p] : otherPlayers) {
-            p.update(dt,false);  
+            p.update(dt, false);
         }
         camera.setCenter(player.getPosition());
         settings.setCenter(camera.getCenter());
         settings.update(window);
         window.setView(camera);
 
-        // frameÀ» Ä«¸Ş¶ó ±âÁØ È­¸é ÁÂ»ó´Ü¿¡ ¹èÄ¡
+        // frameì„ ì¹´ë©”ë¼ ê¸°ì¤€ í™”ë©´ ì¢Œìƒë‹¨ì— ë°°ì¹˜
         sf::Vector2f topLeft = camera.getCenter() - camera.getSize() / 2.f;
         frame.setPosition(topLeft + sf::Vector2f(10.f, 10.f));
+
+        if (selectOverlay.isVisible()) {
+            selectOverlay.update(window);
+        }
     }
 
-
     void render(sf::RenderWindow& window) override {
-        // Ä«¸Ş¶ó ºä¿¡¼­ ¸Ê/Ä³¸¯ÅÍ ·»´õ¸µ
+        // ì¹´ë©”ë¼ ë·°ì—ì„œ ë§µ/ìºë¦­í„° ë Œë”ë§
         window.setView(camera);
 
         if (bg.has_value()) window.draw(*bg);
-        
+
         player.draw(window);
 
         for (auto& [id, p] : otherPlayers) {
             p.draw(window);
         }
 
-        window.draw(frame);  
-        
-        settings.render(window);
-    }
+        window.draw(frame);
 
+        settings.render(window);
+
+        if (selectOverlay.isVisible()) {
+            selectOverlay.render(window);
+        }
+    }
 };

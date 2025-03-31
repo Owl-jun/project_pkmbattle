@@ -10,6 +10,7 @@
 #include "ResourceManager.hpp"
 #include "SoundManager.hpp"
 #include "NetworkManager.hpp"
+#include "Testzz.hpp"
 
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
@@ -59,6 +60,7 @@ void GameManager::init() {
     ResourceManager::getInstance().init();
     player = std::make_unique<Player>();
     // 주의할 점. 절대 같은 씬 또 만들면 안됨
+    //SceneManager::getInstance().registerScene("Test", new Testzz());
     SceneManager::getInstance().registerScene("opening", new OpeningScene());
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());

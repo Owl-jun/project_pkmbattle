@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseUI.hpp"
 #include <vector>
+#include "UIButton.hpp"
 
 class UIManager {
 private:
@@ -14,13 +15,12 @@ public:
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         if (event.is<sf::Event::KeyPressed>() && KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Tab)) {
             bool shiftHeld = KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::LShift);
-            focusStep(shiftHeld ? -1 : 1);  // shift 누르면 역방향
+            focusStep(shiftHeld ? -1 : 1);
             return;
         }
         for (auto& elem : uiElements)
             elem->handleEvent(event, window);
     }
-
 
     void update(sf::RenderWindow& window) {
         for (auto& elem : uiElements)
@@ -59,6 +59,27 @@ public:
         }
     }
 
+    void triggerFocusedElement() {
+        for (auto& elem : uiElements) {
+            if (elem->isFocusable() && elem->isFocused()) {
+                if (auto* button = dynamic_cast<UIButton*>(elem)) {
+                    button->click();
+                    break;
+                }
+            }
+        }
+    }
+
+    const std::vector<BaseUI*>& getElements() const {
+        return uiElements;
+    }
+
+    int getElementIndex(BaseUI* elem) const {
+        for (int i = 0; i < uiElements.size(); ++i) {
+            if (uiElements[i] == elem) return i;
+        }
+        return -1;
+    }
 
     ~UIManager() {
         clear();

@@ -1,5 +1,19 @@
 #pragma once
 #include "BaseUI.hpp"
+#include "pch.h"
+#include "KeyManager.h"
+#include "BaseScene.hpp"
+#include "SceneManager.hpp"
+#include "LoginScene.hpp"
+#include "UIButton.hpp"
+#include "UIManager.hpp"
+#include "TimeManager.hpp"
+#include "ResourceManager.hpp"
+#include "Player.h"
+#include "SettingsOverlay.hpp"
+#include "NetworkManager.hpp"
+#include "SelectOverlay.hpp"
+#include "GameManager.h"
 
 class UITextBox : public BaseUI {
 private:
@@ -75,6 +89,7 @@ public:
 
     bool isFocusable() const override { return true; }
     bool isFocused() const override { return focused; }
+   
 
     void setFocus(bool focus) override { 
         focused = focus; 
