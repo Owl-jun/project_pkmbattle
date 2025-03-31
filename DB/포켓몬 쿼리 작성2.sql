@@ -11,15 +11,6 @@ CREATE TABLE Player (
     player_y INT
 );
 
-CREATE TABLE Poketmon (
-	PKM_id INT AUTO_INCREMENT PRIMARY KEY,
-    Skill_SetID INT NOT NULL,
-    PKM_name VARCHAR(50) NOT NULL,
-    PKM_type VARCHAR(50) NOT NULL,
-    HP FLOAT NOT NULL,
-    FOREIGN KEY (Skill_SetID) REFERENCES PKM_Skill2(Skill_SetID)
-);
-
 CREATE TABLE Skill (
 	Skill_id INT AUTO_INCREMENT PRIMARY KEY,
     Skill_name VARCHAR(50) NOT NULL,
@@ -38,6 +29,19 @@ CREATE TABLE PKM_Skill2 (
     FOREIGN KEY (Skill3_id) REFERENCES Skill(Skill_id),
     FOREIGN KEY (Skill4_id) REFERENCES Skill(Skill_id)
 );
+
+CREATE TABLE Poketmon (
+	PKM_id INT AUTO_INCREMENT PRIMARY KEY,
+    Skill_SetID INT NOT NULL,
+    PKM_name VARCHAR(50) NOT NULL,
+    PKM_type VARCHAR(50) NOT NULL,
+    HP FLOAT NOT NULL,
+    FOREIGN KEY (Skill_SetID) REFERENCES PKM_Skill2(Skill_SetID)
+);
+
+
+
+
 
 SELECT * FROM Player;
 
@@ -60,6 +64,19 @@ INSERT INTO Skill (Skill_id, Skill_name, Attack, Skill_type) VALUES (1, '몸통�
                                                                   , (8, '하이드로펌프', 40, '물')
                                                                   , (9, '덩클채찍', 30, '풀')
                                                                   , (10, '잎날가르기', 40, '풀');
+                                                                  
+SELECT * FROM PKM_Skill;
+
+INSERT INTO PKM_Skill2 (Skill_SetID, Skill1_id, Skill2_id, Skill3_id, Skill4_id) VALUES (1, 1, 2, 3, 4)
+																					  , (2, 1, 2, 5, 6)
+                                                                                      , (3, 1, 2, 7, 8)
+                                                                                      , (4, 1, 2, 9, 10)
+                                                                                      , (5, 1, 2, 5, 6)
+                                                                                      , (6, 1, 2, 7, 8)
+                                                                                      , (7, 1, 2, 3, 4)
+                                                                                      , (8, 1, 2, 9, 10)
+                                                                                      , (9, 1, 2, 5, 6)
+                                                                                      , (10, 1, 2, 7, 8);
 																	
 SELECT * FROM Poketmon;
 
@@ -74,15 +91,4 @@ INSERT INTO Poketmon (PKM_id, Skill_SetID, PKM_name, PKM_type, HP) VALUES (1, 1,
                                                        , (9, 9, '브케인', '불', 100)
                                                        , (10, 10, '리아코', '물', 100);
                                                        
-SELECT * FROM PKM_Skill;
 
-INSERT INTO PKM_Skill (Skill_SetID, Skill1_id, Skill2_id, Skill3_id, Skill4_id) VALUES (1, 1, 2, 3, 4)
-																					  , (2, 1, 2, 5, 6)
-                                                                                      , (3, 1, 2, 7, 8)
-                                                                                      , (4, 1, 2, 9, 10)
-                                                                                      , (5, 1, 2, 5, 6)
-                                                                                      , (6, 1, 2, 7, 8)
-                                                                                      , (7, 1, 2, 3, 4)
-                                                                                      , (8, 1, 2, 9, 10)
-                                                                                      , (9, 1, 2, 5, 6)
-                                                                                      , (10, 1, 2, 7, 8);
