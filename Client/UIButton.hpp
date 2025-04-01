@@ -54,13 +54,14 @@ public:
 
         text.setFont(sharedFont);
         text.setString(label); // 와이드 문자열
-        text.setCharacterSize(36); //텍스트 UI 폰트 크기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        text.setCharacterSize(28); //텍스트 UI 폰트 크기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         text.setFillColor(sf::Color::Black);
 
         const auto bounds = text.getLocalBounds();
         text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });        
         text.setPosition(
-         {shape.getPosition().x + shape.getSize().x / 2.f, shape.getPosition().y + shape.getSize().y / 2.f }
+         {shape.getPosition().x + shape.getSize().x / 2.f,
+         shape.getPosition().y + shape.getSize().y / 2.f - 300.f }
         );
     }
 
