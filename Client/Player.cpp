@@ -1,4 +1,4 @@
-// Player.cpp
+ï»¿// Player.cpp
 #include "pch.h"
 #include "Player.h"
 #include "KeyManager.h"
@@ -6,13 +6,12 @@
 #include "NetworkManager.hpp"
 #include <cmath>
 
-Player::Player() {
+Player::Player(int x, int y) {
     for (int i = 0; i <= 9; ++i) {
         std::string path = "C:/Source/project_pkmbattle/Client/assets/player0" + std::to_string(i) + ".png";
         std::shared_ptr<sf::Texture> tex = std::make_shared<sf::Texture>(
             ResourceManager::getInstance().getTexture(path)
         );
-
 
         if (i <= 2) downFrames.push_back(tex);
         else if (i <= 4) leftFrames.push_back(tex);
@@ -20,7 +19,7 @@ Player::Player() {
         else upFrames.push_back(tex);
     }
 
-    tilePos = { 2, 39 };
+    tilePos = { x, y };
     targetWorldPos = static_cast<sf::Vector2f>(tilePos) * static_cast<float>(tileSize);
 
     if (!downFrames.empty()) {
@@ -28,6 +27,11 @@ Player::Player() {
         sprite->setPosition(targetWorldPos);
         sprite->setScale({ 1.f, 1.f });
     }
+    currentDirection = Direction::Down;
+}
+
+void Player::setTile(sf::Vector2i& pos) {
+    tilePos = pos;
 }
 
 void Player::setPosition(const sf::Vector2f& pos) {
@@ -52,9 +56,19 @@ void Player::setTargetTilePosition(const sf::Vector2i& pos) {
     else
         currentDirection = (dir.y > 0) ? Direction::Down : Direction::Up;
 
-    // µð¹ö±ë ·Î±× Ãâ·Â 
-    std::cout << "[Client] ÀÌµ¿ ¸í·É ¼ö½Å: (" << pos.x << ", " << pos.y << ")\n";
+    // ë””ë²„ê¹… ë¡œê·¸ ì¶œë ¥ 
+    std::cout << "[Client] ì´ë™ ëª…ë ¹ ìˆ˜ì‹ : (" << pos.x << ", " << pos.y << ")\n";
 
+}
+
+void Player::setCurDir(std::string d) {
+    if (!d.empty()) {
+        if (d == "UP") { currentDirection = Direction::Up; }
+        else if (d == "DOWN") { currentDirection = Direction::Down; }
+        else if (d == "RIGHT") { currentDirection = Direction::Right; }
+        else if (d == "LEFT") { currentDirection = Direction::Left; }
+    }
+    updateSpriteTexture();
 }
 
 sf::Vector2i Player::getTilePosition() const {
@@ -92,20 +106,19 @@ void Player::update(float dt, bool isLocalPlayer) {
     lastHeldDirection = Direction::None;
 
     if (!isMoving) {
-        if (keyMgr.isKeyPressed(sf::Keyboard::Key::Left))      lastHeldDirection = Direction::Left;
-        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right)) lastHeldDirection = Direction::Right;
-        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))    lastHeldDirection = Direction::Up;
-        else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
+        if (isLocalPlayer) {
+            if (keyMgr.isKeyPressed(sf::Keyboard::Key::Left))      lastHeldDirection = Direction::Left;
+            else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Right)) lastHeldDirection = Direction::Right;
+            else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Up))    lastHeldDirection = Direction::Up;
+            else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
+        }
 
-        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
-            if (isLocalPlayer)
-            {   
-                // ÇöÀç Ä³¸¯ÅÍ°¡ ¿òÁ÷ÀÌÁö¾Ê°í ¹æÇâ¸¸ ¹Ù²ð¶§ º»ÀÎ Ä³¸¯ÅÍ¸¸ ¹Ù²î´Â Çö»ó
-                // ÀÇ½ÉÁöÁ¡ , ÇØ°á¹æ¹ý ? ¼­¹ö¿¡¼­ ¹æÇâµµ Àü¼Û?
-                currentDirection = lastHeldDirection;
-                sendDirectionToServer(currentDirection);
-                moveCooldown = 0.15f;
-            }
+        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {  
+            // í˜„ìž¬ ìºë¦­í„°ê°€ ì›€ì§ì´ì§€ì•Šê³  ë°©í–¥ë§Œ ë°”ë€”ë•Œ ë³¸ì¸ ìºë¦­í„°ë§Œ ë°”ë€ŒëŠ” í˜„ìƒ
+            // ì˜ì‹¬ì§€ì  , í•´ê²°ë°©ë²• ? ì„œë²„ì—ì„œ ë°©í–¥ë„ ì „ì†¡?
+            currentDirection = lastHeldDirection;
+            sendDirectionToServer(currentDirection);
+            moveCooldown = 0.05f;
             animate(dt);
         }
     }
@@ -148,7 +161,7 @@ void Player::animate(float dt) {
     elapsedTime += dt;
     auto* frames = getCurrentFrameSet();
     if (!frames || frames->empty()) return;
-
+    if (currentFrame >= frames->size()) currentFrame = 0;
     if (elapsedTime >= frameTime) {
         elapsedTime = 0.f;
         currentFrame = (currentFrame + 1) % frames->size();
@@ -159,6 +172,11 @@ void Player::animate(float dt) {
 void Player::updateSpriteTexture() {
     auto* frames = getCurrentFrameSet();
     if (!frames || frames->empty()) return;
+
+    if (currentFrame >= frames->size()) {
+        currentFrame = 0;  // ë°©ì–´ ì½”ë“œ
+    }
+
     sprite->setTexture(*(*frames)[currentFrame]);
 }
 

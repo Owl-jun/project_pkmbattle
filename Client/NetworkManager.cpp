@@ -8,6 +8,7 @@ NetworkManager* NetworkManager::instance = nullptr;
 
 NetworkManager::NetworkManager() {
     socket = std::make_shared<tcp::socket>(io_context);
+    std::cout << "서버 연결 완료\n";
 }
 
 NetworkManager& NetworkManager::getInstance() {
@@ -59,6 +60,26 @@ std::string NetworkManager::receive() {
 
     return std::string(buffer, len);
 }
+
+std::string NetworkManager::receive_block() {
+    socket->non_blocking(false);
+    asio::streambuf buf;
+    asio::error_code ec;
+
+    // \n까지 읽기
+    size_t len = asio::read_until(*socket, buf, "\n", ec);
+
+    if (ec && ec != asio::error::eof) {
+        std::cerr << "[Network Error] receive 실패: " << ec.message() << "\n";
+        return "";
+    }
+
+    std::istream is(&buf);
+    std::string line;
+    std::getline(is, line); // \n은 제거됨
+    return line;
+}
+
 
 
 std::shared_ptr<tcp::socket> NetworkManager::getSocket() {

@@ -1,3 +1,5 @@
+ï»¿
+#include "DBManager.hpp"
 #include <iostream>
 #include <asio.hpp>
 #include <string>
@@ -58,7 +60,11 @@ const std::vector<std::vector<int>> collisionMap = {
 const int MAP_WIDTH = collisionMap[0].size();
 const int MAP_HEIGHT = collisionMap.size();
 
-// --- ¹æÇâ Á¤ÀÇ ---
+// --- DB M ì´ˆê¸°í™” //
+
+DBManager DBM;
+
+// --- ë°©í–¥ ì •ì˜ ---
 std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
     {"UP", {0, -1}},
     {"DOWN", {0, 1}},
@@ -66,71 +72,116 @@ std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
     {"RIGHT", {1, 0}}
 };
 
-// --- ÇÃ·¹ÀÌ¾î ±¸Á¶Ã¼ ---
-struct Player {
-    int x;
-    int y;
-};
 
-// --- ±Û·Î¹ú »óÅÂ ---
+// --- ê¸€ë¡œë²Œ ìƒíƒœ ---
 std::unordered_map<int, Player> players;
 std::unordered_map<int, std::shared_ptr<tcp::socket>> clientSockets;
 std::mutex playerMutex;
 int nextPlayerId = 1;
 
-// --- ÀÌµ¿ °¡´É ¿©ºÎ È®ÀÎ ---
+
+// --- ì´ë™ ê°€ëŠ¥ ì—¬ë¶€ í™•ì¸ ---
 bool canMoveTo(int x, int y) {
     return (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && collisionMap[y][x] == 0);
 }
 
-// --- ¸Ş½ÃÁö Ã³¸® ---
+// --- ë¸Œë¡œë“œìºìŠ¤íŠ¸ ---
+void broadcastPlayerStates() {
+    std::string response = "PLAYERS\n";
+    {
+        std::lock_guard<std::mutex> lock(playerMutex);
+        for (const auto& [id, player] : players) {
+            response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + " DOWN" + '\n';
+        }
+    }
+    for (const auto& [id, sock] : clientSockets) {
+        std::cout << "broadcast: " << response;
+        asio::write(*sock, asio::buffer(response));
+    }
+}
+
+
+// --- ë©”ì‹œì§€ ì²˜ë¦¬ ---
 void processMessage(const std::string& msg, int playerId) {
     std::istringstream iss(msg);
     std::string command, dir;
-    iss >> command >> dir;
+    std::string id, password;
+    iss >> command;
 
-    if (command == "MOVE" && directionOffset.count(dir)) {
-        std::lock_guard<std::mutex> lock(playerMutex);
-        auto& p = players[playerId];
-        int nx = p.x + directionOffset[dir].first;
-        int ny = p.y + directionOffset[dir].second;
+    /* ì´í˜•ìš° ê°•ì„ì¤€ */
+    // ë¡œê·¸ì¸ ë¡œì§ì¶”ê°€
+    if (command == "LOGIN") {
+        iss >> id >> password;
+        std::cout << id << password << std::endl;
+        string response;
+        if(DBM.canLogin(id, password)){
+            Player player = DBM.loadPlayer(id);
+            if (!player.isEmpty()) {
+                {
+                    std::lock_guard<std::mutex> lock(playerMutex);
+                    players[playerId] = player;
+                }
 
-        // ÇÃ·¹ÀÌ¾î °£ Ãæµ¹ °Ë»ç
-        bool blocked = false;
-        for (const auto& [otherId, otherPlayer] : players) {
-            if (otherId != playerId && otherPlayer.x == nx && otherPlayer.y == ny) {
-                blocked = true;
-                break;
+                response = "LOGIN TRUE " + std::to_string(player.x) + ' ' + std::to_string(player.y) + '\n';
+                asio::write(*clientSockets[playerId], asio::buffer(response));
+                broadcastPlayerStates();
             }
         }
-
-        bool moved = false;
-        if (!blocked && canMoveTo(nx, ny)) {
-            p.x = nx;
-            p.y = ny;
-            moved = true;
+        else {
+            response = "LOGIN FALSE\n";
+            cout << response << endl;
+            asio::write(*clientSockets[playerId], asio::buffer(response));
         }
+        
+    }
 
-        if (moved) {
-            std::string response = "PLAYERS\n";
+    if (command == "MOVE") {
+        iss >> dir;
+        if (directionOffset.count(dir)) {
+            std::lock_guard<std::mutex> lock(playerMutex);
+            auto& p = players[playerId];
+            p.dir = dir;
+            int nx = p.x + directionOffset[dir].first;
+            int ny = p.y + directionOffset[dir].second;
+
+            // í”Œë ˆì´ì–´ ê°„ ì¶©ëŒ ê²€ì‚¬
+            bool blocked = false;
+            for (const auto& [otherId, otherPlayer] : players) {
+                if (otherId != playerId && otherPlayer.x == nx && otherPlayer.y == ny) {
+                    blocked = true;
+                    break;
+                }
+            }
+
+            if (!blocked && canMoveTo(nx, ny)) {
+                p.x = nx;
+                p.y = ny;
+            }
+
+            std::string response;
+            response = "PLAYERS\n";
             for (const auto& [id, player] : players) {
-                response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + "\n";
+                cout << player.x << " , " << player.y << endl;
+                response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + " " + player.dir + "\n";
             }
 
             for (const auto& [id, sock] : clientSockets) {
                 asio::write(*sock, asio::buffer(response));
             }
+
         }
     }
+    iss.clear();
 }
 
-// --- Å¬¶óÀÌ¾ğÆ® Ã³¸® ½º·¹µå ---
+
+// --- í´ë¼ì´ì–¸íŠ¸ ì²˜ë¦¬ ìŠ¤ë ˆë“œ ---
 void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
     char temp[128];
     std::string buffer;
 
     try {
-        // Å¬¶óÀÌ¾ğÆ®¿¡°Ô º»ÀÎ ID Àü¼Û
+        // í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ë³¸ì¸ ID ì „ì†¡
         std::string idMsg = "ID " + std::to_string(playerId) + "\n";
         asio::write(*socket, asio::buffer(idMsg));
 
@@ -151,7 +202,7 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
     }
     catch (std::exception& e) {
         std::cerr << "[Server] Player " << playerId << " disconnected: " << e.what() << "\n";
-        // ¿¬°á Á¾·á ½Ã Å¬¸°¾÷
+        // ì—°ê²° ì¢…ë£Œ ì‹œ í´ë¦°ì—…
         std::lock_guard<std::mutex> lock(playerMutex);
         players.erase(playerId);
         clientSockets.erase(playerId);
@@ -170,12 +221,12 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
 
 }
 
-// --- ¼­¹ö ¸ŞÀÎ ---
+// --- ì„œë²„ ë©”ì¸ ---
 int main() {
     try {
         asio::io_context io;
         tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 9000));
-        std::cout << "[Server] ´ë±â Áß...\n";
+        std::cout << "[Server] ëŒ€ê¸° ì¤‘...\n";
 
         while (true) {
             auto socket = std::make_shared<tcp::socket>(io);
@@ -183,16 +234,16 @@ int main() {
 
             std::lock_guard<std::mutex> lock(playerMutex);
             int id = nextPlayerId++;
-            players[id] = { 2, 39 };  // ÃÊ±â À§Ä¡
+            
             clientSockets[id] = socket;
 
-            std::cout << "[Server] Player " << id << " Á¢¼Ó!\n";
+            std::cout << "[Server] Player " << id << " ì ‘ì†!\n";
 
             std::thread(handleClient, id, socket).detach();
         }
     }
     catch (std::exception& e) {
-        std::cerr << "[Server ¿À·ù] " << e.what() << "\n";
+        std::cerr << "[Server ì˜¤ë¥˜] " << e.what() << "\n";
     }
 
     return 0;

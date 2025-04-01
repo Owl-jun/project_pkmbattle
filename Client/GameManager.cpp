@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "GameManager.h"
 #include "KeyManager.h"
 #include "SceneManager.hpp"
@@ -9,17 +9,14 @@
 #include "TimeManager.hpp"
 #include "ResourceManager.hpp"
 #include "SoundManager.hpp"
-#include "NetworkManager.hpp"
+
 
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // À©µµ¿ì Å¸ÀÌÆ² ¹× ÇØ»óµµ¼³Á¤
+    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // ìœˆë„ìš° íƒ€ì´í‹€ ë° í•´ìƒë„ì„¤ì •
     , muteControl({ 720,500 })
 {
 }
 
-Player& GameManager::getPlayer() {
-    return *player;
-}
 
 GameManager& GameManager::getInstance() {
     static GameManager instance;
@@ -32,9 +29,9 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    // ³×Æ®¿öÅ©¿¬°á , Å×½ºÆ® ¿Ï·á ÈÄ ·Î±×ÀÎ½Ã ¿¬°áÇÏ´Â°É·Î º¯°æ
+    // ë„¤íŠ¸ì›Œí¬ì—°ê²° , í…ŒìŠ¤íŠ¸ ì™„ë£Œ í›„ ë¡œê·¸ì¸ì‹œ ì—°ê²°í•˜ëŠ”ê±¸ë¡œ ë³€ê²½
     NetworkManager::getInstance();
-    NetworkManager::getInstance().connect("localhost", "9000");   // ¿¬°á¹®Á¦ ÇØ°áµÇ¸é ÁÖ¼®ÇØÁ¦
+    NetworkManager::getInstance().connect("210.119.12.82", "9000");   // ì—°ê²°ë¬¸ì œ í•´ê²°ë˜ë©´ ì£¼ì„í•´ì œ
     std::string response;
     while (response.empty()) {
         response = NetworkManager::getInstance().receive();
@@ -48,23 +45,21 @@ void GameManager::init() {
         if (type == "ID") {
             iss >> myId;
             NetworkManager::getInstance().setMyId(myId);
-            std::cout << "[Client] ³» ID´Â " << NetworkManager::getInstance().getMyId() << "\n";
+            std::cout << "[Client] ë‚´ IDëŠ” " << NetworkManager::getInstance().getMyId() << "\n";
         }
         else {
             std::cout << "[Client] Unknown server response: " << response << "\n";
         }
     }
     // -------------------
-    SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // »ç¿îµå¸Å´ÏÀú
+    SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // ì‚¬ìš´ë“œë§¤ë‹ˆì €
     ResourceManager::getInstance().init();
-    player = std::make_unique<Player>();
-    // ÁÖÀÇÇÒ Á¡. Àı´ë °°Àº ¾À ¶Ç ¸¸µé¸é ¾ÈµÊ
+    // ì£¼ì˜í•  ì . ì ˆëŒ€ ê°™ì€ ì”¬ ë˜ ë§Œë“¤ë©´ ì•ˆë¨
     SceneManager::getInstance().registerScene("opening", new OpeningScene());
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());
-    SceneManager::getInstance().registerScene("world", new worldScene());
     // --------------------------------------
-    SceneManager::getInstance().changeScene("opening");    // ÃÊ±âÈ­¸é ¼³Á¤
+    SceneManager::getInstance().changeScene("opening");    // ì´ˆê¸°í™”ë©´ ì„¤ì •
 }
 
 void GameManager::update() { 
@@ -94,7 +89,7 @@ void GameManager::render() {
 void GameManager::run() {
     init();
     while (window.isOpen()) {
-        update();   // Á¤º¸¸¦ ÃÖ½ÅÈ­
-        render();   // È­¸é¿¡ Ãâ·ÂÇÏ´Â ±â´É.
+        update();   // ì •ë³´ë¥¼ ìµœì‹ í™”
+        render();   // í™”ë©´ì— ì¶œë ¥í•˜ëŠ” ê¸°ëŠ¥.
     }
 }
