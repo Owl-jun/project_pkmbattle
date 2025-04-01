@@ -3,7 +3,7 @@
 using namespace std;
 using namespace sql;
 
-#define SERVER_IP "210.119.12.82:3306"
+#define SERVER_IP "127.0.0.1:3306"
 #define USERNAME "root"
 #define PASSWORD "root"
 #define DATABASE "Pokemon"
@@ -130,6 +130,27 @@ public:
 		return Player(); // 빈 플레이어 리턴
 	}
 
+	//--------------------------------------
+	void savePlayer(const std::string& id, int x, int y, int win, int lose, int level, double EXP) {
+		try {
+			unique_ptr<Statement> stmt(conn->createStatement());
+			std::string query = "UPDATE Player SET "
+				"player_x = " + std::to_string(x) + ", "
+				"player_y = " + std::to_string(y) + ", "
+				"Win = " + std::to_string(win) + ", "
+				"Lose = " + std::to_string(lose) + ", "
+				"Level = " + std::to_string(level) + ", "
+				"EXP = " + std::to_string(EXP) + " "
+				"WHERE Login_ID = '" + id + "'";
+			stmt->executeUpdate(query);
+			std::cout << "[Saved data] " << "(" << x << ", " << y << ") " << "ID: " << id << ", "
+				<< "Wins: " << win << ", Losses: " << lose << ", "
+				<< "Level: " << level << ", EXP: " << EXP << "\n";
+		}
+		catch (SQLException& e) {
+			std::cerr << "Failed to save player data: " << e.what() << "\n";
+		}
+	}
+	//--------------------------------------
 
 };
-

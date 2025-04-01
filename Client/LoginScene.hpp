@@ -13,7 +13,7 @@
 #include "Player.h"
 #include "ResourceManager.hpp"
 #include "NetworkManager.hpp"
-
+#include "GameManager.h"
 
 class LoginScene : public BaseScene {
 private:

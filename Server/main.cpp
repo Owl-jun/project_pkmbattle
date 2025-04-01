@@ -112,8 +112,31 @@ void processMessage(const std::string& msg, int playerId) {
     std::string id, password;
     iss >> command;
 
-    /* 이형우 강석준 */
+    /* 이형우 강석준 황석준 */
     // 로그인 로직추가
+
+    //--------------------------------------
+    if (command == "EXIT") {
+        std::string response;
+
+        std::lock_guard<std::mutex> lock(playerMutex);
+        if (players.count(playerId)) {
+            try {
+                const auto& p = players[playerId];
+                DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
+                response = "EXIT_OK\n";
+            }
+            catch (std::exception& e) {
+                response = "EXIT_FAIL\n";
+            }
+        }
+        // 클라이언트에게 결과 전송
+        if (clientSockets.count(playerId)) {
+            asio::write(*clientSockets[playerId], asio::buffer(response));
+        }
+    }
+    //--------------------------------------
+
     if (command == "LOGIN") {
         iss >> id >> password;
         std::cout << id << password << std::endl;
@@ -195,6 +218,21 @@ void processMessage(const std::string& msg, int playerId) {
         }
     }
 
+    // 상호작용 명령 처리
+    if (command == "INTERACT") {
+        int targetId;
+        iss >> targetId;
+
+        std::string response = "INTERACTION " + std::to_string(playerId) + " " + std::to_string(targetId) + "\n";
+
+        for (auto& [id, sock] : clientSockets) {
+            asio::write(*sock, asio::buffer(response));
+        }
+    }
+
+
+
+
     iss.clear();
 }
 
@@ -226,6 +264,7 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
     }
     catch (std::exception& e) {
         std::cerr << "[Server] Player " << playerId << " disconnected: " << e.what() << "\n";
+        
         // 연결 종료 시 클린업
         std::lock_guard<std::mutex> lock(playerMutex);
         users.erase(ids[playerId]);

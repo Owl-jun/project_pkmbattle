@@ -1,6 +1,20 @@
 #pragma once
 #include "BaseUI.hpp"
-#include <cstdint>
+#include "pch.h"
+#include "KeyManager.h"
+#include "BaseScene.hpp"
+#include "SceneManager.hpp"
+#include "LoginScene.hpp"
+#include "UIButton.hpp"
+#include "UIManager.hpp"
+#include "TimeManager.hpp"
+#include "ResourceManager.hpp"
+#include "Player.h"
+#include "SettingsOverlay.hpp"
+#include "NetworkManager.hpp"
+#include "SelectOverlay.hpp"
+#include "GameManager.h"
+
 class UITextBox : public BaseUI {
 private:
     sf::RectangleShape box;
@@ -11,7 +25,7 @@ private:
 
     bool showCursor = true;
     float cursorTimer = 0.f;
-    const float cursorBlinkInterval = 0.5f; // 0.5ÃÊ¸¶´Ù ±ôºý
+    const float cursorBlinkInterval = 0.5f; // 0.5ï¿½Ê¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     sf::RectangleShape cursor;
 
 
@@ -64,7 +78,7 @@ public:
         text.setPosition({ pos.x + 10.f, pos.y - 12.f });
     }
     void update(sf::RenderWindow& window) override {
-        // Ä¿¼­ À§Ä¡ °»½Å
+        // Ä¿ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
         auto bounds = text.getGlobalBounds();
         float x = bounds.position.x + bounds.size.x + 2.f;
         float y = bounds.position.y;
@@ -95,6 +109,7 @@ public:
 
     bool isFocusable() const override { return true; }
     bool isFocused() const override { return focused; }
+   
 
     void setFocus(bool focus) override { 
         focused = focus; 
@@ -108,7 +123,7 @@ public:
         std::wcout << L"[DEBUG] input : " << input << std::endl;
         sf::String s;
         for (wchar_t ch : input) {
-            s += ch; //µµ °¡´É (°°Àº ÀÇ¹Ì)
+            s += ch; //ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½Ç¹ï¿½)
         }
         text.setString(s);
     }

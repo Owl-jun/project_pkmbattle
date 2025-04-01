@@ -33,7 +33,18 @@ void ResourceManager::init() {
         "C:/Source/project_pkmbattle/Client/assets/player08.png",
         "C:/Source/project_pkmbattle/Client/assets/player09.png",
         "C:/Source/project_pkmbattle/Client/assets/unmute_icon.png",
-        "C:/Source/project_pkmbattle/Client/assets/mute_icon.png"
+        "C:/Source/project_pkmbattle/Client/assets/mute_icon.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke1.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke2.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke3.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke4.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke5.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke6.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke7.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke8.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke9.png",
+        "C:/Source/project_pkmbattle/Client/assets/Poke10.png",
+
     };
 
     for (const auto& path : texturesToLoad) {
