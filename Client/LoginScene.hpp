@@ -30,6 +30,10 @@ private:
     UITextBox* idBox = nullptr;
     UITextBox* pwBox = nullptr;
 
+    bool loginCompleted = false;
+    std::thread receiveThread;
+
+
 public:
     LoginScene()
         : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
@@ -51,7 +55,6 @@ public:
         pswd.setFillColor(sf::Color::Black);
         id.setPosition({ 270, 277.f });
         pswd.setPosition({ 180, 305.f });
-
 
         idBox = new UITextBox(
             { 300.f, (272.f + 28.f) },
@@ -93,16 +96,18 @@ public:
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
 
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
-
                 NetworkManager::getInstance().send(msg);
-                std::string response = NetworkManager::getInstance().receive();
-                if (response == "TRUE") {
-                    std::cout << "login complete!\n";
-                    SceneManager::getInstance().changeScene("world");
-                }
-                else {
-                    std::cout << "login failed!\n";
-                }
+
+                receiveThread = std::thread([this]() {
+                    while (!loginCompleted) {
+                        std::string line = NetworkManager::getInstance().receive_block();
+                        if (!line.empty() && line.starts_with("LOGIN")) {
+                            handleLoginResponse(line);
+                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                    });
+                receiveThread.detach();
             }
         ));
 
@@ -146,4 +151,25 @@ public:
         window.draw(pswd);
         uiManager.render(window);
     }
+
+    void handleLoginResponse(const std::string& line) {
+        std::istringstream iss(line);
+        std::string tag, response, x, y;
+        iss >> tag >> response >> x >> y;
+
+        if (tag == "LOGIN") {
+            if (response == "TRUE") {
+                std::cout << "로그인 성공!\n";
+                loginCompleted = true;
+                SceneManager::getInstance().make_Player(stoi(x), stoi(y));
+                SceneManager::getInstance().registerScene("world", new worldScene());
+                SceneManager::getInstance().changeScene("world");
+            }
+            else {
+                std::cout << "로그인 실패!\n";
+                // 실패 메시지 띄우는 UI 로직이 있으면 여기에 추가
+            }
+        }
+    }
+
 };

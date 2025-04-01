@@ -1,4 +1,4 @@
-// Player.h
+﻿// Player.h
 #pragma once
 #include <optional>
 
@@ -25,7 +25,8 @@ private:
     const int tileSize = 60;
 
 public:
-    Player();
+    Player() {};
+    Player(int x , int y);
     Player(const Player& other)
         : downFrames(other.downFrames),
         leftFrames(other.leftFrames),
@@ -76,7 +77,8 @@ public:
 
         return *this;
     }
-
+    void setCurDir(std::string d);
+    void setTile(sf::Vector2i& pos);
     void sendDirectionToServer(Direction dir);
     void update(float dt,bool isLocalPlayer);
     void draw(sf::RenderWindow& window);

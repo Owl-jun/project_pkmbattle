@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
@@ -8,6 +8,7 @@
 #include <variant>
 #include <unordered_map>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <string>
 
