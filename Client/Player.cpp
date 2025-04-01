@@ -6,7 +6,11 @@
 #include "NetworkManager.hpp"
 #include <cmath>
 
-Player::Player(int x, int y) {
+
+
+Player::Player(int x, int y)
+    : speechText(font, "", 36)
+    {
     for (int i = 0; i <= 9; ++i) {
         std::string path = "C:/Source/project_pkmbattle/Client/assets/player0" + std::to_string(i) + ".png";
         std::shared_ptr<sf::Texture> tex = std::make_shared<sf::Texture>(
@@ -28,6 +32,25 @@ Player::Player(int x, int y) {
         sprite->setScale({ 1.f, 1.f });
     }
     currentDirection = Direction::Down;
+}
+
+void Player::showSpeechBubble(const std::string& msg, const sf::Font& font) {
+    sf::String unicodeMsg = sf::String::fromUtf8(msg.begin(), msg.end());
+    speechText.setFont(font);
+    speechText.setString(unicodeMsg);
+    speechText.setCharacterSize(18);
+    speechText.setFillColor(sf::Color::Black);
+
+    // 말풍선 배경 설정
+    sf::FloatRect bounds = speechText.getGlobalBounds();
+    sf::Vector2f size = bounds.size;
+
+    speechBubble.setSize({ size.x + 20.f, size.y + 10.f });
+    speechBubble.setFillColor(sf::Color::White);
+    speechBubble.setOutlineColor(sf::Color::Black);
+    speechBubble.setOutlineThickness(2.f);
+
+    speechTimer = speechDuration;
 }
 
 void Player::setTile(sf::Vector2i& pos) {
@@ -125,6 +148,9 @@ void Player::update(float dt, bool isLocalPlayer) {
 
     currentFrame = 0;
     updateSpriteTexture();
+
+    if (speechTimer > 0.f)
+        speechTimer -= dt;
 }
 
 std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet() {
@@ -155,6 +181,17 @@ void Player::sendDirectionToServer(Direction dir) {
 void Player::draw(sf::RenderWindow& window) {
     if (sprite.has_value())
         window.draw(*sprite);
+    if (speechTimer > 0.f) {
+        // 위치 설정
+        sf::FloatRect bounds = speechText.getGlobalBounds();
+        sf::Vector2f size = bounds.size;
+        sf::Vector2f pos = getPosition(); // 머리 위에 띄우기
+        speechBubble.setPosition({ pos.x - (size.x + 20.f) / 2.f, pos.y - 60.f });
+        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - size.y});
+
+        window.draw(speechBubble);
+        window.draw(speechText);
+    }
 }
 
 void Player::animate(float dt) {
