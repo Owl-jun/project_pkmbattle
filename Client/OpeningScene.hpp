@@ -1,12 +1,12 @@
 #pragma once
 #include "pch.h"
-#include "KeyManager.h"
+#include "KeyManager.hpp"
 #include "BaseScene.hpp"
-#include "TitleScene.hpp"
 #include "SceneManager.hpp"
+
+#include "TitleScene.hpp"
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
-#include "ResourceManager.hpp"
 
 
 class OpeningScene : public BaseScene {
@@ -19,7 +19,7 @@ private:
     
 public:
     OpeningScene()
-        : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
         , text(font,"SKIP : ESC", 24)
     {};
 
@@ -89,8 +89,12 @@ public:
         
     }
 
+    void handleEvent(std::string tag, std::string msg) override {
+
+    }
+
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
-        if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Escape)) {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape)) {
             SceneManager::getInstance().changeScene("title");
         }
     }

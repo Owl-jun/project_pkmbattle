@@ -1,16 +1,16 @@
 #pragma once
 #include "pch.h"
 #include "BaseScene.hpp"
-#include "Player.h"
-#include <unordered_map>
-#include <string>
+#include "Player.hpp"
 
 class SceneManager {
 private:
     std::unordered_map<std::string, BaseScene*> scenes;
-    BaseScene* currentScene = nullptr;  //
+    BaseScene* currentScene = nullptr;
     std::string pendingSceneKey;
     std::unique_ptr<Player> player;
+
+    // 싱글톤
     SceneManager() = default;
     SceneManager(const SceneManager&) = delete;
     SceneManager& operator=(const SceneManager&) = delete;
@@ -21,41 +21,9 @@ public:
         return instance;
     }
 
-    void registerScene(const std::string& key, BaseScene* scene) {
-        scenes[key] = scene;
-        scene->init();
-    }
+    // 서버 패킷 핸들러
+    void handleEvent(std::string tag, std::string msg) {
 
-    void make_Player(int x, int y) {
-        player = std::make_unique<Player>(x,y);
-    }
-
-    Player& getPlayer() {
-        return *player;
-    }
-
-    // < 씬 바꾸는 함수 == 장면을 바꾼다.>
-    void changeScene(const std::string& key) {
-        
-        pendingSceneKey = key;
-    }
-
-    BaseScene* getScene(const std::string& key) {
-        auto it = scenes.find(key);
-        return (it != scenes.end()) ? it->second : nullptr;
-    }
-
-    BaseScene* getCurScene() {
-        return currentScene;
-    }
-
-    void applyPendingScene() {
-        if (!pendingSceneKey.empty()) {
-            auto it = scenes.find(pendingSceneKey);
-            if (it != scenes.end()) {
-                currentScene = it->second;
-            }
-        }
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) {
@@ -74,6 +42,45 @@ public:
             currentScene->render(window);
     }
 
+
+
+    // --------------------------------------------------------------
+    // 씬 등록, 전환 관련
+    void registerScene(const std::string& key, BaseScene* scene) {
+        scenes[key] = scene;
+        scene->init();
+    }
+
+    void changeScene(const std::string& key) {        
+        pendingSceneKey = key;
+    }
+
+    void applyPendingScene() {
+        if (!pendingSceneKey.empty()) {
+            auto it = scenes.find(pendingSceneKey);
+            if (it != scenes.end()) {
+                currentScene = it->second;
+            }
+        }
+    }
+    // --------------------------------------------------------------
+
+
+    // ---------------------------------------------------------------
+    // 씬 게터
+    BaseScene* getScene(const std::string& key) {
+        auto it = scenes.find(key);
+        return (it != scenes.end()) ? it->second : nullptr;
+    }
+
+    BaseScene* getCurScene() {
+        return currentScene;
+    }
+    // ---------------------------------------------------------------
+
+
+    // ---------------------------------------------------------------
+    // 메모리관리
     void cleanup() {
         for (auto& [key, scene] : scenes) {
             delete scene;
@@ -84,4 +91,6 @@ public:
     ~SceneManager() {
         cleanup();
     }
+    // ---------------------------------------------------------------
+
 };

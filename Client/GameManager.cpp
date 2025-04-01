@@ -1,22 +1,19 @@
 ﻿#include "pch.h"
-#include "GameManager.h"
-#include "KeyManager.h"
+#include "GameManager.hpp"
+#include "KeyManager.hpp"
 #include "SceneManager.hpp"
 #include "TitleScene.hpp"
 #include "worldScene.hpp"
 #include "LoginScene.hpp"
 #include "OpeningScene.hpp"
 #include "TimeManager.hpp"
-#include "ResourceManager.hpp"
 #include "SoundManager.hpp"
 
 
 GameManager::GameManager()
     : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
-    , muteControl({ 720,500 })
 {
 }
-
 
 GameManager& GameManager::getInstance() {
     static GameManager instance;
@@ -29,99 +26,94 @@ sf::RenderWindow& GameManager::getWindow()
 }
 
 void GameManager::init() {
-    // 네트워크연결 , 테스트 완료 후 로그인시 연결하는걸로 변경
+    // 서버 연결 및 메시지 수신스레드 RUN // 
+    // TEST시 : localhost , 서버주소 210.119.12.82 //
     NetworkManager::getInstance();
-    NetworkManager::getInstance().connect("210.119.12.82", "9000");   // 연결문제 해결되면 주석해제
-    std::string response;
-    while (response.empty()) {
-        response = NetworkManager::getInstance().receive();
-    }
-    int myId = -1;
-    if (!response.empty()) {
-        std::istringstream iss(response);
-        std::string type;
-        iss >> type;
+    NetworkManager::getInstance().connect("localhost", "9000");
+    NetworkManager::getInstance().startReceiveLoop();
+    // ------------------------------------------------------------------------
+    ResourceManager::getInstance().initAuto();
 
-        if (type == "ID") {
-            iss >> myId;
-            NetworkManager::getInstance().setMyId(myId);
-            std::cout << "[Client] 내 ID는 " << NetworkManager::getInstance().getMyId() << "\n";
-        }
-        else {
-            std::cout << "[Client] Unknown server response: " << response << "\n";
-        }
-    }
-    // -------------------
-    SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // 사운드매니저
-    ResourceManager::getInstance().init();
-    // 주의할 점. 절대 같은 씬 또 만들면 안됨
+    // ------------------------------------------------------------------------
+    // 씬 생성
     SceneManager::getInstance().registerScene("opening", new OpeningScene());
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());
-    // --------------------------------------
+    // ------------------------------------------------------------------------
     SceneManager::getInstance().changeScene("opening");    // 초기화면 설정
 }
 
+
+
+// 서버 패킷 핸들러
+void GameManager::handleEvent(std::string tag, std::string msg)
+{
+    if (tag == "EXIT") {
+        int count = 3;
+        if (msg == "EXIT_OK") {
+            window.close();
+        }
+        else {
+            NetworkManager::getInstance().send("EXIT\n");
+            --count;
+            if (count <= 0) { 
+                std::cout << "저장실패, 강제 종료합니다." << std::endl;
+                window.close(); 
+            }
+        }
+    }
+    else {
+        std::cout << "잘못된 서버응답 입니다." << tag << std::endl;
+    }
+}
+
+// -----------------------------------------------------------------
+// 게임LOOP 3종세트
+// INPUT 처리
+void GameManager::handleInput()
+{
+    while (const std::optional<sf::Event> event = window.pollEvent()) {
+        KeyManager::getInstance().handleInput(*event);
+        SceneManager::getInstance().handleInput(*event, window);
+        if (event->is<sf::Event::Closed>()) {
+            NetworkManager::getInstance().send("EXIT\n");
+        }
+    }
+}
+
 void GameManager::update() { 
+    // 메시지큐 -> 이벤트매니저 전달
+    while (NetworkManager::getInstance().hasMessage()) {
+        EventManager::getInstance().dispatch(NetworkManager::getInstance().popMessage());
+    }
+
+    // 수신 패킷이름 지정
+    for (const std::string& tag : { "EXIT" }) {
+        auto events = EventManager::getInstance().getEvents(tag);
+        for (const auto& msg : events) {
+            handleEvent(tag, msg);
+        }
+        EventManager::getInstance().clearEvents(tag);
+    }
+
+    // 매니저 UPDATE
     TimeManager::getInstance().tick();
     KeyManager::getInstance().update();
-    muteControl.update(window);
-    while (const std::optional<sf::Event> event = window.pollEvent()) {
-        if (event->is<sf::Event::Closed>())
-        {
-            //--------------------------------------
-            int count = 0;
-            bool saved = false;
-
-            while (count < 3) {
-                NetworkManager::getInstance().send("EXIT\n");
-
-                std::string response = NetworkManager::getInstance().receive_block();
-
-                if (response == "EXIT_OK") {
-                    std::cout << "[Client] 서버가 정상적으로 저장함\n";;
-                    saved = true;
-                    break;
-                }
-                else {
-                    std::cerr << "[Client] 서버에서 데이터 저장 실패! (" << count + 1 << "/3)\n";
-                    count++;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-                }
-            }
-
-            if (!saved) {
-                std::cerr << "[Client] 서버 응답 없음. 강제 종료합니다.\n";
-            }
-            
-            window.close();
-            //--------------------------------------
-
-        }
-
-
-
-        KeyManager::getInstance().handleEvent(*event);
-        muteControl.handleEvent(*event,window);
-        SceneManager::getInstance().handleInput(*event, window);    
-    }
     SceneManager::getInstance().update(window);                    
 }
 
 void GameManager::render() {  
     window.clear();
     SceneManager::getInstance().render(window);
-    if (!(SceneManager::getInstance().getCurScene() == SceneManager::getInstance().getScene("world")))
-    {
-        muteControl.render(window);
-    }
     window.display();
 }
+// -----------------------------------------------------------------
 
 void GameManager::run() {
     init();
     while (window.isOpen()) {
-        update();   // 정보를 최신화
-        render();   // 화면에 출력하는 기능.
+        handleInput(); 
+        update();   
+        render();   
     }
 }

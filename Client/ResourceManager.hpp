@@ -1,6 +1,5 @@
-// ResourceManager.hpp
 #pragma once
-#include <unordered_map>
+#include "pch.h"
 
 
 class ResourceManager {
@@ -14,10 +13,12 @@ private:
 
 public:
     static ResourceManager& getInstance();
-    
-    void init();
-    sf::Texture& getTexture(const std::string& path);
-    sf::Font& getFont(const std::string& path);
+    void initAuto();
+    void init(const std::string& assetDir = "Client/Assets/");
+
+    // filename은 확장자를 포함합니다.
+    sf::Texture& getTextureByName(const std::string& filename);
+    sf::Font& getFontByName(const std::string& filename);
 
     void clear(); 
 };

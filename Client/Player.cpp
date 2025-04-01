@@ -1,9 +1,7 @@
 ﻿// Player.cpp
 #include "pch.h"
-#include "Player.h"
-#include "KeyManager.h"
-#include "ResourceManager.hpp"
-#include "NetworkManager.hpp"
+#include "Player.hpp"
+#include "KeyManager.hpp"
 #include <cmath>
 
 

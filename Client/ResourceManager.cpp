@@ -1,79 +1,72 @@
 #include "pch.h"
 #include "ResourceManager.hpp"
+#include <filesystem>
 
 ResourceManager& ResourceManager::getInstance() {
     static ResourceManager instance;
     return instance;
 }
 
-void ResourceManager::init() {
-    std::vector<std::string> texturesToLoad = {
-        "C:/Source/project_pkmbattle/Client/assets/introbg.png",
-        "C:/Source/project_pkmbattle/Client/assets/introbird.png",
-        "C:/Source/project_pkmbattle/Client/assets/kstext.png",
-        "C:/Source/project_pkmbattle/Client/assets/hjtext.png",
-        "C:/Source/project_pkmbattle/Client/assets/MADEBY.png",
-        "C:/Source/project_pkmbattle/Client/assets/KHSJ.png",
-        "C:/Source/project_pkmbattle/Client/assets/chansoo.png",
-        "C:/Source/project_pkmbattle/Client/assets/bojeong.png",
-        "C:/Source/project_pkmbattle/Client/assets/dongwan.png",
-        "C:/Source/project_pkmbattle/Client/assets/seokjun.png",
-        "C:/Source/project_pkmbattle/Client/assets/hyeongwoo.png",
-        "C:/Source/project_pkmbattle/Client/assets/bigjun.png",
-        "C:/Source/project_pkmbattle/Client/assets/gugu.png",
-        "C:/Source/project_pkmbattle/Client/assets/worldMap.png",
-        "C:/Source/project_pkmbattle/Client/assets/player00.png",
-        "C:/Source/project_pkmbattle/Client/assets/player01.png",
-        "C:/Source/project_pkmbattle/Client/assets/player02.png",
-        "C:/Source/project_pkmbattle/Client/assets/player03.png",
-        "C:/Source/project_pkmbattle/Client/assets/player04.png",
-        "C:/Source/project_pkmbattle/Client/assets/player05.png",
-        "C:/Source/project_pkmbattle/Client/assets/player06.png",
-        "C:/Source/project_pkmbattle/Client/assets/player07.png",
-        "C:/Source/project_pkmbattle/Client/assets/player08.png",
-        "C:/Source/project_pkmbattle/Client/assets/player09.png",
-        "C:/Source/project_pkmbattle/Client/assets/unmute_icon.png",
-        "C:/Source/project_pkmbattle/Client/assets/mute_icon.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke1.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke2.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke3.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke4.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke5.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke6.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke7.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke8.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke9.png",
-        "C:/Source/project_pkmbattle/Client/assets/Poke10.png",
+// 경로 탐색
+void ResourceManager::initAuto() {
+    namespace fs = std::filesystem;
+    fs::path current = fs::current_path();
 
-    };
-
-    for (const auto& path : texturesToLoad) {
-        getTexture(path);
+    // assets 폴더를 자동 탐색 (위로 올라가면서 찾기)
+    while (current.has_parent_path()) {
+        fs::path tryAssets = current / "Client" / "Assets";
+        if (fs::exists(tryAssets)) {
+            std::cout << "[ResourceManager] Assets loaded from: " << tryAssets << '\n';
+            init(tryAssets.string());
+            return;
+        }
+        current = current.parent_path();
     }
-
-    getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF");
+    throw std::runtime_error("Assets directory not found!");
 }
 
-sf::Texture& ResourceManager::getTexture(const std::string& path) {
-    auto it = textures.find(path);
-    if (it == textures.end()) {
-        // 직접 map에 생성 후 로딩 (복사 없이 안전)
-        if (!textures[path].loadFromFile(path)) {
-            std::cerr << "Failed to load texture: " << path << std::endl;
-            throw std::runtime_error("Texture load failed: " + path);
+void ResourceManager::init(const std::string& assetDir = "Client/Assets/") {
+    namespace fs = std::filesystem;
+
+    for (const auto& entry : fs::recursive_directory_iterator(assetDir)) {
+        if (!entry.is_regular_file()) continue;
+
+        std::string path = entry.path().string();
+        std::string filename = entry.path().filename().string();
+
+        if (entry.path().extension() == ".png" || entry.path().extension() == ".jpg") {
+            sf::Texture tex;
+            if (tex.loadFromFile(path)) {
+                textures[filename] = std::move(tex);
+            }
+            else {
+                std::cerr << "[ResourceManager] Failed to load texture: " << path << '\n';
+            }
+        }
+        else if (entry.path().extension() == ".ttf") {
+            sf::Font font;
+            if (font.openFromFile(path)) {
+                fonts[filename] = std::move(font);
+            }
+            else {
+                std::cerr << "[ResourceManager] Failed to load font: " << path << '\n';
+            }
         }
     }
-    return textures[path];
 }
 
-sf::Font& ResourceManager::getFont(const std::string& path) {
-    auto it = fonts.find(path);
-    if (it == fonts.end()) {
-        if (!fonts[path].openFromFile(path)) {
-            std::cerr << "Failed to load font: " << path << std::endl;
-        }
+sf::Texture& ResourceManager::getTextureByName(const std::string& filename) {
+    if (textures.find(filename) == textures.end()) {
+        throw std::runtime_error("Texture not found: " + filename);
     }
-    return fonts[path];
+    return textures[filename];
+}
+
+sf::Font& ResourceManager::getFontByName(const std::string& filename) {
+    if (fonts.find(filename) == fonts.end()) {
+        throw std::runtime_error("Font not found: " + filename);
+    }
+    return fonts[filename];
 }
 
 void ResourceManager::clear() {

@@ -106,7 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
@@ -134,12 +134,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="fix.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NetworkManager.cpp" />
-    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="SceneManager.hpp" />
@@ -152,22 +155,19 @@
     <ClInclude Include="BattleManager.hpp" />
     <ClInclude Include="battleScene.hpp" />
     <ClInclude Include="CharacterSelectOverlay.hpp" />
+    <ClInclude Include="EventManager.hpp" />
     <ClInclude Include="FPSControl.hpp" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="KeyManager.h" />
+    <ClInclude Include="GameManager.hpp" />
+    <ClInclude Include="KeyManager.hpp" />
     <ClInclude Include="LoginScene.hpp" />
     <ClInclude Include="NetworkManager.hpp" />
     <ClInclude Include="OpeningScene.hpp" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="Player.hpp" />
     <ClInclude Include="ResourceManager.hpp" />
     <ClInclude Include="SelectOverlay.hpp" />
     <ClInclude Include="SettingsOverlay.hpp" />
     <ClInclude Include="SoundManager.hpp" />
-    <ClInclude Include="testScene.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="TimeManager.hpp" />
     <ClInclude Include="TitleScene.hpp" />
     <ClInclude Include="UIButton.hpp" />
