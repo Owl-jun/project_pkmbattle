@@ -30,6 +30,12 @@ private:
     UITextBox* idBox = nullptr;
     UITextBox* pwBox = nullptr;
 
+    bool warningVisible = false;
+    int warningInt = 1;
+    sf::RectangleShape textbox;
+    sf::Text warning;
+    sf::Text warning2;
+
     bool loginCompleted = false;
     std::thread receiveThread;
 
@@ -39,6 +45,8 @@ public:
         : font(ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , id(font, "ID", 30)
         , pswd(font, "PASSWORD", 30)
+        , warning(font, L"이미 접속중인 아이디입니다! 다시시도 : ESC", 24)
+        , warning2(font, L"아이디 혹은 비밀번호가 다릅니다! 다시시도 : ESC", 24)
     {
     }
 
@@ -55,6 +63,13 @@ public:
         pswd.setFillColor(sf::Color::Black);
         id.setPosition({ 270, 277.f });
         pswd.setPosition({ 180, 305.f });
+
+        textbox.setFillColor({ 0, 0, 0, 255 });
+        textbox.setSize({ 400.f,100.f });
+        textbox.setPosition({ (windowSize.x / 2.f) - 200.f , (windowSize.y / 2.f) - 50.f });
+        warning.setPosition({ textbox.getPosition().x + 50.f, textbox.getPosition().y + 20.f });
+        warning2.setPosition({ textbox.getPosition().x + 30.f, textbox.getPosition().y + 20.f });
+
 
         idBox = new UITextBox(
             { 300.f, (272.f + 28.f) },
@@ -84,7 +99,7 @@ public:
                 auto clean = [](const std::string& str) {
                     std::string result;
                     for (char c : str) {
-                        if (!isspace(static_cast<unsigned char>(c)))
+                        if (!isspace(static_cast<unsigned char>(c)) && c != 27)
                             result += c;
                     }
                     return result;
@@ -132,9 +147,9 @@ public:
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
-        // 서버연결없이 테스트용
-        if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::F5)) {
-            SceneManager::getInstance().changeScene("world");
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape))
+        {
+            warningVisible = false;
         }
         uiManager.handleEvent(event, window);
     }
@@ -150,6 +165,13 @@ public:
         window.draw(id);
         window.draw(pswd);
         uiManager.render(window);
+        if (warningVisible) {
+            window.draw(textbox);
+            if (warningInt == 1)
+                window.draw(warning);
+            else if (warningInt == 2)
+                window.draw(warning2);
+        }
     }
 
     void handleLoginResponse(const std::string& line) {
@@ -165,9 +187,15 @@ public:
                 SceneManager::getInstance().registerScene("world", new worldScene());
                 SceneManager::getInstance().changeScene("world");
             }
+            else if (response == "alreadyLoginPlayer") {
+                std::cout << "이미 로그인중인 유저!\n";
+                warningVisible = true;
+                warningInt = 1;
+            }
             else {
                 std::cout << "로그인 실패!\n";
-                // 실패 메시지 띄우는 UI 로직이 있으면 여기에 추가
+                warningVisible = true;
+                warningInt = 2;
             }
         }
     }

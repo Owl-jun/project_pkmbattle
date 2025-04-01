@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "pch.h"
 #include "KeyManager.h"
 #include "BaseScene.hpp"
@@ -23,6 +23,11 @@ private:
     std::optional<sf::Sprite> bg;
     UIManager uiManager;
 
+    // TextBox
+    UITextBox* chatBox;
+    bool isChatting = false;
+    
+
     Player& player;
     std::unordered_map<int, Player> otherPlayers;
     int myId;
@@ -42,7 +47,9 @@ public:
         , player(SceneManager::getInstance().getPlayer())
         , settings({ 800.f,600.f }, ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
         , myId(-1)
+        , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, font))
     {
+        chatBox->setFocus(false);
         myId = NetworkManager::getInstance().getMyId();
         std::cout << "my id : " << myId << std::endl;
 
@@ -70,6 +77,36 @@ public:
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        if (isChatting) {
+            chatBox->handleEvent(event, window);
+
+            if (event.is<sf::Event::KeyPressed>()) {
+                auto key = event.getIf<sf::Event::KeyPressed>();
+                if (key && key->code == sf::Keyboard::Key::Enter) {
+                    std::string msg = chatBox->getInput();
+                    if (!msg.empty()) {
+                        std::string toSend = "CHAT " + msg + "\n";
+                        NetworkManager::getInstance().send(toSend);
+                    }
+                    chatBox->clear();
+                    isChatting = false;
+                }
+            }
+
+            return;
+        }
+
+        // 채팅창이 비활성일 때 Enter를 누르면 채팅모드 진입
+        if (event.is<sf::Event::KeyPressed>()) {
+            auto key = event.getIf<sf::Event::KeyPressed>();
+            if (key && key->code == sf::Keyboard::Key::Enter) {
+                isChatting = true;
+                chatBox->setFocus(true);
+                return;
+            }
+        }
+
+        // 환경설정창
         if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape) && escCooldown <= 0.f) {
             settings.toggle();
             std::cout << "Visible: " << settings.isVisible() << "\n";
@@ -93,7 +130,7 @@ public:
         int fps = static_cast<int>(1.f / dt);
         frame.setString("FPS: " + std::to_string(fps));
 
-        // 서버 응답 받아서 위치 반영
+        // 서버 응답 처리
         std::string response = NetworkManager::getInstance().receive();
         if (!response.empty()) {
             std::istringstream iss(response);
@@ -147,9 +184,27 @@ public:
                     }
                 }
             }
-
             else {
                 std::cout << "[Client] Unknown server response: " << response << "\n";
+            }
+
+            if (type == "CHAT") {
+                int senderId;
+                std::string id , msg;
+                iss >> senderId >> id;
+                iss >> std::ws;
+                std::getline(iss,msg);
+                
+
+                std::cout << "[Chat] From " << id << ": " << msg << std::endl;
+
+                if (senderId == myId) {
+                    player.showSpeechBubble(msg, font);
+                }
+                else if (otherPlayers.count(senderId)) {
+                    otherPlayers[senderId].showSpeechBubble(msg, font);
+                }
+                
             }
         }
 
@@ -162,6 +217,8 @@ public:
         }
 
         camera.setCenter(player.getPosition());
+        chatBox->setPos({ camera.getCenter().x -300.f , camera.getCenter().y + 200.f});
+        chatBox->update(window);
         settings.setCenter(camera.getCenter());
         overlay->setCenter(camera.getCenter());
 
@@ -187,7 +244,12 @@ public:
             p.draw(window);
         }
 
-        window.draw(frame);
+        if (isChatting)
+            chatBox->render(window);
+
+        window.draw(frame);  
+        settings.render(window);
+    }
 
         settings.render(window);
         // 동관이
