@@ -79,8 +79,7 @@ void GameManager::update() {
                 std::string exitResponse = NetworkManager::getInstance().receive_block();
 
                 if (exitResponse == "EXIT_OK") {
-                    std::cout << "[Client] 서버가 정상적으로 저장함\n";
-                    //window.close();
+                    std::cout << "[Client] 서버가 정상적으로 저장함\n";;
                     saved = true;
                     break;
                 }

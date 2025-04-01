@@ -119,7 +119,7 @@ void processMessage(const std::string& msg, int playerId) {
         if (players.count(playerId)) {
             try {
                 const auto& p = players[playerId];
-                DBM.savePlayerData(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
+                DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
                 exitResponse = "EXIT_OK\n";
             }
             catch (std::exception& e) {

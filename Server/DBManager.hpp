@@ -131,7 +131,7 @@ public:
 	}
 
 	//--------------------------------------
-	void savePlayerData(const std::string& id, int x, int y, int win, int lose, int level, double EXP) {
+	void savePlayer(const std::string& id, int x, int y, int win, int lose, int level, double EXP) {
 		try {
 			unique_ptr<Statement> stmt(conn->createStatement());
 			std::string query = "UPDATE Player SET "
