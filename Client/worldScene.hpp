@@ -29,6 +29,7 @@ private:
     
 
     Player& player;
+    bool canmove = true;
     std::unordered_map<int, Player> otherPlayers;
     int myId;
 
@@ -94,20 +95,21 @@ public:
             }
         }
 
-        // 상호작용
-        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Space)) {
+        // 상호작용 시 SEND
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::G) && escCooldown <= 0.f) {
             sf::Vector2i frontTile = player.getTileInFront();
             for (auto& [id, p] : otherPlayers) {
                 if (p.getTilePosition() == frontTile) {
                     std::string toSend = "INTERACT " + std::to_string(id) + "\n";
                     NetworkManager::getInstance().send(toSend);
+                    escCooldown = 0.5f;
                     break;
                 }
             }
         }
 
         // 환경설정창
-        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::G) && escCooldown <= 0.f) {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape) && escCooldown <= 0.f) {
             settings.toggle();
             std::cout << "Visible: " << settings.isVisible() << "\n";
             escCooldown = 0.5f;
@@ -214,7 +216,10 @@ public:
 
         }
 
-        if (!settings.isVisible()) {
+        if (!settings.isVisible()) { canmove = false; }
+        else { canmove = true; }
+
+        if (canmove) {
             player.update(dt,true);  // 설정창 열리면 멈춤
         }
         for (auto& [id, p] : otherPlayers) {
