@@ -4,6 +4,7 @@
 #include <asio.hpp>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <sstream>
 #include <vector>
 #include <thread>
@@ -76,6 +77,8 @@ std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
 // --- 글로벌 상태 ---
 std::unordered_map<int, Player> players;
 std::unordered_map<int, std::shared_ptr<tcp::socket>> clientSockets;
+std::unordered_map<int, string> ids;
+std::unordered_set<string> users;
 std::mutex playerMutex;
 int nextPlayerId = 1;
 
@@ -105,6 +108,7 @@ void broadcastPlayerStates() {
 void processMessage(const std::string& msg, int playerId) {
     std::istringstream iss(msg);
     std::string command, dir;
+    std::string chatmsg;
     std::string id, password;
     iss >> command;
 
@@ -144,10 +148,19 @@ void processMessage(const std::string& msg, int playerId) {
                     std::lock_guard<std::mutex> lock(playerMutex);
                     players[playerId] = player;
                 }
-
-                response = "LOGIN TRUE " + std::to_string(player.x) + ' ' + std::to_string(player.y) + '\n';
-                asio::write(*clientSockets[playerId], asio::buffer(response));
-                broadcastPlayerStates();
+                if (users.find(id) == users.end())
+                {
+                    ids[playerId] = id;
+                    users.insert(id);
+                    response = "LOGIN TRUE " + std::to_string(player.x) + ' ' + std::to_string(player.y) + '\n';
+                    asio::write(*clientSockets[playerId], asio::buffer(response));
+                    broadcastPlayerStates();
+                }
+                else 
+                {
+                    response = "LOGIN alreadyLoginPlayer\n";
+                    asio::write(*clientSockets[playerId], asio::buffer(response));
+                }
             }
         }
         else {
@@ -184,7 +197,6 @@ void processMessage(const std::string& msg, int playerId) {
             std::string response;
             response = "PLAYERS\n";
             for (const auto& [id, player] : players) {
-                cout << player.x << " , " << player.y << endl;
                 response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + " " + player.dir + "\n";
             }
 
@@ -194,6 +206,18 @@ void processMessage(const std::string& msg, int playerId) {
 
         }
     }
+
+    if (command == "CHAT") {
+       
+        std::getline(iss, chatmsg); // 공백 포함 전체 읽기
+        if (!chatmsg.empty() && chatmsg[0] == ' ') chatmsg.erase(0, 1);  // 앞에 공백 제거
+
+        std::string response = "CHAT " + std::to_string(playerId) + " " + ids[playerId] + " " + chatmsg + "\n";
+        for (const auto& [id, sock] : clientSockets) {
+            asio::write(*sock, asio::buffer(response));
+        }
+    }
+
     iss.clear();
 }
 
@@ -228,6 +252,8 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
         
         // 연결 종료 시 클린업
         std::lock_guard<std::mutex> lock(playerMutex);
+        users.erase(ids[playerId]);
+        ids.erase(playerId);
         players.erase(playerId);
         clientSockets.erase(playerId);
     }
