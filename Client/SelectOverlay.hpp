@@ -13,12 +13,15 @@ class SelectOverlay {
 private:
     sf::RectangleShape background;
     sf::Text title;
+    std::vector<BaseUI*> originalButtons;
+    bool isWaiting = false; //
     sf::Font font;
     UIManager uiManager;
     bool visible = false;
     int currentFocusIndex = 0;
     bool enterPressed = false;
     std::function<void()> onFightCallback; // 🔹 싸운다 콜백
+    std::function<void()> onRunCallback; // 🔹 싸운다 콜백
     float escCooldown = 0.f;
 
 
@@ -43,17 +46,38 @@ public:
 
         auto runButton = new UIButton({ 20.f, 55.f }, { 180.f, 40.f }, L9, sf::Color::White, font, [this]() {
             std::cout << "[선택됨] 도망간다!" << std::endl;
+            if (onRunCallback) onRunCallback(); // 🔹 콜백 호출
+            visible = false;
             });
-        uiManager.addElement(fightButton);
-        uiManager.addElement(runButton);
 
+        originalButtons = { fightButton, runButton };
+
+        for (auto* btn : originalButtons) {
+            uiManager.addElement(btn);
+        }
         // 최초 포커스 설정
         fightButton->setFocus(true);
     }
     // 🔹 콜백 세터
     void setFightCallback(std::function<void()> cb) { onFightCallback = cb; }
+    void setRunCallback(std::function<void()> cb) { onRunCallback = cb; }
 
-    void toggle() { visible = !visible; }
+    void setMessage(const std::wstring& msg) {
+        title.setString(msg);
+    }
+
+    void setWaiting(bool waiting) {
+        isWaiting = waiting;
+        uiManager.removeAllElements();
+
+        if (!waiting) {
+            for (auto* btn : originalButtons)
+                uiManager.addElement(btn); // 다시 추가
+            originalButtons[0]->setFocus(true);
+            currentFocusIndex = 0;
+        }
+    }
+    void toggle() { visible = true; }
     void hide() { visible = false; }
     bool isVisible() const { return visible; }
 
@@ -73,7 +97,7 @@ public:
     }
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
-        if (!visible) return;
+        if (!visible || isWaiting) return;
         // Enter/Tab 등은 SelectOverlay에서만 처리하고, UIManager에는 전달하지 않음
         // uiManager.handleEvent(event, window); ← 제거
 
@@ -111,6 +135,15 @@ public:
         }
     }
 
+    void disableCallbacks() {
+        onFightCallback = []() {};
+        onRunCallback = []() {};
+    }
+
+    void show() {
+        if (!visible) visible = true;
+    }
+
     void update(sf::RenderWindow& window) {
         if (!visible) return;
         escCooldown -= TimeManager::getInstance().getDeltaTime();
@@ -121,6 +154,8 @@ public:
         if (!visible) return;
         window.draw(background);
         window.draw(title);
-        uiManager.render(window);
+        if (!isWaiting)
+            uiManager.render(window);
     }
+
 };
