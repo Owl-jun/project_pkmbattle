@@ -1,5 +1,6 @@
 ﻿// Player.h
 #pragma once
+#include "ResourceManager.hpp"
 #include <optional>
 
 enum class Direction {
@@ -24,11 +25,18 @@ private:
     bool isMoving = false;
     const int tileSize = 60;
 
+    sf::Font font = ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF");
+    sf::Text speechText;
+    sf::RectangleShape speechBubble;
+    float speechTimer = 0.f;
+    const float speechDuration = 3.0f; // 3초간 유지
+
 public:
-    Player() {};
+    Player() : speechText(font,"",24) {};
     Player(int x , int y);
     Player(const Player& other)
-        : downFrames(other.downFrames),
+        : speechText(font, "", 24),
+        downFrames(other.downFrames),
         leftFrames(other.leftFrames),
         rightFrames(other.rightFrames),
         upFrames(other.upFrames),
@@ -77,6 +85,9 @@ public:
 
         return *this;
     }
+
+    void showSpeechBubble(const std::string& msg, const sf::Font& font);
+
     void setCurDir(std::string d);
     void setTile(sf::Vector2i& pos);
     void sendDirectionToServer(Direction dir);
