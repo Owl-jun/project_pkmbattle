@@ -27,6 +27,8 @@
     <ClCompile Include="Testzz.hpp" />
     <ClCompile Include="CharacterSelectOverlay.hpp">
       <Filter>UI\Overlays</Filter>
+    <ClCompile Include="endingScene.hpp">
+      <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

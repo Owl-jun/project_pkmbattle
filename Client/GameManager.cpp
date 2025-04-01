@@ -9,6 +9,8 @@
 #include "TimeManager.hpp"
 #include "ResourceManager.hpp"
 #include "SoundManager.hpp"
+#include "NetworkManager.hpp"
+#include "endingScene.hpp"
 
 
 GameManager::GameManager()
@@ -59,7 +61,7 @@ void GameManager::init() {
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());
     // --------------------------------------
-    SceneManager::getInstance().changeScene("opening");    // 초기화면 설정
+    SceneManager::getInstance().changeScene("opening");    // 초기화면 설정s
 }
 
 void GameManager::update() { 

@@ -79,10 +79,10 @@ public:
         );
 
         uiManager.addElement(new UIButton(
-            { 300,400 },        // ¹öÆ° À§Ä¡ 
-            { 200,50 },         // ¹öÆ° Å©±â
-            "START",            // ¹öÆ° ÅØ½ºÆ®
-            sf::Color(0,0,0,0),   // ¹öÆ° »ö
+            { 300,400 },        // ï¿½ï¿½Æ° ï¿½ï¿½Ä¡ 
+            { 200,50 },         // ï¿½ï¿½Æ° Å©ï¿½ï¿½
+            "START",            // ï¿½ï¿½Æ° ï¿½Ø½ï¿½Æ®
+            sf::Color(0,0,0,0),   // ï¿½ï¿½Æ° ï¿½ï¿½
             font,
             []() { SceneManager::getInstance().changeScene("login"); } // command
         ));
