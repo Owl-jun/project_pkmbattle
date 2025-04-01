@@ -136,7 +136,7 @@ public:
         }
 
         // 환경설정창
-        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::G) && escCooldown <= 0.f) {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape) && escCooldown <= 0.f) {
             settings.toggle();
             std::cout << "Visible: " << settings.isVisible() << "\n";
             escCooldown = 0.5f;

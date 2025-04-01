@@ -19,10 +19,7 @@ private:
     int currentFocusIndex = 0;
     bool enterPressed = false;
     std::function<void()> onFightCallback; // 🔹 싸운다 콜백
-<<<<<<< Updated upstream
     float escCooldown = 0.f;
-=======
->>>>>>> Stashed changes
 
 
 public:

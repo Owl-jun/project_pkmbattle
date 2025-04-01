@@ -73,8 +73,8 @@ public:
         shape.setPosition(position);
         const auto bounds = text.getLocalBounds();
         text.setPosition(                                       // fight, run 버튼 텍스 위치
-            { shape.getPosition().x + shape.getSize().x / 1.6f - bounds.size.x / 1.6f,
-              shape.getPosition().y + shape.getSize().y / 1.6f - bounds.size.y / 1.6f }
+            { shape.getPosition().x + shape.getSize().x / 2.f - bounds.size.x / 2.f,
+              shape.getPosition().y + shape.getSize().y / 2.f - bounds.size.y / 2.f }
         );
     }
 
