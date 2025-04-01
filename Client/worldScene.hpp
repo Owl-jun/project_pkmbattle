@@ -6,6 +6,7 @@
 #include "LoginScene.hpp"
 #include "UIButton.hpp"
 #include "UIManager.hpp"
+#include "UITextBox.hpp"
 #include "TimeManager.hpp"
 #include "ResourceManager.hpp"
 #include "Player.h"
@@ -25,13 +26,9 @@ private:
     std::optional<sf::Sprite> bg;
     UIManager uiManager;
 
-<<<<<<< Updated upstream
     // TextBox
     UITextBox* chatBox;
     bool isChatting = false;
-    
-=======
->>>>>>> Stashed changes
 
     Player& player;
     std::unordered_map<int, Player> otherPlayers;
@@ -62,9 +59,6 @@ public:
 
         overlay = new SelectOverlay({ 400.f, 200.f }, font);
         overlay->setCenter({ 400.f, 300.f });
-
-
-
 
 
         // 🔹 싸운다 누르면 캐릭터 선택창 띄우기
@@ -231,9 +225,11 @@ public:
             }
         }
 
-
-        if (!settings.isVisible() && !overlay->isVisible()) {           // || !overlay->isVisible() 추가 (동관)
-            player.update(dt, true);  // 설정창이나 선택창 열리면 멈춤
+        if (settings.isVisible() || overlay->isVisible() || charSelector->isVisible()) {
+            player.update(dt, false);  // UI 떠 있으면 조작 못함
+        }
+        else {
+            player.update(dt, true);   // 아무것도 없으면 움직임 가능
         }
         for (auto& [id, p] : otherPlayers) {
             p.update(dt, false);
@@ -256,6 +252,7 @@ public:
         
 
     }
+
     void render(sf::RenderWindow& window) override {
         // 카메라 뷰에서 맵/캐릭터 렌더링
         window.setView(camera);
@@ -273,12 +270,10 @@ public:
 
         window.draw(frame);  
         settings.render(window);
-    }
-
-        settings.render(window);
         // 동관이
         overlay->render(window); // 🔹 overlay 렌더링
         charSelector->render(window); 
-        
     }
+
+
 };

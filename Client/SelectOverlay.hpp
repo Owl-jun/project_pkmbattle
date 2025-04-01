@@ -19,6 +19,7 @@ private:
     int currentFocusIndex = 0;
     bool enterPressed = false;
     std::function<void()> onFightCallback; // 🔹 싸운다 콜백
+    float escCooldown = 0.f;
 
 
 public:
@@ -75,7 +76,6 @@ public:
         if (!visible) return;
         // Enter/Tab 등은 SelectOverlay에서만 처리하고, UIManager에는 전달하지 않음
         // uiManager.handleEvent(event, window); ← 제거
-        std::cout << "ㅋㅋ 간지럽노" << std::endl;
 
         auto& elements = uiManager.getElements();
         int size = static_cast<int>(elements.size());
@@ -89,7 +89,8 @@ public:
                 currentFocusIndex = (currentFocusIndex + 1) % size;
                 elements[currentFocusIndex]->setFocus(true);
             }
-            else if (key->code == sf::Keyboard::Key::Enter && !enterPressed) {
+            else if (key->code == sf::Keyboard::Key::Space && !enterPressed && escCooldown <= 0.f) {
+                escCooldown = 0.5f;
                 enterPressed = true;
                 if (auto* button = dynamic_cast<UIButton*>(elements[currentFocusIndex])) {
                     button->click();
@@ -98,7 +99,7 @@ public:
         }
         else if (event.is<sf::Event::KeyReleased>()) {
             auto key = event.getIf<sf::Event::KeyReleased>();
-            if (key->code == sf::Keyboard::Key::Enter) {
+            if (key->code == sf::Keyboard::Key::Space) {
                 enterPressed = false;
             }
         }
@@ -106,6 +107,7 @@ public:
 
     void update(sf::RenderWindow& window) {
         if (!visible) return;
+        escCooldown -= TimeManager::getInstance().getDeltaTime();
         uiManager.update(window);
     }
 
