@@ -16,9 +16,10 @@ public:
             const std::string& label, 
             sf::Color Color, 
             sf::Font& sharedFont,
-            std::function<void()> clickFunc)
+            std::function<void()> clickFunc,
+            unsigned int textSize = 48)
         : onClick(clickFunc) 
-        , text(sharedFont,label,48)
+        , text(sharedFont,label,textSize)
         , defaultColor(Color)
     {
         shape.setPosition(pos);
