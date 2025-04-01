@@ -68,7 +68,39 @@ void GameManager::update() {
     muteControl.update(window);
     while (const std::optional<sf::Event> event = window.pollEvent()) {
         if (event->is<sf::Event::Closed>())
+        {
+            //--------------------------------------
+            int count = 0;
+            bool saved = false;
+
+            while (count < 3) {
+                NetworkManager::getInstance().send("EXIT\n");
+
+                std::string response = NetworkManager::getInstance().receive_block();
+
+                if (response == "EXIT_OK") {
+                    std::cout << "[Client] 서버가 정상적으로 저장함\n";;
+                    saved = true;
+                    break;
+                }
+                else {
+                    std::cerr << "[Client] 서버에서 데이터 저장 실패! (" << count + 1 << "/3)\n";
+                    count++;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                }
+            }
+
+            if (!saved) {
+                std::cerr << "[Client] 서버 응답 없음. 강제 종료합니다.\n";
+            }
+            
             window.close();
+            //--------------------------------------
+
+        }
+
+
+
         KeyManager::getInstance().handleEvent(*event);
         muteControl.handleEvent(*event,window);
         SceneManager::getInstance().handleInput(*event, window);    

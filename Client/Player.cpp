@@ -34,8 +34,40 @@ Player::Player(int x, int y)
     currentDirection = Direction::Down;
 }
 
+// 현재 바라보는 방향으로 한 칸 앞 위치 계산
+sf::Vector2i Player::getTileInFront() const {
+    switch (currentDirection) {
+    case Direction::Up: return { tilePos.x, tilePos.y - 1 };
+    case Direction::Down: return { tilePos.x, tilePos.y + 1 };
+    case Direction::Left: return { tilePos.x - 1, tilePos.y };
+    case Direction::Right: return { tilePos.x + 1, tilePos.y };
+    default: return tilePos;
+    }
+}
+
+sf::String wrapText(const sf::String& str, unsigned int maxWidth, const sf::Font& font, unsigned int characterSize) {
+    sf::Text tempText(font,"", characterSize);
+    sf::String wrapped;
+    sf::String currentLine;
+
+    for (std::size_t i = 0; i < str.getSize(); ++i) {
+        currentLine += str[i];
+        tempText.setString(currentLine);
+        if (tempText.getLocalBounds().size.x > maxWidth) {
+            wrapped += '\n';
+            currentLine = str[i];
+        }
+        else {
+            wrapped += str[i];
+        }
+    }
+
+    return wrapped;
+}
+
 void Player::showSpeechBubble(const std::string& msg, const sf::Font& font) {
     sf::String unicodeMsg = sf::String::fromUtf8(msg.begin(), msg.end());
+    sf::String wrapped = wrapText(unicodeMsg, 200, font, 18);
     speechText.setFont(font);
     speechText.setString(unicodeMsg);
     speechText.setCharacterSize(18);
@@ -186,7 +218,7 @@ void Player::draw(sf::RenderWindow& window) {
         sf::FloatRect bounds = speechText.getGlobalBounds();
         sf::Vector2f size = bounds.size;
         sf::Vector2f pos = getPosition(); // 머리 위에 띄우기
-        speechBubble.setPosition({ pos.x - (size.x + 20.f) / 2.f, pos.y - 60.f });
+        speechBubble.setPosition({ pos.x - (size.x + 40.f) / 2.f, pos.y - 50.f });
         speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - size.y});
 
         window.draw(speechBubble);
