@@ -13,7 +13,6 @@ Player::Player(int x, int y) {
             ResourceManager::getInstance().getTexture(path)
         );
 
-
         if (i <= 2) downFrames.push_back(tex);
         else if (i <= 4) leftFrames.push_back(tex);
         else if (i <= 6) rightFrames.push_back(tex);
@@ -28,6 +27,7 @@ Player::Player(int x, int y) {
         sprite->setPosition(targetWorldPos);
         sprite->setScale({ 1.f, 1.f });
     }
+    currentDirection = Direction::Down;
 }
 
 void Player::setTile(sf::Vector2i& pos) {
@@ -161,7 +161,7 @@ void Player::animate(float dt) {
     elapsedTime += dt;
     auto* frames = getCurrentFrameSet();
     if (!frames || frames->empty()) return;
-
+    if (currentFrame >= frames->size()) currentFrame = 0;
     if (elapsedTime >= frameTime) {
         elapsedTime = 0.f;
         currentFrame = (currentFrame + 1) % frames->size();
@@ -172,6 +172,11 @@ void Player::animate(float dt) {
 void Player::updateSpriteTexture() {
     auto* frames = getCurrentFrameSet();
     if (!frames || frames->empty()) return;
+
+    if (currentFrame >= frames->size()) {
+        currentFrame = 0;  // 방어 코드
+    }
+
     sprite->setTexture(*(*frames)[currentFrame]);
 }
 
