@@ -3,9 +3,9 @@
 using namespace std;
 using namespace sql;
 
-#define SERVER_IP "127.0.0.1:3306"
+#define SERVER_IP "210.119.12.82:3306"
 #define USERNAME "root"
-#define PASSWORD "12345"
+#define PASSWORD "root"
 #define DATABASE "Pokemon"
 
 struct skill {
