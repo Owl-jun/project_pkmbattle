@@ -76,9 +76,9 @@ void GameManager::update() {
             while (count < 3) {
                 NetworkManager::getInstance().send("EXIT\n");
 
-                std::string exitResponse = NetworkManager::getInstance().receive_block();
+                std::string response = NetworkManager::getInstance().receive_block();
 
-                if (exitResponse == "EXIT_OK") {
+                if (response == "EXIT_OK") {
                     std::cout << "[Client] 서버가 정상적으로 저장함\n";;
                     saved = true;
                     break;
@@ -86,7 +86,7 @@ void GameManager::update() {
                 else {
                     std::cerr << "[Client] 서버에서 데이터 저장 실패! (" << count + 1 << "/3)\n";
                     count++;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
                 }
             }
 

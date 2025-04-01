@@ -108,27 +108,27 @@ void processMessage(const std::string& msg, int playerId) {
     std::string id, password;
     iss >> command;
 
-    /* 이형우 강석준 */
+    /* 이형우 강석준 황석준 */
     // 로그인 로직추가
 
     //--------------------------------------
     if (command == "EXIT") {
-        std::string exitResponse;
+        std::string response;
 
         std::lock_guard<std::mutex> lock(playerMutex);
         if (players.count(playerId)) {
             try {
                 const auto& p = players[playerId];
                 DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
-                exitResponse = "EXIT_OK\n";
+                response = "EXIT_OK\n";
             }
             catch (std::exception& e) {
-                exitResponse = "EXIT_FAIL\n";
+                response = "EXIT_FAIL\n";
             }
         }
         // 클라이언트에게 결과 전송
         if (clientSockets.count(playerId)) {
-            asio::write(*clientSockets[playerId], asio::buffer(exitResponse));
+            asio::write(*clientSockets[playerId], asio::buffer(response));
         }
     }
     //--------------------------------------
