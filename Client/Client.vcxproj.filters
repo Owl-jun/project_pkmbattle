@@ -158,5 +158,11 @@
     <ClInclude Include="BattleManager.hpp">
       <Filter>MANAGERS\BattleManager</Filter>
     </ClInclude>
+    <ClInclude Include="UISlider.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="FPSControl.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

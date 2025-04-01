@@ -152,6 +152,7 @@
     <ClInclude Include="BattleManager.hpp" />
     <ClInclude Include="battleScene.hpp" />
     <ClInclude Include="CharacterSelectOverlay.hpp" />
+    <ClInclude Include="FPSControl.hpp" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LoginScene.hpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="UIButton.hpp" />
     <ClInclude Include="UIManager.hpp" />
     <ClInclude Include="UImuteControl.hpp" />
+    <ClInclude Include="UISlider.hpp" />
     <ClInclude Include="UITextBox.hpp" />
     <ClInclude Include="worldScene.hpp" />
   </ItemGroup>
