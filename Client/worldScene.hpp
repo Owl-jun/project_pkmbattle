@@ -124,12 +124,13 @@ public:
         }
 
         // 상호작용
-        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Space)) {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Space) && escCooldown <= 0.f) {
             sf::Vector2i frontTile = player.getTileInFront();
             for (auto& [id, p] : otherPlayers) {
                 if (p.getTilePosition() == frontTile) {
                     std::string toSend = "INTERACT " + std::to_string(id) + "\n";
                     NetworkManager::getInstance().send(toSend);
+                    escCooldown = 0.5f;
                     break;
                 }
             }
@@ -143,10 +144,10 @@ public:
         }
 
         // 🔹 1키 누르면 SelectOverlay 토글 <- 이거 기능구현 후 없애야함. (부딪혔거나, 특정 위치값에 갔을경우)
-        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Num1) && escCooldown <= 0.f) {
+        /*if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Num1) && escCooldown <= 0.f) {
             overlay->toggle();
             escCooldown = 0.5f;
-        }
+        }*/
 
         overlay->handleEvent(event, window); // 🔹 overlay 이벤트 전달
         charSelector->handleEvent(event, window);
@@ -253,7 +254,6 @@ public:
         }
 
         if (settings.isVisible() || overlay->isVisible() || charSelector->isVisible()) {
-            player.update(dt, false);  // UI 떠 있으면 조작 못함
         }
         else {
             player.update(dt, true);   // 아무것도 없으면 움직임 가능
@@ -306,6 +306,7 @@ public:
     
     void showInteractionUI(int id1, int id2) {
         std::cout << "⚡ ID " << id1 << " <-> ID " << id2 << " 상호작용 시작!" << std::endl;
+        overlay->toggle();
         // UIManager나 새로운 InteractionUIManager에 띄우는 방식
     }
 

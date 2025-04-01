@@ -84,7 +84,13 @@ public:
         if (event.is<sf::Event::KeyPressed>()) {
             auto key = event.getIf<sf::Event::KeyPressed>();
 
-            if (key->code == sf::Keyboard::Key::Tab) {
+            if (key->code == sf::Keyboard::Key::Up) {
+                elements[currentFocusIndex]->setFocus(false);
+                if (currentFocusIndex > 0) { currentFocusIndex = (currentFocusIndex - 1) % size; }
+                else { currentFocusIndex = (currentFocusIndex + 1) % size; }
+                elements[currentFocusIndex]->setFocus(true);
+            }
+            else if (key->code == sf::Keyboard::Key::Down) {
                 elements[currentFocusIndex]->setFocus(false);
                 currentFocusIndex = (currentFocusIndex + 1) % size;
                 elements[currentFocusIndex]->setFocus(true);
