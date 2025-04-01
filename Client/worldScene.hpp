@@ -94,8 +94,20 @@ public:
             }
         }
 
+        // 상호작용
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Space)) {
+            sf::Vector2i frontTile = player.getTileInFront();
+            for (auto& [id, p] : otherPlayers) {
+                if (p.getTilePosition() == frontTile) {
+                    std::string toSend = "INTERACT " + std::to_string(id) + "\n";
+                    NetworkManager::getInstance().send(toSend);
+                    break;
+                }
+            }
+        }
+
         // 환경설정창
-        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Escape) && escCooldown <= 0.f) {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::G) && escCooldown <= 0.f) {
             settings.toggle();
             std::cout << "Visible: " << settings.isVisible() << "\n";
             escCooldown = 0.5f;
@@ -163,11 +175,7 @@ public:
                     }
                 }
             }
-            else {
-                std::cout << "[Client] Unknown server response: " << response << "\n";
-            }
-
-            if (type == "CHAT") {
+            else if (type == "CHAT") {
                 int senderId;
                 std::string id , msg;
                 iss >> senderId >> id;
@@ -185,6 +193,25 @@ public:
                 }
                 
             }
+            else if (type == "INTERACTION") {
+                int id1, id2;
+                iss >> id1 >> id2;
+
+                if (myId == id1 || myId == id2) {
+                    // 본인 혹은 대상인 경우 상호작용 UI 띄우기
+                    showInteractionUI(id1, id2);
+                }
+                else {
+                    // 관전자라면 알림 UI 띄우기
+                    showOtherPlayersInteraction(id1, id2);
+                }
+            }
+
+            else {
+                std::cout << "[Client] Unknown server response: " << response << "\n";
+            }
+
+
         }
 
         if (!settings.isVisible()) {
@@ -212,11 +239,12 @@ public:
 
         if (bg.has_value()) window.draw(*bg);
         
-        player.draw(window);
 
         for (auto& [id, p] : otherPlayers) {
             p.draw(window);
         }
+
+        player.draw(window);
 
         if (isChatting)
             chatBox->render(window);
@@ -224,5 +252,16 @@ public:
         window.draw(frame);  
         settings.render(window);
     }
+    
+    void showInteractionUI(int id1, int id2) {
+        std::cout << "⚡ ID " << id1 << " <-> ID " << id2 << " 상호작용 시작!" << std::endl;
+        // UIManager나 새로운 InteractionUIManager에 띄우는 방식
+    }
+
+    void showOtherPlayersInteraction(int id1, int id2) {
+        std::cout << "👀 ID " << id1 << "과(와) ID " << id2 << "가 뭔가 하고 있음..." << std::endl;
+        // 캐릭터 근처에 말풍선 표시도 가능
+    }
+
 
 };

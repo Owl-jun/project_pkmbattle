@@ -218,6 +218,21 @@ void processMessage(const std::string& msg, int playerId) {
         }
     }
 
+    // 상호작용 명령 처리
+    if (command == "INTERACT") {
+        int targetId;
+        iss >> targetId;
+
+        std::string response = "INTERACTION " + std::to_string(playerId) + " " + std::to_string(targetId) + "\n";
+
+        for (auto& [id, sock] : clientSockets) {
+            asio::write(*sock, asio::buffer(response));
+        }
+    }
+
+
+
+
     iss.clear();
 }
 

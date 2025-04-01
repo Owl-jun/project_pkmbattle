@@ -87,7 +87,7 @@ public:
     }
 
     void showSpeechBubble(const std::string& msg, const sf::Font& font);
-
+    sf::Vector2i getTileInFront() const;
     void setCurDir(std::string d);
     void setTile(sf::Vector2i& pos);
     void sendDirectionToServer(Direction dir);
