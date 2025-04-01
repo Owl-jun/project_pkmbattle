@@ -57,6 +57,7 @@ void GameManager::init() {
     SoundManager::getInstance().playMusic("C:/Source/project_pkmbattle/Client/assets/track1.mp3");  // 사운드매니저
     ResourceManager::getInstance().init();
     // 주의할 점. 절대 같은 씬 또 만들면 안됨
+    SceneManager::getInstance().registerScene("ending", new endingScene());
     SceneManager::getInstance().registerScene("opening", new OpeningScene());
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());

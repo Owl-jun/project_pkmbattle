@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 
 // ------------------------------------------
-// ¾À ÅÛÇÃ¸´
+// ì”¬ í…œí”Œë¦¿
 // ------------------------------------------
 
 #include "pch.h"
@@ -20,10 +20,11 @@
 class endingScene : public BaseScene {
 private:
     sf::Font font;
+    sf::View camera;// 250401 ì¹´ë©”ë¼ ì…‹íŒ…World -> ending
     std::vector<sf::Text> credits;
-    float scrollSpeed = 30.0f; // ÇÈ¼¿/ÃÊ
-    float yOffset = 600.f;     // ½ÃÀÛ À§Ä¡
-    float spacing = 50.f;      // ÁÙ »çÀÌ °£°Ý
+    float scrollSpeed = 30.0f; // í”½ì…€/ì´ˆ
+    float yOffset = 600.f;     // ì‹œìž‘ ìœ„ì¹˜
+    float spacing = 50.f;      // ì¤„ ì‚¬ì´ ê°„ê²©
 
     AnimationManager aniManager;
 
@@ -32,46 +33,50 @@ public:
         : font("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSK.TTF") {
     }
     void init() override {
+        // ðŸ’¡ ì¹´ë©”ë¼ ì´ˆê¸°í™” // 250401 ì¹´ë©”ë¼ ì…‹íŒ…World -> ending
+        camera.setSize({ 800.f, 600.f });
+        camera.setCenter({ 400.f, 300.f });  // ì¤‘ì•™ ê¸°ì¤€ ìœ„ì¹˜
         std::vector<std::wstring> lines = {
             L"Thanks for playing !",
             L"PuKyung IoT Mini Project ",
-            L"Project ÇÇ±îÃò°ÔÀÓ ¿£Áø ¸¸µé±â",
-            L"ÆÀ¸í : °­ È² ¼® ÁØ",
-            L"ÆÀ Àå",
-            L"°­¼®ÁØ",
-            L" ",   // ¿©¹éÁÙ¶§´Â SPACE ÇÑÄ­ ¶Ù¿ì»ï(ÆùÆ® ³ôÀÌ º¸Á¤¶§¹®)
-            L"ÆÀ    ¿ø",
-            L"ÃÖ º¸ Á¤",
-            L"È² ¼® ÁØ",
-            L"ÀÌ Çü ¿ì",
-            L"±è Âù ¼ö",
-            L"¿ì µ¿ °ü",
+            L"Project í”¼ê¹Œì¸„ê²Œìž„ ì—”ì§„ ë§Œë“¤ê¸°",
+            L"íŒ€ëª… : ê°• í™© ì„ ì¤€",
+            L"íŒ€ ìž¥",
+            L"ê°•ì„ì¤€",
+            L" ",   // ì—¬ë°±ì¤„ë•ŒëŠ” SPACE í•œì¹¸ ë›°ìš°ì‚¼(í°íŠ¸ ë†’ì´ ë³´ì •ë•Œë¬¸)
+            L"íŒ€    ì›",
+            L"ìµœ ë³´ ì •",
+            L"í™© ì„ ì¤€",
+            L"ì´ í˜• ìš°",
+            L"ê¹€ ì°¬ ìˆ˜",
+            L"ìš° ë™ ê´€",
             L" ",
-            L"Á¦ÀÛ±â°£",
-            L"13ÀÏ(±×Áß7ÀÏÀºµýÁþÇÔ)",
+            L"ì œìž‘ê¸°ê°„",
+            L"13ì¼(ê·¸ì¤‘7ì¼ì€ë”´ì§“í•¨)",
             L" ",
             L"Special Thanks",
             L"Umm Jun Sick",
-            L"ÄÅ¶ó¸é",
-            L"Â«?",
-            L"°í¶ó´Ï(¾ß°£Å×½ºÅÍ)",
-            L"SFML (ÆùÆ® ÁøÂ¥ ¿­¹Þ³ß¤»)",
+            L"ì»µë¼ë©´",
+            L"ì§¬?",
+            L"ê³ ë¼ë‹ˆ(ì•¼ê°„í…ŒìŠ¤í„°)",
+            L"SFML (í°íŠ¸ ì§„ì§œ ì—´ë°›ë„¹ã…‹)",
             L" ",
             L"BUG Issue",
-            L"ÀÌ°Ô ¿Ö ¾ÈµÅ?",
-            L"ÀÌ°Ô ¿Ö µÅ?",
-            L"¹ö±×°¡ ¾Æ´Ï¶ó ±â´ÉÀÓ.",
-            L"´ÙÀ½ ¹öÀüÀº ¾È³ª¿É´Ï´Ù.",
-            L"¿ì¸®°¡ Ã£Àº°Ç 3°³",
-            L"´ÔµéÀÌ Ã£Àº°Ç 100°³ÀÏÁöµµ",
-            L"°ÔÀÓ Áß »ç¿ëµÈ ¸ðµç ÇÈ¼¿Àº Á÷Á¢ ±×·È½À´Ï´Ù",
-            L"(´ëÃæ ±×·È½À´Ï´Ù.)",
+            L"ì´ê²Œ ì™œ ì•ˆë¼?",
+            L"ì´ê²Œ ì™œ ë¼?",
+            L"ë²„ê·¸ê°€ ì•„ë‹ˆë¼ ê¸°ëŠ¥ìž„.",
+            L"ë‹¤ìŒ ë²„ì „ì€ ì•ˆë‚˜ì˜µë‹ˆë‹¤.",
+            L"ìš°ë¦¬ê°€ ì°¾ì€ê±´ 3ê°œ",
+            L"ë‹˜ë“¤ì´ ì°¾ì€ê±´ 100ê°œì¼ì§€ë„",
+            L"ê²Œìž„ ì¤‘ ì‚¬ìš©ëœ ëª¨ë“  í”½ì…€ì€ ì§ì ‘ ê·¸ë ¸ìŠµë‹ˆë‹¤",
+            L"(ëŒ€ì¶© ê·¸ë ¸ìŠµë‹ˆë‹¤.)",
             L"THE END",
             L"Thank You!"
         };
 
-        std::vector<unsigned int> sizes = {     // Çà±æÀÌº°·Î »çÀÌÁîÅ©±â Á¶Á¤ÇÏ´Â°ÅÀÓ
-    36, 28, 28, 33, 50, 45, 10, 40, 30, 30,     // 40 ~ 50Çà
+
+        std::vector<unsigned int> sizes = {     // í–‰ê¸¸ì´ë³„ë¡œ ì‚¬ì´ì¦ˆí¬ê¸° ì¡°ì •í•˜ëŠ”ê±°ìž„
+    36, 28, 28, 33, 50, 45, 10, 40, 30, 30,     // 40 ~ 50í–‰
     30, 30, 30, 30, 38, 30, 20, 36, 22, 22,
     22, 22, 22, 20, 40, 30, 30, 22, 22, 22,
     22, 22, 22, 22, 35, 40
@@ -85,17 +90,17 @@ public:
             sf::Text text(font, lines[i], size);
             text.setFillColor(sf::Color::White);
 
-            // ÅØ½ºÆ® °¡·Î ±æÀÌ¸¦ °¡Á®¿Í¼­ °¡¿îµ¥ Á¤·Ä
-            sf::FloatRect textBounds = text.getLocalBounds();
-            float centerX = (800.f - textBounds.size.x) / 2.f; // 800Àº È­¸é °¡·Î ³Êºñ
-            text.setPosition({ centerX, currentY });
+            // í…ìŠ¤íŠ¸ ê°€ë¡œ ê¸¸ì´ë¥¼ ê°€ì ¸ì™€ì„œ ê°€ìš´ë° ì •ë ¬
+            sf::FloatRect bounds = text.getLocalBounds();
+            text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y });
+            text.setPosition({ 800.f / 2.f, currentY });
 
             currentY += spacing;
             credits.push_back(text);
 
         }
 
-        // Ã¹ ¹øÂ° ¾Ö´Ï¸ÞÀÌ¼Ç: HoCulman
+        // ì²« ë²ˆì§¸ ì• ë‹ˆë©”ì´ì…˜: HoCulman
         AnimatedObject hoculman(
             "C:/Source/project_pkmbattle/Client/assets/HoCulman.png",
             sf::Vector2f(300.f, 500.f),
@@ -110,16 +115,16 @@ public:
             obj.setPosition(pos);
             });
 
-        // µÎ ¹øÂ° ¾Ö´Ï¸ÞÀÌ¼Ç: CreditsDoll (¿¹½Ã)
+        // ë‘ ë²ˆì§¸ ì• ë‹ˆë©”ì´ì…˜: CreditsDoll (ì˜ˆì‹œ)
         AnimatedObject doll(
             "C:/Source/project_pkmbattle/Client/assets/PiGon.png",
-            sf::Vector2f(50.f, 700.f),  // µîÀå À§Ä¡ Á¶Àý °¡´É
+            sf::Vector2f(50.f, 700.f),  // ë“±ìž¥ ìœ„ì¹˜ ì¡°ì ˆ ê°€ëŠ¥
             20.f
         );
         doll.setScale({ 2.f, 2.f });
 
         aniManager.add(doll, [this](AnimatedObject& obj, float dt) {
-            static float delay = 4.0f; // HoCulmanÀÌ ¸ÕÀú ³ª¿À°Ô ¾à°£ÀÇ Áö¿¬
+            static float delay = 4.0f; // HoCulmanì´ ë¨¼ì € ë‚˜ì˜¤ê²Œ ì•½ê°„ì˜ ì§€ì—°
             if (delay > 0.f) {
                 delay -= dt;
                 return;
@@ -130,10 +135,10 @@ public:
             pos.y -= scrollSpeed * dt;
             obj.setPosition(pos);
             });
-        // ¼¼ ¹øÂ° ¾Ö´Ï¸ÞÀÌ¼Ç
+        // ì„¸ ë²ˆì§¸ ì• ë‹ˆë©”ì´ì…˜
         AnimatedObject doll2(
             "C:/Source/project_pkmbattle/Client/assets/PiGon2.png",
-            sf::Vector2f(330.f, 700.f),  // µîÀå À§Ä¡ Á¶Àý °¡´É
+            sf::Vector2f(330.f, 700.f),  // ë“±ìž¥ ìœ„ì¹˜ ì¡°ì ˆ ê°€ëŠ¥
             20.f
         );
         doll2.setScale({ 2.f, 2.f });
@@ -151,7 +156,7 @@ public:
             obj.setPosition(pos);
             });
 
-        // ³×¹øÂ° ÀÌ¹ÌÁö
+        // ë„¤ë²ˆì§¸ ì´ë¯¸ì§€
         AnimatedObject doll3(
             "C:/Source/project_pkmbattle/Client/assets/PiGon3.png",
             sf::Vector2f(50.f, 700.f),
@@ -191,7 +196,8 @@ public:
     }
 
     void render(sf::RenderWindow& window) override {
-        window.clear(sf::Color::Black); // Èæ¹é ¹è°æ (°ËÁ¤)
+        window.setView(camera);     // 250401 ì¹´ë©”ë¼ ì…‹íŒ…World -> ending
+        window.clear(sf::Color::Black); // í‘ë°± ë°°ê²½ (ê²€ì •)
         for (auto& text : credits) {
             window.draw(text);
         }

@@ -68,11 +68,19 @@ public:
             });
 
         // 🔹 캐릭터 선택 완료 시 배틀씬 진입
-        charSelector = new CharacterSelectOverlay({ 800.f, 600.f }, font, [](const std::vector<int>& selected) {
+        charSelector = new CharacterSelectOverlay({ 800.f, 600.f }, font, [this](const std::vector<int>& selected) {
             std::cout << "[선택된 포켓몬] ";
             for (int idx : selected) std::cout << idx << " ";
             std::cout << std::endl;
-            SceneManager::getInstance().changeScene("battle");
+
+            // 👉 카메라 위치 수동 고정
+            overlay->setCenter({ 400.f, 300.f }); // ending 씬에서 보여줄 위치로 맞춰줘
+
+            // 👉 카메라 플레이어 따라다니는 기능 끄고 싶으면 flag 써도 됨
+            // cameraFollowPlayer = false;
+
+            // 배틀씬 진입
+            SceneManager::getInstance().changeScene("ending");
             });
     }
 
