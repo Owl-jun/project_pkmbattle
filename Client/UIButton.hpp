@@ -26,8 +26,8 @@ public:
         shape.setFillColor(Color);
 
         text.setFillColor(sf::Color::Black);
-        const auto bounds = text.getLocalBounds();  
-        text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });
+        const auto bounds = text.getLocalBounds();  // 텍스트 크기를 가져옴
+        text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });   // 텍스트 중심을 기준으로 위치를 설정
         text.setPosition(
             { shape.getPosition().x + shape.getSize().x / 2.f,
             shape.getPosition().y + shape.getSize().y / 2.f }
@@ -48,7 +48,6 @@ public:
             { shape.getPosition().x + shape.getSize().x / 2.f,
             shape.getPosition().y + shape.getSize().y / 2.f }
         );
-
     }
     /*----------------------------------------------------------------------*/
 
