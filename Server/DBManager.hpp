@@ -143,7 +143,7 @@ public:
 				"EXP = " + std::to_string(EXP) + " "
 				"WHERE Login_ID = '" + id + "'";
 			stmt->executeUpdate(query);
-			std::cout << "[Saved data] " << id << " (" << x << ", " << y << "), "
+			std::cout << "[Saved data] " << "(" << x << ", " << y << ") " << "ID: " << id << ", "
 				<< "Wins: " << win << ", Losses: " << lose << ", "
 				<< "Level: " << level << ", EXP: " << EXP << "\n";
 		}
