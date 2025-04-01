@@ -13,6 +13,8 @@
 #include "NetworkManager.hpp"
 #include "GameManager.h"
 #include "SelectOverlay.hpp"
+#include "CharacterSelectOverlay.hpp"
+
 
 class worldScene : public BaseScene {
 private:
@@ -23,10 +25,13 @@ private:
     std::optional<sf::Sprite> bg;
     UIManager uiManager;
 
+<<<<<<< Updated upstream
     // TextBox
     UITextBox* chatBox;
     bool isChatting = false;
     
+=======
+>>>>>>> Stashed changes
 
     Player& player;
     std::unordered_map<int, Player> otherPlayers;
@@ -37,6 +42,8 @@ private:
 
     SelectOverlay* overlay = nullptr;   // 추가댐
 
+    CharacterSelectOverlay* charSelector = nullptr;     // 추가
+
     float escCooldown = 0.f;
 
 public:
@@ -45,7 +52,7 @@ public:
         , deltatime("0")
         , frame(font, deltatime, 24)
         , player(SceneManager::getInstance().getPlayer())
-        , settings({ 800.f,600.f }, ResourceManager::getInstance().getFont("C:/Source/project_pkmbattle/Client/fonts/POKEMONGSKMONO.TTF"))
+        , settings({ 800.f,600.f }, font)
         , myId(-1)
         , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, font))
     {
@@ -53,10 +60,26 @@ public:
         myId = NetworkManager::getInstance().getMyId();
         std::cout << "my id : " << myId << std::endl;
 
+        overlay = new SelectOverlay({ 400.f, 200.f }, font);
+        overlay->setCenter({ 400.f, 300.f });
 
-        overlay = new SelectOverlay({ 400.f, 200.f }, font);        // 추가 (동관)
-        overlay->setCenter({ 400.f, 300.f }); // 중앙 정렬`         // 추가 (동관)
 
+
+
+
+        // 🔹 싸운다 누르면 캐릭터 선택창 띄우기
+        overlay->setFightCallback([this]() {
+            charSelector->show();
+            overlay->hide();
+            });
+
+        // 🔹 캐릭터 선택 완료 시 배틀씬 진입
+        charSelector = new CharacterSelectOverlay({ 800.f, 600.f }, font, [](const std::vector<int>& selected) {
+            std::cout << "[선택된 포켓몬] ";
+            for (int idx : selected) std::cout << idx << " ";
+            std::cout << std::endl;
+            SceneManager::getInstance().changeScene("battle");
+            });
     }
 
     ~worldScene() {
@@ -120,7 +143,7 @@ public:
         }
 
         overlay->handleEvent(event, window); // 🔹 overlay 이벤트 전달
-
+        charSelector->handleEvent(event, window);
         settings.handleEvent(event, window);
     }
 
@@ -224,6 +247,7 @@ public:
 
         settings.update(window);
         overlay->update(window); // 🔹 overlay 업데이트
+        charSelector->update(window); // 🔹 charSelector 업데이트
         window.setView(camera);
 
         // frame을 카메라 기준 화면 좌상단에 배치
@@ -254,6 +278,7 @@ public:
         settings.render(window);
         // 동관이
         overlay->render(window); // 🔹 overlay 렌더링
+        charSelector->render(window); 
         
     }
 };

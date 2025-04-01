@@ -61,7 +61,7 @@ public:
         text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });        
         text.setPosition(
          {shape.getPosition().x + shape.getSize().x / 2.f,
-         shape.getPosition().y + shape.getSize().y / 2.f - 300.f }
+         shape.getPosition().y + shape.getSize().y / 2.f }
         );
     }
 

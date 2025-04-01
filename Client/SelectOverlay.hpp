@@ -18,6 +18,8 @@ private:
     bool visible = false;
     int currentFocusIndex = 0;
     bool enterPressed = false;
+    std::function<void()> onFightCallback; // 🔹 싸운다 콜백
+
 
 public:
     SelectOverlay(const sf::Vector2f& size, const sf::Font& sharedFont)
@@ -35,6 +37,7 @@ public:
 
         auto fightButton = new UIButton({ 8.f, 15.f }, { 180.f, 40.f }, L8, sf::Color::White, font, [this]() {
             std::cout << "[선택됨] 싸운다!" << std::endl;
+            if (onFightCallback) onFightCallback(); // 🔹 콜백 호출
             });
 
         auto runButton = new UIButton({ 20.f, 55.f }, { 180.f, 40.f }, L9, sf::Color::White, font, [this]() {
@@ -46,6 +49,8 @@ public:
         // 최초 포커스 설정
         fightButton->setFocus(true);
     }
+    // 🔹 콜백 세터
+    void setFightCallback(std::function<void()> cb) { onFightCallback = cb; }
 
     void toggle() { visible = !visible; }
     void hide() { visible = false; }

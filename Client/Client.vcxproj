@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CharacterSelectOverlay.hpp" />
     <ClCompile Include="fix.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="KeyManager.cpp" />
@@ -152,7 +153,9 @@
     <ClInclude Include="AnimationManager.hpp" />
     <ClInclude Include="baseScene.hpp" />
     <ClInclude Include="BaseUI.hpp" />
-    <ClInclude Include="BattleManager.hpp" />
+    <ClInclude Include="BattleManager.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="battleScene.hpp" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="KeyManager.h" />
