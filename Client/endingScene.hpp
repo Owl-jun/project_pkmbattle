@@ -52,13 +52,13 @@ public:
             L"우 동 관",
             L" ",
             L"제작기간",
-            L"13일(그중7일은딴짓함)",
+            L"13일",
             L" ",
             L"Special Thanks",
-            L"Umm Jun Sick",
+            L"중국집 사장님",
             L"컵라면",
-            L"짬?",
-            L"고라니(야간테스터)",
+            L"팀장님(출석체크맨날 빼먹음)",
+            L"",
             L"SFML (폰트 진짜 열받넹ㅋ)",
             L" ",
             L"BUG Issue",
@@ -68,7 +68,7 @@ public:
             L"다음 버전은 안나옵니다.",
             L"우리가 찾은건 3개",
             L"님들이 찾은건 100개일지도",
-            L"게임 중 사용된 모든 픽셀은 직접 그렸습니다",
+            L"",
             L"(대충 그렸습니다.)",
             L"THE END",
             L"Thank You!"
@@ -102,8 +102,8 @@ public:
 
         // 첫 번째 애니메이션: HoCulman
         AnimatedObject hoculman(
-            "C:/Source/project_pkmbattle/Client/assets/HoCulman.png",
-            sf::Vector2f(300.f, 500.f),
+            "C:/Source/project_pkmbattle/Client/assets/Poke1.png",
+            sf::Vector2f(400.f, 500.f),
             20.f
         );
         hoculman.setScale({ 2.f, 2.f });
@@ -117,14 +117,14 @@ public:
 
         // 두 번째 애니메이션: CreditsDoll (예시)
         AnimatedObject doll(
-            "C:/Source/project_pkmbattle/Client/assets/PiGon.png",
+            "C:/Source/project_pkmbattle/Client/assets/Poke2.png",
             sf::Vector2f(50.f, 700.f),  // 등장 위치 조절 가능
             20.f
         );
         doll.setScale({ 2.f, 2.f });
 
         aniManager.add(doll, [this](AnimatedObject& obj, float dt) {
-            static float delay = 4.0f; // HoCulman이 먼저 나오게 약간의 지연
+            static float delay = 6.0f; // HoCulman이 먼저 나오게 약간의 지연
             if (delay > 0.f) {
                 delay -= dt;
                 return;
@@ -137,8 +137,8 @@ public:
             });
         // 세 번째 애니메이션
         AnimatedObject doll2(
-            "C:/Source/project_pkmbattle/Client/assets/PiGon2.png",
-            sf::Vector2f(330.f, 700.f),  // 등장 위치 조절 가능
+            "C:/Source/project_pkmbattle/Client/assets/Poke3.png",
+            sf::Vector2f(400.f, 700.f),  // 등장 위치 조절 가능
             20.f
         );
         doll2.setScale({ 2.f, 2.f });
@@ -158,7 +158,7 @@ public:
 
         // 네번째 이미지
         AnimatedObject doll3(
-            "C:/Source/project_pkmbattle/Client/assets/PiGon3.png",
+            "C:/Source/project_pkmbattle/Client/assets/Poke4.png",
             sf::Vector2f(50.f, 700.f),
             20.f
         );
@@ -176,11 +176,31 @@ public:
             pos.y -= scrollSpeed * dt;
             obj.setPosition(pos);
             });
+
+        AnimatedObject doll4(
+            "C:/Source/project_pkmbattle/Client/assets/Poke5.png",
+            sf::Vector2f(400.f, 700.f),
+            20.f
+        );
+        doll4.setScale({ 2.f, 2.f });
+
+        aniManager.add(doll4, [this](AnimatedObject& obj, float dt) {
+            static float delay = 26.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
         if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Escape)) {
-            SceneManager::getInstance().changeScene("title");
+            SceneManager::getInstance().changeScene("opening");
         }
     }
 

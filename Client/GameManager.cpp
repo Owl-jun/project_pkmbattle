@@ -61,6 +61,7 @@ void GameManager::init() {
     SceneManager::getInstance().registerScene("opening", new OpeningScene());
     SceneManager::getInstance().registerScene("title", new TitleScene());
     SceneManager::getInstance().registerScene("login", new LoginScene());
+    //SceneManager::getInstance().registerScene("world", new worldScene());
     // --------------------------------------
     SceneManager::getInstance().changeScene("opening");    // 초기화면 설정s
 }
