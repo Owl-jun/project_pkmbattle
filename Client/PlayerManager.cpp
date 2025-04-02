@@ -5,12 +5,16 @@
 
 void PlayerManager::addPlayer(int id, std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp) {
     if (otherPlayers.contains(id)) return;
-    otherPlayers[id] = Player(nickname,_x, _y, _win, _lose, _level, _exp);
+    Player p(nickname, _x, _y, _win, _lose, _level, _exp);
+    otherPlayers[id] = p;
+    std::cout << "[PlayerManager] : addPlayer 실행 완료!" << std::endl;
 }
 
-void PlayerManager::make_MyPlayer(std::string nickname ,int _x , int _y, int _win , int _lose, int _level, int _exp) 
+void PlayerManager::make_MyPlayer(int id, std::string nickname, int _x , int _y, int _win , int _lose, int _level, int _exp) 
 {
+
     MyPlayer = Player(nickname, _x, _y, _win, _lose, _level, _exp);
+    std::cout << "[PlayerManager] : make_MyPlayer 실행 완료! id : " << std::to_string(id) << std::endl;
 }
 
 // --------------------------------------
@@ -82,8 +86,9 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
     else if (tag == "NEWUSER") {
         std::istringstream iss(msg);
         int id, x, y, win, lose, level, exp;
-        iss >> id >> x >> y >> win >> lose >> level >> exp;
-        addPlayer(id, x, y, win, lose, level, exp);
+        std::string name;
+        iss >> id >> name >> x >> y >> win >> lose >> level >> exp;
+        addPlayer(id, name, x, y, win, lose, level, exp);
         EventManager::getInstance().clearEvents(tag);
     }
 

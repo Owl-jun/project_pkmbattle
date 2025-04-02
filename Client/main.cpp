@@ -1,5 +1,5 @@
 ﻿#include "pch.h"
-#include "GameManager.h"
+#include "GameManager.hpp"
 
 int main() {
     GameManager::getInstance().run();

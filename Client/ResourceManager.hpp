@@ -16,7 +16,7 @@ private:
 public:
     static ResourceManager& getInstance();
     void initAuto();
-    void init(const std::string& assetDir = "Client/Assets/");
+    void init(const std::string& assetDir);
 
     // filename은 확장자를 포함합니다.
     sf::Texture& getTextureByName(const std::string& filename);

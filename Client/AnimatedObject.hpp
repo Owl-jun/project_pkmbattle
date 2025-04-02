@@ -20,24 +20,25 @@ private:
 
     // 애니메이션 관련 매개 변수
     int direction = -1;     // 방향
-    float speed = 0.f;      // 속도
+    float speed = 250.f;      // 속도
     float amplitude = 0.f;  // 진폭
     float freq = 0.f;       // 주기
     float delay = 0.f;      // 딜레이타임
 
 public:
     AnimatedObject() = default;
-    AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _delay = 0.f)
+    AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _delay = 0.f, float _alpha = 255.f)
     {
         texture = &ResourceManager::getInstance().getTextureByName(fileName);
         sprite.emplace(*texture);
         basePos = pos;
         m_Pos = pos;
+        alpha = _alpha;
         sprite->setPosition(pos);
         sprite->setColor(sf::Color(255, 255, 255, alpha));
         delay = _delay;
     }
-    AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _speed, float _freq, int _direction = -1, float _amplitude = 0.f)
+    AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _speed, float _freq, int _direction, float _amplitude = 0.f)
     {
         texture = &ResourceManager::getInstance().getTextureByName(fileName);
         sprite.emplace(*texture);
@@ -54,9 +55,8 @@ public:
     void update(std::function<void(AnimatedObject&, float)> func, float dt) {
         func(*this, dt);
     }
-    void draw(sf::RenderWindow& window) {
-        if (!finished)
-            window.draw(*sprite);
+    void draw(sf::RenderWindow& window) {    
+        window.draw(*sprite);
     }
     bool isFinished() { return finished; }
 
@@ -64,7 +64,6 @@ public:
     // 생성자별 사용가능 애니메이션
     // AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _delay)
     void fadein(float dt) {
-        alpha = 0.f;
         // 딜레이 처리
         elapsed += dt;
         if (!started) {

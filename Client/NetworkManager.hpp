@@ -24,6 +24,7 @@ private:
     NetworkManager(); // 싱글톤
 
 public:
+    void setSocketID(int id);
     int getSocketID() const;
     static NetworkManager& getInstance();
     std::shared_ptr<tcp::socket> getSocket();

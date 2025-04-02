@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "BaseScene.hpp"
 #include "SceneManager.hpp"
+#include "GameManager.hpp"
 
 #include "UIButton.hpp"
 #include "UIManager.hpp"
@@ -30,7 +31,7 @@ public:
         bgtextureSize = static_cast<sf::Vector2f>(ResourceManager::getInstance().getTextureByName("introbg.png").getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         bg.setScale({ (windowSize.x / bgtextureSize.x), (windowSize.y / bgtextureSize.y) });
-        aniManager.add(bg);
+        aniManager.add(bg, [](AnimatedObject& obj, float dt) {});
         
         AnimatedObject bird("introbird.png", {windowSize.x/2, windowSize.y/2}, 850.f, 2.f, -1.f, 50.f);
         bird.setScale({ 0.25,0.25 });

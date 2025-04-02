@@ -30,12 +30,12 @@ public:
         MADEBY = std::unique_ptr<AnimatedObject>(new AnimatedObject("MADEBY.png", { 250 , 100 }));
         KHSJ = std::unique_ptr<AnimatedObject>(new AnimatedObject("KHSJ.png", { 250 , 200 }));
 
-        AnimatedObject Chansoo("chansoo.png", { 250, 400 }, 0.5f);
-        AnimatedObject Bojeong("bojeong.png", { 300, 400 }, 1.0f);
-        AnimatedObject Dongkwan("dongwan.png",{ 350, 400 }, 1.5f);
-        AnimatedObject Seokjun("seokjun.png",{ 400, 400 }, 2.0f);
-        AnimatedObject Hyeongwoo("hyeongwoo.png",{ 450, 400 },2.5f);
-        AnimatedObject Bigjun("bigjun.png",{ 500, 400 },3.0f);
+        AnimatedObject Chansoo("chansoo.png", { 250, 400 }, 0.5f, 0.f);
+        AnimatedObject Bojeong("bojeong.png", { 300, 400 }, 1.0f, 0.f);
+        AnimatedObject Dongkwan("dongwan.png",{ 350, 400 }, 1.5f, 0.f);
+        AnimatedObject Seokjun("seokjun.png",{ 400, 400 }, 2.0f, 0.f);
+        AnimatedObject Hyeongwoo("hyeongwoo.png",{ 450, 400 },2.5f, 0.f);
+        AnimatedObject Bigjun("bigjun.png",{ 500, 400 },3.0f, 0.f);
 
         aniManager.add(Chansoo, [](AnimatedObject& obj, float dt) { obj.fadein(dt); } );
         aniManager.add(Bojeong, [](AnimatedObject& obj, float dt) { obj.fadein(dt); } );

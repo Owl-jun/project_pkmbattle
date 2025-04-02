@@ -148,7 +148,7 @@
     <ClCompile Include="ResourceManager.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SceneManager.hpp" />
+    <ClCompile Include="SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimatedObject.hpp" />
@@ -178,6 +178,7 @@
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PlayerManager.hpp" />
     <ClInclude Include="ResourceManager.hpp" />
+    <ClInclude Include="SceneManager.hpp" />
     <ClInclude Include="SelectOverlay.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>

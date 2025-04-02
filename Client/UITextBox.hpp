@@ -114,7 +114,6 @@ public:
     }
 
     void updateText() {
-        std::wcout << L"[DEBUG] input : " << input << std::endl;
         sf::String s;
         for (wchar_t ch : input) {
             s += ch; 

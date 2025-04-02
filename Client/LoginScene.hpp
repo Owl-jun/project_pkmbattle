@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "pch.h"
+#include "SceneManager.hpp"
 #include "KeyManager.hpp"
 #include "BaseScene.hpp"
-#include "SceneManager.hpp"
 #include "TimeManager.hpp"
 #include "PlayerManager.hpp"
+#include "GameManager.hpp"
 
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
@@ -55,7 +56,7 @@ public:
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
         bg.setScale({ (windowSize.x / bgtextureSize.x), (windowSize.y / bgtextureSize.y) });
         bg.setPosition({ 0.f, 0.f });
-        aniManager.add(bg);
+        aniManager.add(bg, [](AnimatedObject& obj, float dt) {});
 
         id.setFillColor(sf::Color::Black);
         id.setPosition({ 270, 277.f });
@@ -98,9 +99,9 @@ public:
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
                 NetworkManager::getInstance().send(msg);
+                std::cout << "[LoginScene] 로그인 요청 전송완료 "<< "\n";
             }
         ));
-
         
         AnimatedObject Seokjun("seokjun.png", { 700, 100 }, 20.f, 0.f, -1);
         Seokjun.setScale({ 2.f,2.f });
@@ -116,36 +117,44 @@ public:
         std::istringstream iss(line);
         std::string response;
         iss >> response;
+        std::cout << "[LoginScene] handleEvent : 수신 tag = " << tag << " response : " << response << std::endl;
 
         if (tag == "LOGIN") {
-            if (tag == "LOGIN") {
-                if (response == "TRUE") {
-                    std::vector<std::string> lines;
-                    std::string line;
-                    while (std::getline(iss, line)) {
-                        if (!line.empty()) lines.push_back(line);
-                    }
+            if (response == "TRUE") {
+                std::vector<std::string> tokens;
+                std::string token;
 
-                    for (size_t i = 0; i < lines.size(); ++i) {
-                        std::istringstream userIss(lines[i]);
-                        std::string nickname;
-                        int id, x, y, win, lose, level;
-                        float exp;
-                        userIss >> id >> nickname >> x >> y >> win >> lose >> level >> exp;
-
-                        if (i == 0) {
-                            // 내 플레이어 초기화
-                            PlayerManager::getInstance().make_MyPlayer(nickname, x, y, win, lose, level, exp);
-                        }
-                        else {
-                            // 상대 플레이어 추가
-                            PlayerManager::getInstance().addPlayer(id, nickname, x, y, win, lose, level, exp);
-                        }
-                    }
-
-                    SceneManager::getInstance().changeScene("world");
+                // 남은 데이터 토큰화
+                while (iss >> token) {
+                    tokens.push_back(token);
                 }
+
+                size_t playerDataSize = 8; // id, nickname, x, y, win, lose, level, exp
+                size_t playerCount = (tokens.size() / playerDataSize);
+
+                for (size_t i = 0; i < playerCount; ++i) {
+                    size_t offset = i * playerDataSize;
+
+                    int id = std::stoi(tokens[offset + 0]);
+                    std::string nickname = tokens[offset + 1];
+                    int x = std::stoi(tokens[offset + 2]);
+                    int y = std::stoi(tokens[offset + 3]);
+                    int win = std::stoi(tokens[offset + 4]);
+                    int lose = std::stoi(tokens[offset + 5]);
+                    int level = std::stoi(tokens[offset + 6]);
+                    float exp = std::stof(tokens[offset + 7]);
+
+                    if (i == 0) {
+                        PlayerManager::getInstance().make_MyPlayer(id, nickname, x, y, win, lose, level, exp);
+                    }
+                    else {
+                        PlayerManager::getInstance().addPlayer(id, nickname, x, y, win, lose, level, exp);
+                    }
+                }
+
+                SceneManager::getInstance().changeScene("world");
             }
+            
             else if (response == "EXIST") {
                 std::cout << "이미 로그인중인 유저!\n";
                 warningVisible = true;

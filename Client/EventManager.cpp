@@ -1,24 +1,22 @@
+ï»¿#include "pch.h"
 #include "EventManager.hpp"
-#include <sstream>
+
 
 EventManager& EventManager::getInstance() {
     static EventManager instance;
     return instance;
 }
 
-void EventManager::dispatch(const std::string& msg) {
-    std::istringstream iss(msg);
-    std::string tag;
-    iss >> tag; // Ã¹ ´Ü¾î¸¦ ÅÂ±×(¸í·É¾î)·Î »ç¿ë
-
+void EventManager::dispatch(const std::string& tag, const std::string& data) {
     std::lock_guard<std::mutex> lock(eventMutex);
-    eventMap[tag].push_back(msg);
+    eventMap[tag].push_back(data);
 }
+
 
 std::vector<std::string> EventManager::getEvents(const std::string& tag) {
     std::lock_guard<std::mutex> lock(eventMutex);
     if (eventMap.find(tag) == eventMap.end()) return {};
-    return eventMap[tag]; // º¹»çº» ¹ÝÈ¯
+    return eventMap[tag]; // ë³µì‚¬ë³¸ ë°˜í™˜
 }
 
 void EventManager::clearEvents(const std::string& tag) {

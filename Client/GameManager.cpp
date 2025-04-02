@@ -43,12 +43,21 @@ void GameManager::init() {
 }
 
 // 서버 패킷 핸들러
+int count = 3;
 void GameManager::handleEvent(std::string tag, std::string msg)
 {
     if (tag == "EXIT") {
-        int count = 3;
-        if (msg == "EXIT_OK") {
-            window.close();
+        std::stringstream iss(msg);
+        int id;
+        std::string message;
+        iss >> id >> message;
+        if (message == "EXIT_OK") {
+            if (id == NetworkManager::getInstance().getSocketID())
+            {
+                window.close();
+                NetworkManager::getInstance().stopReceiveLoop();
+                return;
+            }
         }
         else {
             NetworkManager::getInstance().send("EXIT\n");
@@ -56,13 +65,25 @@ void GameManager::handleEvent(std::string tag, std::string msg)
             if (count <= 0) { 
                 std::cout << "저장실패, 강제 종료합니다." << std::endl;
                 window.close(); 
+                NetworkManager::getInstance().stopReceiveLoop();
+                return;
             }
         }
+        EventManager::getInstance().clearEvents(tag);
+    }
+    else if (tag == "ID") {
+        std::stringstream iss(msg);
+        int id;
+        iss >> id;
+        std::cout << "id 파싱 결과 : " << id << "setSocketID 실행"  << std::endl;
+        NetworkManager::getInstance().setSocketID(id);
+        std::cout << "[NetworkManager] SocketID set completed !! SocketID : " << NetworkManager::getInstance().getSocketID() << std::endl;
         EventManager::getInstance().clearEvents(tag);
     }
     else {
         std::cout << "잘못된 서버응답 입니다." << tag << std::endl;
     }
+    
 }
 
 // -----------------------------------------------------------------
@@ -82,13 +103,24 @@ void GameManager::handleInput()
 void GameManager::update() { 
     // 메시지큐 -> 이벤트매니저 전달
     while (NetworkManager::getInstance().hasMessage()) {
-        EventManager::getInstance().dispatch(NetworkManager::getInstance().popMessage());
+        std::string fullMsg = NetworkManager::getInstance().popMessage();
+
+        std::istringstream iss(fullMsg);
+        std::string tag;
+        iss >> tag;
+
+        std::string rest;
+        std::getline(iss, rest);
+        if (!rest.empty() && rest[0] == ' ') rest.erase(0, 1); // 공백 제거
+
+        EventManager::getInstance().dispatch(tag, rest);
     }
 
     // 수신 패킷이름 지정
-    for (const std::string& tag : { "EXIT" }) {
+    for (const std::string& tag : { "EXIT", "ID"}) {
         auto events = EventManager::getInstance().getEvents(tag);
         for (const auto& msg : events) {
+            std::cout << "tag : " << tag << " msg : " << msg << std::endl;
             handleEvent(tag, msg);
         }
     }

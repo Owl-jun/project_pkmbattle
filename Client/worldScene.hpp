@@ -46,7 +46,7 @@ public:
     // ----------------------------------------------------------------------------------
     // 4종세트
     void handleEvent(std::string tag, std::string line) {
-
+        PlayerManager::getInstance().handleEvent(tag, line);
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {

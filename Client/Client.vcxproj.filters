@@ -18,9 +18,6 @@
     <ClCompile Include="ResourceManager.cpp">
       <Filter>MANAGERS\ResourceManager</Filter>
     </ClCompile>
-    <ClCompile Include="SceneManager.hpp">
-      <Filter>MANAGERS\SceneManager</Filter>
-    </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
       <Filter>MANAGERS\NetworkManager</Filter>
     </ClCompile>
@@ -29,6 +26,9 @@
     </ClCompile>
     <ClCompile Include="PlayerManager.cpp">
       <Filter>MANAGERS\PlayerManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>MANAGERS\SceneManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +171,9 @@
     </ClInclude>
     <ClInclude Include="PlayerManager.hpp">
       <Filter>MANAGERS\PlayerManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.hpp">
+      <Filter>MANAGERS\SceneManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

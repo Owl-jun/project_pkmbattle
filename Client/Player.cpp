@@ -22,6 +22,7 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
         if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             currentDirection = lastHeldDirection;
             sendDirectionToServer(currentDirection);
+            std::cout << "Player::handleInput : 방향키 누름 서버 전송완료" << std::endl;
             moveCooldown = 0.15f;
             currentFrame = 0;
             updateSpriteTexture();
@@ -56,10 +57,11 @@ void Player::update(float dt) {
 }
 
 void Player::draw(sf::RenderWindow& window) {
-    if (sprite.has_value())
+    if (sprite.has_value()) {
         window.draw(*sprite);
-    nickname.setPosition({ sprite->getPosition().x - 60.f , sprite->getPosition().y - 60.f });
-    window.draw(nickname);
+    }
+    //nickname.setPosition({ sprite->getPosition().x - 60.f , sprite->getPosition().y - 60.f });
+    //window.draw(nickname);  // 예외 발생지점
 
     if (speechTimer > 0.f) {
         // 위치 설정
@@ -179,7 +181,7 @@ void Player::showSpeechBubble(const std::string& msg) {
     speechTimer = speechDuration;
 }
 
-sf::String wrapText(const sf::String& str, unsigned int maxWidth, const sf::Font& font, unsigned int characterSize) {
+sf::String Player::wrapText(const sf::String& str, unsigned int maxWidth, const sf::Font& font, unsigned int characterSize) {
     sf::Text tempText(font,"", characterSize);
     sf::String wrapped;
     sf::String currentLine;

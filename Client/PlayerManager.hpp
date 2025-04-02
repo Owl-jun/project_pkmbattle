@@ -20,7 +20,7 @@ public:
     PlayerManager(const PlayerManager&) = delete;
     PlayerManager& operator=(const PlayerManager&) = delete;
 
-    void make_MyPlayer(std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp);
+    void make_MyPlayer(int id, std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp);
     // 루프용 3종세트
     void handleInput(const sf::Event& event, sf::RenderWindow& window);
     void update(float dt);

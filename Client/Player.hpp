@@ -37,7 +37,6 @@ private:
     sf::Font font = ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF");
     sf::RectangleShape speechBubble;
     sf::Text speechText;
-    sf::Text nickname;
     float speechTimer = 0.f;
     const float speechDuration = 3.0f; // 3초간 유지
 
@@ -49,6 +48,7 @@ public:
 
     // 채팅관련
     void showSpeechBubble(const std::string& msg);
+    sf::String wrapText(const sf::String& str, unsigned int maxWidth, const sf::Font& font, unsigned int characterSize);
     
     // 이동관련
     void sendDirectionToServer(Direction dir);
@@ -73,11 +73,11 @@ private:
 public:
     // ---------------------------------------------------------------------
     // 생성자 종합세트
-    Player() : speechText(font, "", 24), nickname(font, "null", 24) {};
+    Player() : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF")) , speechText(font, "", 24)  {};
     Player(std::string _name , int x, int y, int _win , int _lose , int _level, float _exp ) 
-        : speechText(font, "", 24)
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
+        , speechText(font, "", 24)
         , name(_name)
-        , nickname(font, name, 24)
         , win(_win)
         , lose(_lose)
         , level(_level)
@@ -98,7 +98,7 @@ public:
         tilePos = { x, y };
         targetWorldPos = static_cast<sf::Vector2f>(tilePos) * static_cast<float>(tileSize);
 
-        if (!downFrames.empty()) {
+        if (!downFrames.empty() && downFrames[0]->getSize().x > 0) {
             sprite.emplace(*downFrames[0]);
             sprite->setPosition(targetWorldPos);
             sprite->setScale({ 1.f, 1.f });
@@ -106,9 +106,9 @@ public:
         currentDirection = Direction::Down;
     };
     Player(const Player& other)
-        : speechText(font, "", 24),
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF")),
+        speechText(font, "", 24),
         name(other.name),
-        nickname(font,name,24),
         win(other.win),
         lose(other.lose),
         level(other.level),
@@ -127,16 +127,17 @@ public:
         elapsedTime(other.elapsedTime),
         currentFrame(other.currentFrame)
     {
+
         if (other.sprite.has_value()) {
-            sprite.emplace(other.sprite.value());
+            sprite.emplace(*other.sprite);
             sprite->setPosition(targetWorldPos);
             sprite->setScale({ 1.f, 1.f });
         }
     }
     Player& operator=(const Player& other) {
         if (this == &other) return *this;
+        font = other.font;
         name = other.name;
-        nickname = other.nickname;
         win = other.win;
         lose = other.lose;
         level = other.level;
@@ -157,7 +158,7 @@ public:
         currentFrame = other.currentFrame;
 
         if (other.sprite.has_value()) {
-            sprite.emplace(other.sprite.value());
+            sprite.emplace(*other.sprite);
             sprite->setPosition(targetWorldPos);
             sprite->setScale({ 1.f, 1.f });
         }

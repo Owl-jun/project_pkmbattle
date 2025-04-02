@@ -18,6 +18,8 @@ void ResourceManager::initAuto() {
         if (fs::exists(tryAssets)) {
             std::cout << "[ResourceManager] Assets loaded from: " << tryAssets << '\n';
             init(tryAssets.string());
+            std::cout << "[ResourceManager] Assets loaded complete " << '\n';
+
             return;
         }
         current = current.parent_path();
@@ -38,15 +40,17 @@ void ResourceManager::init(const std::string& assetDir = "Client/Assets/") {
             sf::Texture tex;
             if (tex.loadFromFile(path)) {
                 textures[filename] = std::move(tex);
+                std::cout << "[Texture Loaded] " << filename << '\n';
             }
             else {
                 std::cerr << "[ResourceManager] Failed to load texture: " << path << '\n';
             }
         }
-        else if (entry.path().extension() == ".ttf") {
+        else if (entry.path().extension() == ".ttf" || entry.path().extension() == ".TTF") {
             sf::Font font;
             if (font.openFromFile(path)) {
                 fonts[filename] = std::move(font);
+                std::cout << "[Font Loaded] " << filename << '\n';
             }
             else {
                 std::cerr << "[ResourceManager] Failed to load font: " << path << '\n';

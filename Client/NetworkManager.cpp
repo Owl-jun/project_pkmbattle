@@ -12,6 +12,11 @@ NetworkManager::NetworkManager() {
 // --------------------------------------------------------------
 // get , setter
 
+void NetworkManager::setSocketID(int id)
+{
+    socketID = id;
+}
+
 int NetworkManager::getSocketID() const { return socketID; }
 
 NetworkManager& NetworkManager::getInstance() {
