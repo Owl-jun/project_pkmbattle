@@ -1,34 +1,32 @@
 #pragma once
 #include "pch.h"
 #include "BaseUI.hpp"
-#include "KeyManager.hpp"
-#include "BaseScene.hpp"
-#include "SceneManager.hpp"
-#include "LoginScene.hpp"
-#include "UIButton.hpp"
-#include "UIManager.hpp"
 #include "TimeManager.hpp"
-#include "SettingsOverlay.hpp"
-#include "SelectOverlay.hpp"
-#include "GameManager.hpp"
+#include "KeyManager.hpp"
+#include "UIManager.hpp"
+#include "UIButton.hpp"
+
+
+
 
 class UITextBox : public BaseUI {
 private:
     sf::RectangleShape box;
     sf::Text text;
     sf::Font font;
+
     bool focused = false;
     std::wstring input;
+
+    sf::RectangleShape cursor;
 
     bool showCursor = true;
     float cursorTimer = 0.f;
     const float cursorBlinkInterval = 0.5f;
-    sf::RectangleShape cursor;
-
 
 public:
-    UITextBox(const sf::Vector2f& pos, const sf::Vector2f& size, sf::Font& sharedFont)
-        : font(sharedFont), text(font, "", 24)
+    UITextBox(const sf::Vector2f& pos, const sf::Vector2f& size, int fontSize)
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF")), text(font, "", fontSize)
     {
         box.setPosition(pos);
         box.setSize(size);
@@ -38,17 +36,20 @@ public:
 
         text.setPosition({ pos.x + 10.f, pos.y -12.f });
         text.setFillColor(sf::Color::Black);
-        cursor.setSize({ 2.f, 24.f });
+        cursor.setSize({ 2.f, 18.f });
         cursor.setFillColor(sf::Color::Black);
         
     }
 
-    void handleEvent(const sf::Event& event, sf::RenderWindow& window) override {
+    // ------------------------------------------------------------------------
+    // Loop 3종
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
         if (event.is<sf::Event::MouseButtonPressed>()) {
             auto mouse = event.getIf<sf::Event::MouseButtonPressed>();
             if (mouse) {
                 sf::Vector2f mousePos = window.mapPixelToCoords({ mouse->position.x, mouse->position.y });
                 focused = box.getGlobalBounds().contains(mousePos);
+                setFocus(focused);
             }
         }
 
@@ -70,14 +71,21 @@ public:
             updateText();
         }
     }
-    void setPos(sf::Vector2f pos) {
-        box.setPosition(pos);
-        text.setPosition({ pos.x + 10.f, pos.y - 12.f });
-    }
+
     void update(sf::RenderWindow& window) override {
         auto bounds = text.getGlobalBounds();
-        float x = bounds.position.x + bounds.size.x + 2.f;
-        float y = bounds.position.y;
+        float x, y;
+        if (text.getString().isEmpty())
+        {
+            bounds = box.getGlobalBounds();
+            x = bounds.position.x + 5.f;
+            y = bounds.position.y;
+        }
+        else 
+        {
+            x = bounds.position.x + bounds.size.x + 2.f;
+            y = bounds.position.y;
+        }
         cursor.setPosition({ x, y });
 
         if (!focused) return;
@@ -87,8 +95,6 @@ public:
             cursorTimer = 0.f;
             showCursor = !showCursor;
         }
-
-
     }
 
     void render(sf::RenderWindow& window) override {
@@ -97,22 +103,14 @@ public:
         if (focused && showCursor)
             window.draw(cursor);
     }
+    // ------------------------------------------------------------------------
 
+
+    // ------------------------------------------------------------------------
+    // 텍스트 관련 메서드
     void clear() {
         input.clear();
         text.setString("");
-    }
-
-    bool isFocusable() const override { return true; }
-    bool isFocused() const override { return focused; }
-   
-
-    void setFocus(bool focus) override { 
-        focused = focus; 
-        if (focused)
-            box.setFillColor(sf::Color::Yellow); 
-        else
-            box.setFillColor(sf::Color::White);
     }
 
     void updateText() {
@@ -124,6 +122,29 @@ public:
         text.setString(s);
     }
 
+    void setPos(sf::Vector2f pos) {
+        box.setPosition(pos);
+        text.setPosition({ pos.x + 10.f, pos.y - 12.f });
+    }
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // 포커스 관련 
+    bool isFocusable() const override { return true; }
+    bool isFocused() const override { return focused; }
+
+    void setFocus(bool focus) override { 
+        focused = focus; 
+        if (focused)
+            box.setFillColor(sf::Color::Yellow); 
+        else
+            box.setFillColor(sf::Color::White);
+    }
+    // ------------------------------------------------------------------------
+
+
+    // ------------------------------------------------------------------------
+    // 기타 유틸 함수
     std::string wstringToUtf8(const std::wstring& wstr) const {
         std::string result;
         for (wchar_t wc : wstr) {
@@ -152,6 +173,6 @@ public:
     std::string getInput() const {
         return wstringToUtf8(input);
     }
-
+    // ------------------------------------------------------------------------
 
 };

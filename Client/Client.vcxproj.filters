@@ -27,6 +27,9 @@
     <ClCompile Include="EventManager.cpp">
       <Filter>MANAGERS\EventManager</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerManager.cpp">
+      <Filter>MANAGERS\PlayerManager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="assets">
@@ -83,6 +86,9 @@
     <Filter Include="MANAGERS\EventManager">
       <UniqueIdentifier>{f701d144-adb3-4aae-b1f3-f05c59f85788}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MANAGERS\PlayerManager">
+      <UniqueIdentifier>{a59aac53-6132-4a3b-8276-eeedf0a78a16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KeyManager.hpp">
@@ -136,9 +142,6 @@
     <ClInclude Include="NetworkManager.hpp">
       <Filter>MANAGERS\NetworkManager</Filter>
     </ClInclude>
-    <ClInclude Include="UImuteControl.hpp">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="baseScene.hpp">
       <Filter>Scenes</Filter>
     </ClInclude>
@@ -160,14 +163,14 @@
     <ClInclude Include="UISlider.hpp">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="FPSControl.hpp">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="CharacterSelectOverlay.hpp">
       <Filter>UI\Overlays</Filter>
     </ClInclude>
     <ClInclude Include="EventManager.hpp">
       <Filter>MANAGERS\EventManager</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerManager.hpp">
+      <Filter>MANAGERS\PlayerManager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

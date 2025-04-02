@@ -6,4 +6,11 @@
 
 <tag> "LOGIN"
 클라 "LOGIN ID PW\n"
-서버 "LOGIN TRUE X Y WIN LOSE LEVEL EXP" || "LOGIN EXIST" (이미접속중) || "LOGIN FALSE"
+서버 
+(모든 접속플레이어 정보 브로드캐스트)
+"LOGIN TRUE ID X Y WIN LOSE LEVEL EXP" 
+|| "LOGIN ID EXIST" (이미접속중) || "LOGIN ID FALSE"
+
+<tag> "MOVE"
+클라 "MOVE DIRECTION\n"
+서버 "MOVE TRUE ID DIR X Y\n" || "MOVE FALSE ID DIR\n"

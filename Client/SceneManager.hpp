@@ -53,10 +53,9 @@ public:
     // 씬 등록, 전환 관련
     void registerAll() {
         registerScene("opening", new OpeningScene);
-        registerScene("title", new OpeningScene);
-        registerScene("login", new OpeningScene);
-        registerScene("world", new OpeningScene);
-        registerScene("battle", new OpeningScene);
+        registerScene("title", new TitleScene);
+        registerScene("login", new LoginScene);
+        registerScene("world", new worldScene);
     }
 
     void registerScene(const std::string& key, BaseScene* scene) {

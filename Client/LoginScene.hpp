@@ -3,6 +3,8 @@
 #include "KeyManager.hpp"
 #include "BaseScene.hpp"
 #include "SceneManager.hpp"
+#include "TimeManager.hpp"
+#include "PlayerManager.hpp"
 
 #include "AnimatedObject.hpp"
 #include "AnimationManager.hpp"
@@ -18,7 +20,7 @@ private:
     AnimationManager aniManager;
     UIManager uiManager;
 
-    AnimatedObject bgTex;
+    AnimatedObject bg;
     sf::Vector2f bgtextureSize;
     sf::Vector2f windowSize;
 
@@ -35,7 +37,7 @@ private:
 
     bool warningVisible = false;
     int warningInt = 1;
-    bool loginCompleted = false;
+    float timer = 0.f;
 
 public:
     LoginScene()
@@ -48,12 +50,12 @@ public:
     }
 
     void init() override {
-        bgTex = AnimatedObject("introbg.png", { 0.f,0.f });
+        bg = AnimatedObject("introbg.png", { 0.f,0.f });
         bgtextureSize = static_cast<sf::Vector2f>(ResourceManager::getInstance().getTextureByName("introbg.png").getSize());
         windowSize = static_cast<sf::Vector2f>(GameManager::getInstance().getWindow().getSize());
-        bgTex.setScale({ (windowSize.x / bgtextureSize.x), (windowSize.y / bgtextureSize.y) });
-        bgTex.setPosition({ 0.f, 0.f });
-        aniManager.add(bgTex);
+        bg.setScale({ (windowSize.x / bgtextureSize.x), (windowSize.y / bgtextureSize.y) });
+        bg.setPosition({ 0.f, 0.f });
+        aniManager.add(bg);
 
         id.setFillColor(sf::Color::Black);
         id.setPosition({ 270, 277.f });
@@ -66,8 +68,8 @@ public:
         warning.setPosition({ textbox.getPosition().x + 50.f, textbox.getPosition().y + 20.f });
         warning2.setPosition({ textbox.getPosition().x + 30.f, textbox.getPosition().y + 20.f });
 
-        idBox = new UITextBox( { 300.f, (272.f + 28.f) }, { 200.f, 28.f }, font );
-        pwBox = new UITextBox( { 300.f, (272.f + 56.f) }, { 200.f, 28.f }, font );
+        idBox = new UITextBox( { 300.f, (272.f + 28.f) }, { 200.f, 28.f }, 24 );
+        pwBox = new UITextBox( { 300.f, (272.f + 56.f) }, { 200.f, 28.f }, 24 );
         idBox->setFocus(true);
 
         uiManager.addElement(idBox);
@@ -75,9 +77,8 @@ public:
         uiManager.addElement(new UIButton(
             { 505.f, 300.f },
             { 150.f, 56.f },
-            "LOGIN",
+            "LOGIN", 48,
             sf::Color::Color(0,0,0,20),
-            font,
             [this]() {
                 std::string id = idBox->getInput();
                 std::string pw = pwBox->getInput();
@@ -111,29 +112,56 @@ public:
     }
 
     // 서버 응답 처리로직
-    void handleEvent(const std::string& line) {
+    void handleEvent(std::string tag, std::string line) {
         std::istringstream iss(line);
-        std::string tag, response, x, y;
-        iss >> tag >> response >> x >> y;
+        std::string response;
+        iss >> response;
 
         if (tag == "LOGIN") {
-            if (response == "TRUE") {
-                std::cout << "로그인 성공!\n";
-                loginCompleted = true;
-                SceneManager::getInstance().make_Player(stoi(x), stoi(y));
-                SceneManager::getInstance().registerScene("world", new worldScene());
-                SceneManager::getInstance().changeScene("world");
+            if (tag == "LOGIN") {
+                if (response == "TRUE") {
+                    std::vector<std::string> lines;
+                    std::string line;
+                    while (std::getline(iss, line)) {
+                        if (!line.empty()) lines.push_back(line);
+                    }
+
+                    for (size_t i = 0; i < lines.size(); ++i) {
+                        std::istringstream userIss(lines[i]);
+                        std::string nickname;
+                        int id, x, y, win, lose, level;
+                        float exp;
+                        userIss >> id >> nickname >> x >> y >> win >> lose >> level >> exp;
+
+                        if (i == 0) {
+                            // 내 플레이어 초기화
+                            PlayerManager::getInstance().make_MyPlayer(nickname, x, y, win, lose, level, exp);
+                        }
+                        else {
+                            // 상대 플레이어 추가
+                            PlayerManager::getInstance().addPlayer(id, nickname, x, y, win, lose, level, exp);
+                        }
+                    }
+
+                    SceneManager::getInstance().changeScene("world");
+                }
             }
-            else if (response == "alreadyLoginPlayer") {
+            else if (response == "EXIST") {
                 std::cout << "이미 로그인중인 유저!\n";
                 warningVisible = true;
+                timer = 5.f;
                 warningInt = 1;
             }
             else {
                 std::cout << "로그인 실패!\n";
                 warningVisible = true;
+                timer = 5.f;
                 warningInt = 2;
             }
+            EventManager::getInstance().clearEvents(tag);
+        }
+        else {
+            std::cout << "잘못된 tag 형식입니다." << std::endl;
         }
     }
 
@@ -146,6 +174,15 @@ public:
     }
 
     void update(sf::RenderWindow& window) override {
+        // 수신 패킷이름 지정
+        for (const std::string& tag : { "LOGIN" }) {
+            auto events = EventManager::getInstance().getEvents(tag);
+            for (const auto& msg : events) {
+                handleEvent(tag, msg);
+            }
+        }
+        timer -= TimeManager::getInstance().getDeltaTime();
+        if (timer <= 0.f) { warningVisible = false; }
         aniManager.updateAll(TimeManager::getInstance().getDeltaTime());
         uiManager.update(window);
     }

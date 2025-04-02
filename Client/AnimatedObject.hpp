@@ -118,7 +118,7 @@ public:
 
 
     // --------------------------------------------------------------------------
-    // AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _speed, int _direction = -1, float _amplitude = 0.f, float _freq = 1.f)
+    // AnimatedObject(const std::string& fileName, sf::Vector2f pos, float _speed, float _freq, int _direction = -1, float _amplitude = 0.f)
     // 한쪽방향 무한루프 이동
     void move(float dt,float windowWidth) {
         timer += dt;

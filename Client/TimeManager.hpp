@@ -5,7 +5,6 @@ class TimeManager {
 private:
     sf::Clock clock;
     float deltaTime = 0.f;
-    //const float targetFrameTime = 1.f / 30.f; // 기본 FRAME
      // 기본 FRAME에서 값을 변경하기 위해 const를 제거
     /*----------------------------------------------------------------------*/
     float targetFrameTime = 1.f / 30.f;
@@ -38,10 +37,6 @@ public:
 
         clock.restart();
     }
-
-    //void update() {
-    //    deltaTime = clock.restart().asSeconds();
-    //}
 
     float getDeltaTime() const {
         return deltaTime;

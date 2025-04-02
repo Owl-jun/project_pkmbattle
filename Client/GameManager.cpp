@@ -58,6 +58,7 @@ void GameManager::handleEvent(std::string tag, std::string msg)
                 window.close(); 
             }
         }
+        EventManager::getInstance().clearEvents(tag);
     }
     else {
         std::cout << "잘못된 서버응답 입니다." << tag << std::endl;
@@ -90,7 +91,6 @@ void GameManager::update() {
         for (const auto& msg : events) {
             handleEvent(tag, msg);
         }
-        EventManager::getInstance().clearEvents(tag);
     }
 
     // 매니저 UPDATE
