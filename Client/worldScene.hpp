@@ -58,7 +58,7 @@ public:
                 if (key && key->code == sf::Keyboard::Key::Enter) {
                     std::string msg = chatBox->getInput();
                     if (!msg.empty()) {
-                        std::string toSend = "CHAT " + std::to_string(NetworkManager::getInstance().getSocketID()) + ' ' + msg + "\n";
+                        std::string toSend = "CHAT " + msg + "\n";
                         NetworkManager::getInstance().send(toSend);
                     }
                     chatBox->clear();

@@ -31,18 +31,28 @@ void PlayerManager::update(float dt) {
             handleEvent(tag, msg);
         }
     }
-    MyPlayer.update(dt);
     for (auto& [id, player] : otherPlayers) {
         player.update(dt);
     }
+    MyPlayer.update(dt);
 }
 
 void PlayerManager::draw(sf::RenderWindow& window) {
-    for (auto& [id, player] : otherPlayers) {
-        player.draw(window);
+    std::vector<int> toDraw;
+
+    for (const auto& [id, player] : otherPlayers) {
+        toDraw.push_back(id); // draw용 ID만 먼저 따로 저장
     }
+
+    for (int id : toDraw) {
+        if (otherPlayers.find(id) != otherPlayers.end()) {
+            otherPlayers[id].draw(window); // draw 시점에서 존재 확인
+        }
+    }
+
     MyPlayer.draw(window);
 }
+
 // --------------------------------------
 
 void PlayerManager::handleEvent(std::string tag, std::string msg) {
@@ -62,7 +72,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         if (result == "TRUE") {
             int x, y;
             iss >> x >> y;
-            if (id == 0) {
+            if (id == NetworkManager::getInstance().getSocketID()) {
                 MyPlayer.move({ x, y }, dir);
             }
             else {
@@ -72,7 +82,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
             }
         }
         else if (result == "FALSE") {
-            if (id == 0) {
+            if (id == NetworkManager::getInstance().getSocketID()) {
                 MyPlayer.setCurDir(dirStr);
             }
             else {
@@ -88,7 +98,8 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         int id, x, y, win, lose, level, exp;
         std::string name;
         iss >> id >> name >> x >> y >> win >> lose >> level >> exp;
-        addPlayer(id, name, x, y, win, lose, level, exp);
+        if (id == NetworkManager::getInstance().getSocketID()) {}
+        else { addPlayer(id, name, x, y, win, lose, level, exp); }
         EventManager::getInstance().clearEvents(tag);
     }
 
@@ -99,15 +110,18 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         removePlayer(id);
         EventManager::getInstance().clearEvents(tag);
     }
+
     else if (tag == "CHAT") {
         std::istringstream iss(msg);
         int id;
         std::string message;
         iss >> id; 
+        std::cout << "id파싱 : " << id << std::endl;
         std::getline(iss,message);
         if (!message.empty() && message[0] == ' ') {
             message = message.substr(1); // 앞 공백 제거
         }
+        std::cout << "현재 도착 메시지" << message << std::endl;
         if (id == NetworkManager::getInstance().getSocketID())
         {
             MyPlayer.showSpeechBubble(message);

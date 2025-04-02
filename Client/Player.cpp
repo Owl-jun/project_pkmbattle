@@ -22,12 +22,11 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
         if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             currentDirection = lastHeldDirection;
             sendDirectionToServer(currentDirection);
-            std::cout << "Player::handleInput : 방향키 누름 서버 전송완료" << std::endl;
-            moveCooldown = 0.15f;
-            currentFrame = 0;
+            moveCooldown = 0.05f;
             updateSpriteTexture();
         }
     }
+
 }
 
 void Player::update(float dt) {
@@ -47,9 +46,14 @@ void Player::update(float dt) {
             sf::Vector2f norm = normalize(dir);
             sprite->move(norm * dist);
         }
-
         animate(dt);
         return;
+    }
+    else {
+        currentFrame = 0;
+        if (auto* frames = getCurrentFrameSet(); frames && !frames->empty()) {
+            sprite->setTexture(*(*frames)[0]);
+        }
     }
 
     if (speechTimer > 0.f)
@@ -106,7 +110,6 @@ void Player::move(const sf::Vector2i& pos, Direction dir) {
 
     isMoving = true;
     currentDirection = dir;
-    std::cout << "[Client] 이동 명령 수신: (" << pos.x << ", " << pos.y << ")\n";
 }
 
 // ----------------------------------------------------------
@@ -121,6 +124,7 @@ void Player::animate(float dt) {
         currentFrame = (currentFrame + 1) % frames->size();
         sprite->setTexture(*(*frames)[currentFrame]);
     }
+    
 }
 
 void Player::updateSpriteTexture() {

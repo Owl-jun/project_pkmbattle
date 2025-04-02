@@ -64,20 +64,6 @@ const int MAP_HEIGHT = collisionMap.size();
 // --- DB M 초기화 //
 DBManager DBM;
 
-// --- 상호작용 관련 구조체 //
-struct FightInteraction {
-    int id1, id2;
-    std::string choice1 = ""; // "FIGHT" or "RUN"
-    std::string choice2 = "";
-
-};
-
-std::vector<FightInteraction> ongoingFights;
-
-bool operator==(const FightInteraction& a, const FightInteraction& b) {
-    return (a.id1 == b.id1 && a.id2 == b.id2) || (a.id1 == b.id2 && a.id2 == b.id1);
-}
-
 
 // --- 방향 정의 ---
 std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
@@ -91,7 +77,7 @@ std::unordered_map<std::string, std::pair<int, int>> directionOffset = {
 // --- 글로벌 상태 ---
 std::unordered_map<int, Player> players;                                // 플레이어 객체 저장
 std::unordered_map<int, std::shared_ptr<tcp::socket>> clientSockets;    // 소켓 저장소
-std::unordered_map<int, std::string> users;                                       // 접속 유저
+std::unordered_map<int, std::string> users;                              // 접속 유저
 std::mutex playerMutex;
 int nextPlayerId = 1;
 
@@ -170,19 +156,18 @@ void processMessage(const std::string& msg, int playerId) {
 
     else if (command == "LOGIN") {
         iss >> id >> password;
+        bool dup = false;
         std::cout << id << password << std::endl;
         string response;
         if(DBM.canLogin(id, password)){
             Player player = DBM.loadPlayer(id);
             if (!player.isEmpty()) {
-                {
-                    std::lock_guard<std::mutex> lock(playerMutex);
-                    players[playerId] = player;
+                for (const auto& [pId, gId] : users) {
+                    if (gId == id) { dup = true; break; }
                 }
-                if (users[playerId].empty()) {
+                if (dup == false) {
+                    std::lock_guard<std::mutex> lock(playerMutex);
                     users[playerId] = id;
-
-                    // 플레이어 목록에 추가
                     players[playerId] = player;
 
                     std::string response = makeLoginSuccessResponse(playerId, players);
@@ -203,10 +188,9 @@ void processMessage(const std::string& msg, int playerId) {
                         asio::write(*sock, asio::buffer(broadRes));
                     }
                 }
-
                 else 
                 {
-                    response = "LOGIN " + std::to_string(playerId) + " EXIST\n";
+                    response = "LOGIN EXIST\n";
                     asio::write(*clientSockets[playerId], asio::buffer(response));
                 }
             }
@@ -221,8 +205,10 @@ void processMessage(const std::string& msg, int playerId) {
 
     else if (command == "MOVE") {
         iss >> dir;
+        std::cout << "MOVE 수신 dir : " << dir << std::endl;
         if (directionOffset.count(dir)) {
             std::lock_guard<std::mutex> lock(playerMutex);
+            std::string response;
             auto& p = players[playerId];
             p.dir = dir;
             int nx = p.x + directionOffset[dir].first;
@@ -240,18 +226,24 @@ void processMessage(const std::string& msg, int playerId) {
             if (!blocked && canMoveTo(nx, ny)) {
                 p.x = nx;
                 p.y = ny;
+                response = "MOVE TRUE ";
             }
 
-            std::string response;
-            response = "PLAYERS\n";
-            for (const auto& [id, player] : players) {
-                response += std::to_string(id) + " " + std::to_string(player.x) + " " + std::to_string(player.y) + " " + player.dir + "\n";
+            if (response == "MOVE TRUE ")
+            {
+                response += std::to_string(playerId) + " " 
+                    + players[playerId].dir + " " 
+                    + std::to_string(players[playerId].x) + " " 
+                    + std::to_string(players[playerId].y) + "\n";
             }
-
+            else {
+                response = "MOVE FALSE " 
+                    + std::to_string(playerId) + " "
+                    + players[playerId].dir + "\n";
+            }
             for (const auto& [id, sock] : clientSockets) {
                 asio::write(*sock, asio::buffer(response));
             }
-
         }
     }
 
@@ -259,8 +251,8 @@ void processMessage(const std::string& msg, int playerId) {
        
         std::getline(iss, chatmsg); // 공백 포함 전체 읽기
         if (!chatmsg.empty() && chatmsg[0] == ' ') chatmsg.erase(0, 1);  // 앞에 공백 제거
-
-        std::string response = "CHAT " + std::to_string(playerId) + " " + chatmsg + "\n";
+        
+        std::string response = "CHAT " + std::to_string(playerId) + " "+ players[playerId].name + " " + chatmsg + "\n";
         for (const auto& [id, sock] : clientSockets) {
             asio::write(*sock, asio::buffer(response));
         }

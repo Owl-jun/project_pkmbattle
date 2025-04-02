@@ -5,7 +5,7 @@ using namespace sql;
 
 #define SERVER_IP "127.0.0.1:3306"
 #define USERNAME "root"
-#define PASSWORD "root"
+#define PASSWORD "12345"
 #define DATABASE "Pokemon"
 
 struct skill {
