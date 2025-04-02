@@ -12,15 +12,15 @@ private:
 
 public:
 
-    // 🔹 기존 string 생성자 유지
     UIButton(const sf::Vector2f& pos,
         const sf::Vector2f& size,
         const std::string& label,
         sf::Color Color,
         sf::Font& sharedFont,
-        std::function<void()> clickFunc)
+        std::function<void()> clickFunc,
+        unsigned int textSize = 48)
         : onClick(clickFunc)
-        , text(sharedFont, label, 48)
+        , text(sharedFont,label,textSize)
         , defaultColor(Color)
     {
         shape.setPosition(pos);
@@ -56,9 +56,8 @@ public:
         text.setString(label); // 와이드 문자열
         text.setCharacterSize(28); //텍스트 UI 폰트 크기!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         text.setFillColor(sf::Color::Black);
-
-        const auto bounds = text.getLocalBounds();
-        text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });        
+        const auto bounds = text.getLocalBounds();  // 텍스트 크기를 가져옴
+        text.setOrigin({ bounds.position.x + bounds.size.x / 2.f, bounds.position.y + bounds.size.y / 2.f });   // 텍스트 중심을 기준으로 위치를 설정
         text.setPosition(
          {shape.getPosition().x + shape.getSize().x / 2.f,
          shape.getPosition().y + shape.getSize().y / 2.f }

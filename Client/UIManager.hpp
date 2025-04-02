@@ -70,6 +70,10 @@ public:
         }
     }
 
+    void removeAllElements() {
+        uiElements.clear(); // delete는 하지 않고 리스트만 비움
+    }
+
     const std::vector<BaseUI*>& getElements() const {
         return uiElements;
     }

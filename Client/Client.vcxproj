@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{71D8E4F6-5178-4460-A440-44CA1EF9A1CF}</ProjectGuid>
+    <ProjectGuid>{D7B1D1C1-C248-4CA1-9E8E-1D525AA24681}</ProjectGuid>
     <RootNamespace>Client</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -152,6 +152,8 @@
     <ClInclude Include="BaseUI.hpp" />
     <ClInclude Include="BattleManager.hpp" />
     <ClInclude Include="battleScene.hpp" />
+    <ClInclude Include="CharacterSelectOverlay.hpp" />
+    <ClInclude Include="FPSControl.hpp" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="LoginScene.hpp" />
@@ -172,6 +174,7 @@
     <ClInclude Include="UIButton.hpp" />
     <ClInclude Include="UIManager.hpp" />
     <ClInclude Include="UImuteControl.hpp" />
+    <ClInclude Include="UISlider.hpp" />
     <ClInclude Include="UITextBox.hpp" />
     <ClInclude Include="worldScene.hpp" />
   </ItemGroup>
