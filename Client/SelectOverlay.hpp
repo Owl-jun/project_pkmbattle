@@ -37,7 +37,7 @@ public:
         title.setPosition({ 30.f, 20.f });
 
         std::wstring L8 = L"싸우자!!";
-        std::wstring L9 = L"너 밥이야";
+        std::wstring L9 = L"도망간다!";
 
         auto fightButton = new UIButton({ 8.f, 15.f }, { 180.f, 40.f }, L8, sf::Color::White, font, [this]() {
             std::cout << "[선택됨] 싸운다!" << std::endl;

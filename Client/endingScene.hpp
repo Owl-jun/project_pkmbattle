@@ -68,7 +68,7 @@ public:
             L"다음 버전은 안나옵니다.",
             L"우리가 찾은건 3개",
             L"님들이 찾은건 100개일지도",
-            L"",
+            L"캐릭터 픽셀은 직접 그렸습니다.",
             L"(대충 그렸습니다.)",
             L"THE END",
             L"Thank You!"
@@ -102,7 +102,7 @@ public:
 
         // 첫 번째 애니메이션: HoCulman
         AnimatedObject hoculman(
-            "C:/Source/project_pkmbattle/Client/assets/Poke1.png",
+            "C:/Source/project_pkmbattle/Client/assets/ending1.png",
             sf::Vector2f(400.f, 500.f),
             20.f
         );
@@ -117,14 +117,14 @@ public:
 
         // 두 번째 애니메이션: CreditsDoll (예시)
         AnimatedObject doll(
-            "C:/Source/project_pkmbattle/Client/assets/Poke2.png",
+            "C:/Source/project_pkmbattle/Client/assets/ending2.png",
             sf::Vector2f(50.f, 700.f),  // 등장 위치 조절 가능
             20.f
         );
         doll.setScale({ 2.f, 2.f });
 
         aniManager.add(doll, [this](AnimatedObject& obj, float dt) {
-            static float delay = 6.0f; // HoCulman이 먼저 나오게 약간의 지연
+            static float delay = 3.0f; // HoCulman이 먼저 나오게 약간의 지연
             if (delay > 0.f) {
                 delay -= dt;
                 return;
@@ -137,8 +137,8 @@ public:
             });
         // 세 번째 애니메이션
         AnimatedObject doll2(
-            "C:/Source/project_pkmbattle/Client/assets/Poke3.png",
-            sf::Vector2f(400.f, 700.f),  // 등장 위치 조절 가능
+            "C:/Source/project_pkmbattle/Client/assets/ending3.png",
+            sf::Vector2f(450.f, 700.f),  // 등장 위치 조절 가능
             20.f
         );
         doll2.setScale({ 2.f, 2.f });
@@ -158,14 +158,86 @@ public:
 
         // 네번째 이미지
         AnimatedObject doll3(
-            "C:/Source/project_pkmbattle/Client/assets/Poke4.png",
+            "C:/Source/project_pkmbattle/Client/assets/ending4.png",
             sf::Vector2f(50.f, 700.f),
             20.f
         );
         doll3.setScale({ 2.f, 2.f });
-
         aniManager.add(doll3, [this](AnimatedObject& obj, float dt) {
             static float delay = 18.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
+
+        AnimatedObject doll4(
+            "C:/Source/project_pkmbattle/Client/assets/ending5.png",
+            sf::Vector2f(450.f, 700.f),
+            20.f
+        );
+        doll4.setScale({ 2.f, 2.f });
+        aniManager.add(doll4, [this](AnimatedObject& obj, float dt) {
+            static float delay = 26.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;}
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
+
+
+        AnimatedObject doll5(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon3.png",
+            sf::Vector2f(50.f, 700.f),
+            20.f
+        );
+        doll5.setScale({ 1.f, 1.f });
+        aniManager.add(doll5, [this](AnimatedObject& obj, float dt) {
+            static float delay = 32.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
+
+        AnimatedObject doll6(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon.png",
+            sf::Vector2f(450.f, 700.f),
+            20.f
+        );
+        doll6.setScale({ 1.f, 1.f });
+        aniManager.add(doll6, [this](AnimatedObject& obj, float dt) {
+            static float delay = 38.0f;
+            if (delay > 0.f) {
+                delay -= dt;
+                return;
+            }
+            obj.fadein(dt);
+            auto pos = obj.getSprite().getPosition();
+            pos.y -= scrollSpeed * dt;
+            obj.setPosition(pos);
+            });
+
+        AnimatedObject doll7(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon2.png",
+            sf::Vector2f(50.f, 700.f),
+            20.f
+        );
+        doll7.setScale({ 1.f, 1.f });
+
+        aniManager.add(doll7, [this](AnimatedObject& obj, float dt) {
+            static float delay = 42.0f;
             if (delay > 0.f) {
                 delay -= dt;
                 return;
@@ -177,15 +249,14 @@ public:
             obj.setPosition(pos);
             });
 
-        AnimatedObject doll4(
-            "C:/Source/project_pkmbattle/Client/assets/Poke5.png",
-            sf::Vector2f(400.f, 700.f),
+        AnimatedObject doll8(
+            "C:/Source/project_pkmbattle/Client/assets/PiGon3.png",
+            sf::Vector2f(450.f, 700.f),
             20.f
         );
-        doll4.setScale({ 2.f, 2.f });
-
-        aniManager.add(doll4, [this](AnimatedObject& obj, float dt) {
-            static float delay = 26.0f;
+        doll8.setScale({ 1.f, 1.f });
+        aniManager.add(doll8, [this](AnimatedObject& obj, float dt) {
+            static float delay = 42.0f;
             if (delay > 0.f) {
                 delay -= dt;
                 return;

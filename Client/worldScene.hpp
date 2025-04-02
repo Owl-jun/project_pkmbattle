@@ -64,11 +64,11 @@ public:
         overlay->setCenter({ 400.f, 300.f });
 
 
-        //// 🔹 싸운다 누르면 캐릭터 선택창 띄우기
-        //overlay->setFightCallback([this]() {
-        //    charSelector->show();
-        //    overlay->hide();
-        //    });
+        // 🔹 싸운다 누르면 캐릭터 선택창 띄우기
+        overlay->setFightCallback([this]() {
+            charSelector->show();
+            overlay->hide();
+            });
 
         // 🔹 캐릭터 선택 완료 시 배틀씬 진입
         charSelector = new CharacterSelectOverlay({ 800.f, 600.f }, font, [this](const std::vector<int>& selected) {
@@ -155,10 +155,10 @@ public:
         }
 
         // 🔹 1키 누르면 SelectOverlay 토글 <- 이거 기능구현 후 없애야함. (부딪혔거나, 특정 위치값에 갔을경우)
-        /*if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Num1) && escCooldown <= 0.f) {
+        if (KeyManager::getInstance().isKeyDown(sf::Keyboard::Key::Num1) && escCooldown <= 0.f) {
             overlay->toggle();
             escCooldown = 0.5f;
-        }*/
+        }
 
         overlay->handleEvent(event, window); // 🔹 overlay 이벤트 전달
         charSelector->handleEvent(event, window);
