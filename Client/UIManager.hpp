@@ -12,14 +12,14 @@ public:
         uiElements.push_back(element);
     }
 
-    void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) {
         if (event.is<sf::Event::KeyPressed>() && KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Tab)) {
             bool shiftHeld = KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::LShift);
             focusStep(shiftHeld ? -1 : 1);
             return;
         }
         for (auto& elem : uiElements)
-            elem->handleEvent(event, window);
+            elem->handleInput(event, window);
     }
 
     void update(sf::RenderWindow& window) {

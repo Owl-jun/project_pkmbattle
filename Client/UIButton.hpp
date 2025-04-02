@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "BaseUI.hpp"
-#include "KeyManager.h"
+#include "KeyManager.hpp"
 #include <functional>
 
 class UIButton : public BaseUI {
@@ -77,7 +77,7 @@ public:
         );
     }
 
-    void handleEvent(const sf::Event& event, sf::RenderWindow& window) override {
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
         sf::Vector2f mousePos = window.mapPixelToCoords(pixelPos);
 

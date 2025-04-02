@@ -1,19 +1,16 @@
 #pragma once
-#include "BaseUI.hpp"
 #include "pch.h"
-#include "KeyManager.h"
+#include "BaseUI.hpp"
+#include "KeyManager.hpp"
 #include "BaseScene.hpp"
 #include "SceneManager.hpp"
 #include "LoginScene.hpp"
 #include "UIButton.hpp"
 #include "UIManager.hpp"
 #include "TimeManager.hpp"
-#include "ResourceManager.hpp"
-#include "Player.h"
 #include "SettingsOverlay.hpp"
-#include "NetworkManager.hpp"
 #include "SelectOverlay.hpp"
-#include "GameManager.h"
+#include "GameManager.hpp"
 
 class UITextBox : public BaseUI {
 private:
@@ -25,7 +22,7 @@ private:
 
     bool showCursor = true;
     float cursorTimer = 0.f;
-    const float cursorBlinkInterval = 0.5f; // 0.5�ʸ��� ����
+    const float cursorBlinkInterval = 0.5f;
     sf::RectangleShape cursor;
 
 
@@ -78,7 +75,6 @@ public:
         text.setPosition({ pos.x + 10.f, pos.y - 12.f });
     }
     void update(sf::RenderWindow& window) override {
-        // Ŀ�� ��ġ ����
         auto bounds = text.getGlobalBounds();
         float x = bounds.position.x + bounds.size.x + 2.f;
         float y = bounds.position.y;
@@ -123,11 +119,10 @@ public:
         std::wcout << L"[DEBUG] input : " << input << std::endl;
         sf::String s;
         for (wchar_t ch : input) {
-            s += ch; //�� ���� (���� �ǹ�)
+            s += ch; 
         }
         text.setString(s);
     }
-
 
     std::string wstringToUtf8(const std::wstring& wstr) const {
         std::string result;

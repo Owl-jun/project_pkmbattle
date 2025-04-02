@@ -32,18 +32,15 @@ void GameManager::init() {
     NetworkManager::getInstance().connect("localhost", "9000");
     NetworkManager::getInstance().startReceiveLoop();
     // ------------------------------------------------------------------------
-    ResourceManager::getInstance().initAuto();
-
+    // 리소스 매니저 (Assets 폴더 모든 파일 등록)
+    // 이미지파일 : .png | .jpg  /// 폰트파일 : .ttf
+    ResourceManager::getInstance().initAuto();  
     // ------------------------------------------------------------------------
-    // 씬 생성
-    SceneManager::getInstance().registerScene("opening", new OpeningScene());
-    SceneManager::getInstance().registerScene("title", new TitleScene());
-    SceneManager::getInstance().registerScene("login", new LoginScene());
-    // ------------------------------------------------------------------------
+    // 모든 씬 생성 : 키워드 [ opening , title , login , world , battle ]
+    SceneManager::getInstance().registerAll();
     SceneManager::getInstance().changeScene("opening");    // 초기화면 설정
+    // ------------------------------------------------------------------------
 }
-
-
 
 // 서버 패킷 핸들러
 void GameManager::handleEvent(std::string tag, std::string msg)
@@ -68,7 +65,7 @@ void GameManager::handleEvent(std::string tag, std::string msg)
 }
 
 // -----------------------------------------------------------------
-// 게임LOOP 3종세트
+// 게임LOOP
 // INPUT 처리
 void GameManager::handleInput()
 {

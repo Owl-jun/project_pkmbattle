@@ -1,0 +1,9 @@
+패킷프레임 정리
+
+<tag> "EXIT"  
+클라 "EXIT\n" 
+서버 "EXIT EXIT_OK\n" || "EXIT EXIT_FALSE\n"
+
+<tag> "LOGIN"
+클라 "LOGIN ID PW\n"
+서버 "LOGIN TRUE X Y WIN LOSE LEVEL EXP" || "LOGIN EXIST" (이미접속중) || "LOGIN FALSE"

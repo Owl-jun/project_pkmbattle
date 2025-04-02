@@ -3,12 +3,12 @@
 #include "TimeManager.hpp"
 #include "BaseUI.hpp"
 #include "UISlider.hpp"
-#include "KeyManager.h"
+#include "KeyManager.hpp"
 #include "UImuteControl.hpp"
 #include "FPSControl.hpp"
 #include <functional>
 #include "SoundManager.hpp"
-#include "GameManager.h"
+#include "GameManager.hpp"
 #include <memory>
 
 class SettingsOverlay {

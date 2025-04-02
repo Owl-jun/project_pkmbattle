@@ -151,31 +151,63 @@
     <ClInclude Include="AnimatedObject.hpp" />
     <ClInclude Include="AnimationManager.hpp" />
     <ClInclude Include="baseScene.hpp" />
-    <ClInclude Include="BaseUI.hpp" />
-    <ClInclude Include="BattleManager.hpp" />
-    <ClInclude Include="battleScene.hpp" />
-    <ClInclude Include="CharacterSelectOverlay.hpp" />
+    <ClInclude Include="BaseUI.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="BattleManager.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="battleScene.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="CharacterSelectOverlay.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="EventManager.hpp" />
-    <ClInclude Include="FPSControl.hpp" />
+    <ClInclude Include="FPSControl.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="KeyManager.hpp" />
-    <ClInclude Include="LoginScene.hpp" />
+    <ClInclude Include="LoginScene.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="NetworkManager.hpp" />
     <ClInclude Include="OpeningScene.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="ResourceManager.hpp" />
-    <ClInclude Include="SelectOverlay.hpp" />
-    <ClInclude Include="SettingsOverlay.hpp" />
-    <ClInclude Include="SoundManager.hpp" />
+    <ClInclude Include="SelectOverlay.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="SettingsOverlay.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="SoundManager.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="TimeManager.hpp" />
-    <ClInclude Include="TitleScene.hpp" />
-    <ClInclude Include="UIButton.hpp" />
-    <ClInclude Include="UIManager.hpp" />
-    <ClInclude Include="UImuteControl.hpp" />
-    <ClInclude Include="UISlider.hpp" />
-    <ClInclude Include="UITextBox.hpp" />
-    <ClInclude Include="worldScene.hpp" />
+    <ClInclude Include="TitleScene.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="UIButton.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="UIManager.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="UImuteControl.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="UISlider.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="UITextBox.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="worldScene.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

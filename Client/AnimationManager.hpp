@@ -24,15 +24,10 @@ public:
         return allFinished;
     }
 
-
     void renderAll(sf::RenderWindow& window) {
         for (auto& obj : objects) {
             obj.draw(window);
         }
-    }
-
-    std::vector<AnimatedObject>& getObjects() {
-        return objects;
     }
 
 };

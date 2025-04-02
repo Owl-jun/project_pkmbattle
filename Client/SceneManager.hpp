@@ -1,14 +1,17 @@
 #pragma once
 #include "pch.h"
 #include "BaseScene.hpp"
-#include "Player.hpp"
+#include "OpeningScene.hpp"
+#include "TitleScene.hpp"
+#include "LoginScene.hpp"
+#include "worldScene.hpp"
+#include "battleScene.hpp"
 
 class SceneManager {
 private:
     std::unordered_map<std::string, BaseScene*> scenes;
     BaseScene* currentScene = nullptr;
     std::string pendingSceneKey;
-    std::unique_ptr<Player> player;
 
     // ½Ì±ÛÅæ
     SceneManager() = default;
@@ -26,6 +29,8 @@ public:
 
     }
 
+    // ----------------------------------------------------------------------
+    // °ÔÀÓ·çÇÁ
     void handleInput(const sf::Event& event, sf::RenderWindow& window) {
         if (currentScene)
             currentScene->handleInput(event, window);
@@ -41,11 +46,19 @@ public:
         if (currentScene)
             currentScene->render(window);
     }
-
+    // ----------------------------------------------------------------------
 
 
     // --------------------------------------------------------------
     // ¾À µî·Ï, ÀüÈ¯ °ü·Ã
+    void registerAll() {
+        registerScene("opening", new OpeningScene);
+        registerScene("title", new OpeningScene);
+        registerScene("login", new OpeningScene);
+        registerScene("world", new OpeningScene);
+        registerScene("battle", new OpeningScene);
+    }
+
     void registerScene(const std::string& key, BaseScene* scene) {
         scenes[key] = scene;
         scene->init();
