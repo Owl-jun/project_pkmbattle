@@ -24,7 +24,7 @@ void PlayerManager::handleInput(const sf::Event& event, sf::RenderWindow& window
 
 void PlayerManager::update(float dt) {
     // 수신 패킷이름 지정
-    for (const std::string& tag : { "MOVE" , "NEWUSER" , "EXITUSER", "CHAT" , "CHCOLOR"}) {
+    for (const std::string& tag : { "MOVE" , "NEWUSER" , "EXITUSER", "CHAT" , "CHCOLOR", "GETCAP"}) {
         auto events = EventManager::getInstance().getEvents(tag);
         for (const auto& msg : events) {
             handleEvent(tag, msg);
@@ -147,6 +147,23 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         }
         EventManager::getInstance().clearEvents(tag);
     }
+    else if (tag == "GETCAP") {
+        std::istringstream iss(msg);
+        int id;
+        std::string com;
+        iss >> id >> com;
+
+        if (com == "GET")
+        {
+            PlayerManager::getInstance().setCapHolderId(id);
+
+        }
+        else if (com == "LOST")
+        {
+            PlayerManager::getInstance().setCapHolderId(-1);
+        }
+        EventManager::getInstance().clearEvents(tag);
+    }
 }
 
 void PlayerManager::removePlayer(int id) {
@@ -161,5 +178,10 @@ Player* PlayerManager::getPlayer(int id) {
 
 Player& PlayerManager::getMyPlayer() {
     return MyPlayer;
+}
+
+std::unordered_map<int, Player>& PlayerManager::getPlayers()
+{
+    return otherPlayers;
 }
 

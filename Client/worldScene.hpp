@@ -18,9 +18,16 @@ private:
     AnimationManager aniManager;
     float keyCooldown = 0.f;
 
+    std::unordered_map<int, Player>& otherPlayers = PlayerManager::getInstance().getPlayers();
+    Player& myPlayer = PlayerManager::getInstance().getMyPlayer();
+    sf::Texture capTex = ResourceManager::getInstance().getTextureByName("capC.png");
+    sf::Sprite cap = sf::Sprite(capTex);
+    bool capView = true;
+    
     // 채팅 UI
     UITextBox* chatBox;
     bool isChatting = false;
+
 
     UIChatIcon chaticon;
 
@@ -34,6 +41,7 @@ public:
         , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, 24))
         , chaticon({0.f,0.f}, {60.f,30.f},24)
     {
+        cap.setPosition({ 6 * 60.f,5 * 60.f });
         chatBox->setFocus(false);
     }
 
@@ -90,6 +98,16 @@ public:
                         std::cout << "CHCOLOR 송신완료" << std::endl;
                     }
                 }
+                if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(6, 5)) {
+                    if (PlayerManager::getInstance().getCapHolderId() == -1) {
+                        std::string toSend = "GETCAP GET\n";
+                        NetworkManager::getInstance().send(toSend);
+                    }
+                    else if (PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
+                        std::string toSend = "GETCAP LOST\n";
+                        NetworkManager::getInstance().send(toSend);
+                    }
+                }
             }
         }
 
@@ -102,7 +120,7 @@ public:
         keyCooldown -= dt;
         PlayerManager::getInstance().update(dt);
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
-        
+
         PlayerManager::getInstance().getChatUI().update(window);
         PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
         chaticon.setPos({ 
@@ -121,7 +139,28 @@ public:
         aniManager.renderAll(window);
         PlayerManager::getInstance().draw(window);
         PlayerManager::getInstance().getChatUI().render(window);
-        
+
+        if (PlayerManager::getInstance().getCapHolderId() == -1) {
+            // 누구도 안가졌을 때
+            myPlayer.setGetCap(false);
+            for (auto& [id, p] : otherPlayers) {
+                p.setGetCap(false);
+            }
+            window.draw(cap);
+        }
+        else if (PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
+            // 내가 소유자일 때
+            myPlayer.setGetCap(true);
+        }
+        else {
+            // 다른 사람이 가졌을 때
+            for (auto& [id, p] : otherPlayers) {
+                if (id == PlayerManager::getInstance().getCapHolderId()) {
+                    p.setGetCap(true);
+                }
+            }
+        }
+
         if (isChatting)
         {
             chatBox->render(window);
