@@ -80,8 +80,18 @@ public:
                 chatBox->setFocus(true);
                 return;
             }
+            if (key && key->code == sf::Keyboard::Key::Space) {
+                int x = 16;
+                for (int i = 0; i < 4; ++i) {
+                    if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(x + i, 8))
+                    {
+                        std::string toSend = "CHCOLOR " + std::to_string(i) + "\n";
+                        NetworkManager::getInstance().send(toSend);
+                        std::cout << "CHCOLOR 송신완료" << std::endl;
+                    }
+                }
+            }
         }
-
 
         PlayerManager::getInstance().getChatUI().handleInput(event,window);
         PlayerManager::getInstance().handleInput(event,window);
@@ -116,7 +126,7 @@ public:
         {
             chatBox->render(window);
             chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 200.f });
-            chaticon.render(window);
+            // chaticon.render(window);
         }
     }
     // ---------------------------------------------------------------------------------

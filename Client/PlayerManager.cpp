@@ -24,7 +24,7 @@ void PlayerManager::handleInput(const sf::Event& event, sf::RenderWindow& window
 
 void PlayerManager::update(float dt) {
     // 수신 패킷이름 지정
-    for (const std::string& tag : { "MOVE" , "NEWUSER" , "EXITUSER", "CHAT"}) {
+    for (const std::string& tag : { "MOVE" , "NEWUSER" , "EXITUSER", "CHAT" , "CHCOLOR"}) {
         auto events = EventManager::getInstance().getEvents(tag);
         for (const auto& msg : events) {
             handleEvent(tag, msg);
@@ -131,6 +131,19 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         else
         {
             otherPlayers[id].showSpeechBubble(message);
+        }
+        EventManager::getInstance().clearEvents(tag);
+    }
+
+    else if (tag == "CHCOLOR") {
+        
+        std::istringstream iss(msg);
+        int id, set;
+        iss >> id >> set;
+
+        if (id == NetworkManager::getInstance().getSocketID()) { getMyPlayer().setColor(set); }
+        else {
+            otherPlayers[id].setColor(set);
         }
         EventManager::getInstance().clearEvents(tag);
     }

@@ -141,14 +141,14 @@ public:
                     int y = std::stoi(tokens[offset + 3]);
                     int win = std::stoi(tokens[offset + 4]);
                     int lose = std::stoi(tokens[offset + 5]);
-                    int level = std::stoi(tokens[offset + 6]);
+                    int col = std::stoi(tokens[offset + 6]);
                     float exp = std::stof(tokens[offset + 7]);
 
                     if (i == 0) {
-                        PlayerManager::getInstance().make_MyPlayer(id, nickname, x, y, win, lose, level, exp);
+                        PlayerManager::getInstance().make_MyPlayer(id, nickname, x, y, win, lose, col, exp);
                     }
                     else {
-                        PlayerManager::getInstance().addPlayer(id, nickname, x, y, win, lose, level, exp);
+                        PlayerManager::getInstance().addPlayer(id, nickname, x, y, win, lose, col, exp);
                     }
                 }
 

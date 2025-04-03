@@ -139,6 +139,7 @@ void Player::updateSpriteTexture() {
 }
 
 std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet(int colorMode) {
+    // colorMode 0 : default || 1 : Blue || 2 : Green || 3 : pink
     if (colorMode == 0) {
         switch (currentDirection) {
         case Direction::Down:  return &downFrames;
@@ -163,6 +164,15 @@ std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet(int colorM
         case Direction::Left:  return &leftFrames3;
         case Direction::Right: return &rightFrames3;
         case Direction::Up:    return &upFrames3;
+        default:               return nullptr;
+        }
+    }
+    else if (colorMode == 3) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames4;
+        case Direction::Left:  return &leftFrames4;
+        case Direction::Right: return &rightFrames4;
+        case Direction::Up:    return &upFrames4;
         default:               return nullptr;
         }
     }

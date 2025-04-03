@@ -30,15 +30,15 @@ struct Player{
 	string name;
 	int win;
 	int lose;
-	int level;
 	double EXP;
 	string dir;
+	int colNum;
 
 	Player() {}
 	Player(int x, int y, string dir = "DOWN")
 		: x(x), y(y), dir(dir)
 	{}
-	Player(string id, string password, int x, int y, string name, int win, int lose, int level, double EXP, string dir = "DOWN")
+	Player(string id, string password, int x, int y, string name, int win, int lose, int colNum, double EXP, string dir = "DOWN")
 		: id(id)
 		, password(password)
 		, x(x)
@@ -46,7 +46,7 @@ struct Player{
 		, name(name)
 		, win(win)
 		, lose(lose)
-		, level(level)
+		, colNum(colNum)
 		, EXP(EXP)
 		, dir(dir)
 	{
@@ -118,10 +118,10 @@ public:
 				string p_name = res->getString("Player_name");
 				int win = res->getInt("Win");
 				int lose = res->getInt("Lose");
-				int level = res->getInt("Level");
+				int colNum = res->getInt("colNum");
 				double EXP = res->getDouble("EXP");
 
-				return Player(p_id, p_password, x, y, p_name, win, lose, level, EXP);
+				return Player(p_id, p_password, x, y, p_name, win, lose, colNum, EXP);
 			}
 		}
 		catch (SQLException& e) {
@@ -131,7 +131,7 @@ public:
 	}
 
 	//--------------------------------------
-	void savePlayer(const std::string& id, int x, int y, int win, int lose, int level, double EXP) {
+	void savePlayer(const std::string& id, int x, int y, int win, int lose, int colNum, double EXP) {
 		try {
 			unique_ptr<Statement> stmt(conn->createStatement());
 			std::string query = "UPDATE Player SET "
@@ -139,13 +139,13 @@ public:
 				"player_y = " + std::to_string(y) + ", "
 				"Win = " + std::to_string(win) + ", "
 				"Lose = " + std::to_string(lose) + ", "
-				"Level = " + std::to_string(level) + ", "
+				"colNum = " + std::to_string(colNum) + ", "
 				"EXP = " + std::to_string(EXP) + " "
 				"WHERE Login_ID = '" + id + "'";
 			stmt->executeUpdate(query);
 			std::cout << "[Saved data] " << "(" << x << ", " << y << ") " << "ID: " << id << ", "
 				<< "Wins: " << win << ", Losses: " << lose << ", "
-				<< "Level: " << level << ", EXP: " << EXP << "\n";
+				<< "Level: " << colNum << ", EXP: " << EXP << "\n";
 		}
 		catch (SQLException& e) {
 			std::cerr << "Failed to save player data: " << e.what() << "\n";
