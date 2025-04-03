@@ -9,6 +9,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <queue>
 
 using asio::ip::tcp;
 
@@ -81,6 +82,41 @@ std::unordered_map<int, std::string> users;                              // 접�
 std::mutex playerMutex;
 int nextPlayerId = 1;
 
+
+//=======================================================
+std::queue<std::tuple<std::string, int, std::function<void()>>> eventQueue;
+std::mutex eventMutex;
+std::condition_variable eventCV;
+
+std::queue<std::function<void()>> sendQueue;
+std::mutex sendMutex;
+std::condition_variable sendCV;
+
+std::atomic<bool> isRunning(true);
+//=======================================================
+
+
+//=======================================================
+void enqueueSend(std::function<void()> fn) {
+    {
+        std::lock_guard<std::mutex> lock(sendMutex);
+        sendQueue.push(fn);
+    }
+    sendCV.notify_one();
+}
+
+void broadcast(const std::string& msg) {
+    enqueueSend([msg] {
+        std::lock_guard<std::mutex> lock(playerMutex);
+        for (const auto& [id, sock] : clientSockets) {
+            asio::write(*sock, asio::buffer(msg));
+        }
+        });
+}
+//=======================================================
+
+
+
 // --- 이동 가능 여부 확인 ---
 bool canMoveTo(int x, int y) {
     return (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && collisionMap[y][x] == 0);
@@ -141,125 +177,98 @@ void processMessage(const std::string& msg, int playerId) {
                 DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
                 response = "EXIT " + std::to_string(playerId) + " EXIT_OK\n";
                 broadRes = "EXITUSER " + std::to_string(playerId) + '\n';
-                asio::write(*clientSockets[playerId], asio::buffer(response));
-                // 브로드 캐스트
-                for (const auto& [id, sock] : clientSockets) {
-                    asio::write(*sock, asio::buffer(broadRes));
-                }
             }
             catch (std::exception& e) {
                 response = "EXIT EXIT_FAIL\n";
             }
         }
-        else { asio::write(*clientSockets[playerId], asio::buffer("EXIT " + std::to_string(playerId) + " EXIT_OK\n")); }
+        //=======================================================
+        enqueueSend([playerId, response]() {
+            if (clientSockets.count(playerId)) {
+                asio::write(*clientSockets[playerId], asio::buffer(response));
+            }
+        });
+        broadcast(broadRes);
+        //=======================================================
     }
 
+    //=======================================================
     else if (command == "LOGIN") {
         iss >> id >> password;
         bool dup = false;
-        std::cout << id << password << std::endl;
-        string response;
-        if(DBM.canLogin(id, password)){
+        std::string response;
+        if (DBM.canLogin(id, password)) {
             Player player = DBM.loadPlayer(id);
-            if (!player.isEmpty()) {
-                for (const auto& [pId, gId] : users) {
-                    if (gId == id) { dup = true; break; }
-                }
-                if (dup == false) {
-                    std::lock_guard<std::mutex> lock(playerMutex);
-                    users[playerId] = id;
-                    players[playerId] = player;
-
-                    std::string response = makeLoginSuccessResponse(playerId, players);
-
-                    asio::write(*clientSockets[playerId], asio::buffer(response));
-
-                    // NEWUSER 브로드캐스트 (다른 플레이어에게 알림)
-                    std::string broadRes = "NEWUSER " + std::to_string(playerId) + ' '
-                        + player.name + ' '
-                        + std::to_string(player.x) + ' '
-                        + std::to_string(player.y) + ' '
-                        + std::to_string(player.win) + ' '
-                        + std::to_string(player.lose) + ' '
-                        + std::to_string(player.level) + ' '
-                        + std::to_string(player.EXP) + '\n';
-
-                    for (const auto& [id, sock] : clientSockets) {
-                        asio::write(*sock, asio::buffer(broadRes));
+            {
+                std::lock_guard<std::mutex> lock(playerMutex);
+                for (const auto& [pid, gid] : users) {
+                    if (gid == id) {
+                        dup = true;
+                        break;
                     }
                 }
-                else 
-                {
-                    response = "LOGIN EXIST\n";
-                    asio::write(*clientSockets[playerId], asio::buffer(response));
+                if (!dup) {
+                    users[playerId] = id;
+                    players[playerId] = player;
+                    response = makeLoginSuccessResponse(playerId, players);
+                    enqueueSend([playerId, response]() {
+                        asio::write(*clientSockets[playerId], asio::buffer(response));
+                        });
+
+                    std::ostringstream broad;
+                    broad << "NEWUSER " << playerId << " " << player.name << " " << player.x << " " << player.y << " "
+                        << player.win << " " << player.lose << " " << player.level << " " << player.EXP << "\n";
+                    broadcast(broad.str());
+                    return;
                 }
             }
+            response = "LOGIN EXIST\n";
         }
         else {
             response = "LOGIN FALSE\n";
-            cout << response << endl;
-            asio::write(*clientSockets[playerId], asio::buffer(response));
         }
-        
+        enqueueSend([playerId, response]() {
+            asio::write(*clientSockets[playerId], asio::buffer(response));
+            });
     }
 
     else if (command == "MOVE") {
         iss >> dir;
-        std::cout << "MOVE 수신 dir : " << dir << std::endl;
-        if (directionOffset.count(dir)) {
+        std::string response;
+        {
             std::lock_guard<std::mutex> lock(playerMutex);
-            std::string response;
             auto& p = players[playerId];
-            p.dir = dir;
             int nx = p.x + directionOffset[dir].first;
             int ny = p.y + directionOffset[dir].second;
 
-            // 플레이어 간 충돌 검사
             bool blocked = false;
-            for (const auto& [otherId, otherPlayer] : players) {
-                if (otherId != playerId && otherPlayer.x == nx && otherPlayer.y == ny) {
+            for (const auto& [id, op] : players) {
+                if (id != playerId && op.x == nx && op.y == ny) {
                     blocked = true;
                     break;
                 }
             }
 
             if (!blocked && canMoveTo(nx, ny)) {
-                p.x = nx;
-                p.y = ny;
-                response = "MOVE TRUE ";
-            }
-
-            if (response == "MOVE TRUE ")
-            {
-                response += std::to_string(playerId) + " " 
-                    + players[playerId].dir + " " 
-                    + std::to_string(players[playerId].x) + " " 
-                    + std::to_string(players[playerId].y) + "\n";
+                p.x = nx; p.y = ny;
+                response = "MOVE TRUE " + std::to_string(playerId) + " " + dir + " " + std::to_string(nx) + " " + std::to_string(ny) + "\n";
             }
             else {
-                response = "MOVE FALSE " 
-                    + std::to_string(playerId) + " "
-                    + players[playerId].dir + "\n";
-            }
-            for (const auto& [id, sock] : clientSockets) {
-                asio::write(*sock, asio::buffer(response));
+                response = "MOVE FALSE " + std::to_string(playerId) + " " + dir + "\n";
             }
         }
+        broadcast(response);
     }
-
     else if (command == "CHAT") {
        
         std::getline(iss, chatmsg); // 공백 포함 전체 읽기
         if (!chatmsg.empty() && chatmsg[0] == ' ') chatmsg.erase(0, 1);  // 앞에 공백 제거
         
         std::string response = "CHAT " + std::to_string(playerId) + " "+ players[playerId].name + " " + chatmsg + "\n";
-        for (const auto& [id, sock] : clientSockets) {
-            asio::write(*sock, asio::buffer(response));
-        }
+        broadcast(response);
+        //=======================================================
+
     }
-
-
-    iss.clear();
 }
 
 
@@ -284,7 +293,15 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
             while ((pos = buffer.find('\n')) != std::string::npos) {
                 std::string line = buffer.substr(0, pos + 1);
                 buffer.erase(0, pos + 1);
-                processMessage(line, playerId);
+                //=======================================================
+                {
+                    std::lock_guard<std::mutex> lock(eventMutex);
+                    eventQueue.emplace(line, playerId, [line, playerId]() {
+                        processMessage(line, playerId);
+                        });
+                }
+                eventCV.notify_one();
+                //=======================================================
             }
         }
     }
@@ -297,7 +314,7 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
         players.erase(playerId);
         clientSockets.erase(playerId);
     }
-
+    /*
     std::string response = "PLAYERS\n";
     {
         std::lock_guard<std::mutex> lock(playerMutex);
@@ -308,16 +325,55 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
     for (const auto& [id, sock] : clientSockets) {
         asio::write(*sock, asio::buffer(response));
     }
-
+    */
 }
+
+//=======================================================
+void LogicWorker(int id) {
+    while (isRunning) {
+        std::tuple<std::string, int, std::function<void()>> task;
+        {
+            std::unique_lock<std::mutex> lock(eventMutex);
+            eventCV.wait(lock, [] { return !eventQueue.empty() || !isRunning; });
+            if (!isRunning && eventQueue.empty()) break;
+            task = std::move(eventQueue.front());
+            eventQueue.pop();
+        }
+        std::get<2>(task)();
+    }
+}
+
+void SendWorker() {
+    while (isRunning) {
+        std::function<void()> task;
+        {
+            std::unique_lock<std::mutex> lock(sendMutex);
+            sendCV.wait(lock, [] { return !sendQueue.empty() || !isRunning; });
+            if (!isRunning && sendQueue.empty()) break;
+            task = std::move(sendQueue.front());
+            sendQueue.pop();
+        }
+        task();
+    }
+}
+//=======================================================
+
+
 
 // --- 서버 메인 ---
 int main() {
-
     try {
         asio::io_context io;
         tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 9000));
         std::cout << "[Server] 대기 중...\n";
+
+
+        //=======================================================
+        std::vector<std::thread> logicThreads;
+        for (int i = 0; i < 4; ++i)
+            logicThreads.emplace_back(LogicWorker, i);
+        std::thread sender(SendWorker);
+        //=======================================================
 
         while (true) {
             auto socket = std::make_shared<tcp::socket>(io);
@@ -332,6 +388,13 @@ int main() {
 
             std::thread(handleClient, id, socket).detach();
         }
+
+        isRunning = false;
+        eventCV.notify_all();
+        sendCV.notify_all();
+        for (auto& t : logicThreads) t.join();
+        sender.join();
+
     }
     catch (std::exception& e) {
         std::cerr << "[Server 오류] " << e.what() << "\n";
