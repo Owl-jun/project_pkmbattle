@@ -33,7 +33,7 @@ sf::RenderWindow& GameManager::getWindow()
 void GameManager::init() {
     // 네트워크연결 , 테스트 완료 후 로그인시 연결하는걸로 변경
     NetworkManager::getInstance();
-    NetworkManager::getInstance().connect("210.119.12.82", "9000");   // 연결문제 해결되면 주석해제
+    NetworkManager::getInstance().connect("127.0.0.1", "9000");   // 연결문제 해결되면 주석해제210.119.12.82
     std::string response;
     while (response.empty()) {
         response = NetworkManager::getInstance().receive();
