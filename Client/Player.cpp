@@ -23,6 +23,7 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
             currentDirection = lastHeldDirection;
             sendDirectionToServer(currentDirection);
             moveCooldown = 0.f;
+            setCapDir();
             updateSpriteTexture();
         }
     }
@@ -46,6 +47,7 @@ void Player::update(float dt) {
             sf::Vector2f norm = normalize(dir);
             sprite->move(norm * dist);
         }
+        setCapDir();
         animate(dt);
         return;
     }
@@ -55,7 +57,7 @@ void Player::update(float dt) {
             sprite->setTexture(*(*frames)[0]);
         }
     }
-
+    cap->setPosition({ sprite->getGlobalBounds().getCenter() });
     if (speechTimer > 0.f)
         speechTimer -= dt;
 }
@@ -63,6 +65,9 @@ void Player::update(float dt) {
 void Player::draw(sf::RenderWindow& window) {
     if (sprite.has_value()) {
         window.draw(*sprite);
+    }
+    if (getCap) {
+        window.draw(*cap);
     }
     //nickname.setPosition({ sprite->getPosition().x - 60.f , sprite->getPosition().y - 60.f });
     //window.draw(nickname);  // 예외 발생지점
@@ -237,8 +242,26 @@ sf::String Player::wrapText(const sf::String& str, unsigned int maxWidth, const 
 }
 // ----------------------------------------------------------
 
+
+
 // ----------------------------------------------------------
 // 게터 세터
+
+void Player::setGetCap(bool isGet)
+{
+    getCap = isGet;
+}
+
+void Player::setCapDir()
+{
+    switch (currentDirection) {
+    case Direction::Down:  cap->setTexture(*CAP[0]); break;
+    case Direction::Left:  cap->setTexture(*CAP[2]); break;
+    case Direction::Right: cap->setTexture(*CAP[3]); break;
+    case Direction::Up:    cap->setTexture(*CAP[1]); break;
+    default:               break;
+    }
+}
 void Player::setColor(int num) {
     colorMode = num;
 }
@@ -264,6 +287,11 @@ void Player::setCurDir(std::string d) {
 
 sf::Vector2i Player::getTilePosition() const {
     return tilePos;
+}
+
+bool Player::isGetCap()
+{
+    return getCap;
 }
 
 sf::Vector2f Player::getPosition() const {

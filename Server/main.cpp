@@ -278,6 +278,24 @@ void processMessage(const std::string& msg, int playerId) {
         }
     }
 
+    else if (command == "GETCAP") {
+        std::string com;
+        iss >> com;
+        std::lock_guard<std::mutex> lock(playerMutex);
+        std::cout << "GETCAP 수신" << std::endl;
+        
+        if (com == "GET")
+        {
+            for (const auto& [id, sock] : clientSockets) {
+                asio::write(*sock, asio::buffer("GETCAP " + std::to_string(playerId) + " GET\n"));
+            }
+        }
+        else if (com == "LOST") {
+            for (const auto& [id, sock] : clientSockets) {
+                asio::write(*sock, asio::buffer("GETCAP -1 LOST\n"));
+            }
+        }
+    }
 
     iss.clear();
 }

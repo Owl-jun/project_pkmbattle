@@ -12,8 +12,12 @@ private:
     std::vector<std::shared_ptr<sf::Texture>> downFrames2, leftFrames2, rightFrames2, upFrames2;    // 파랑
     std::vector<std::shared_ptr<sf::Texture>> downFrames3, leftFrames3, rightFrames3, upFrames3;    // 초록
     std::vector<std::shared_ptr<sf::Texture>> downFrames4, leftFrames4, rightFrames4, upFrames4;    // 핑크
-    std::optional<sf::Sprite> sprite;   
+    std::vector<std::shared_ptr<sf::Texture>> CAP;    // 모자
+    std::optional<sf::Sprite> sprite;
+    std::optional<sf::Sprite> cap;
     
+    bool getCap = false;
+
     int colorMode = 0;
     float speed = 350.f;
     float frameTime = 0.01f;
@@ -30,7 +34,6 @@ private:
     std::string name;
     int win;
     int lose;
-    int level;
     float exp;
     sf::Vector2f targetWorldPos;    // 이동할 실 좌표
 
@@ -63,11 +66,14 @@ public:
 
 
     // 게터 세터
+    void setGetCap(bool);
+    void setCapDir();
     void setColor(int);
     void setPosition(const sf::Vector2f& pos);
     void setTile(sf::Vector2i& pos);
     sf::Vector2f getPosition() const;
     sf::Vector2i getTilePosition() const;
+    bool isGetCap();
 
 private:
     void animate(float dt);
@@ -88,6 +94,10 @@ public:
         , colorMode(_col)
         , exp(_exp)
     {
+        CAP.push_back(std::make_shared<sf::Texture>(ResourceManager::getInstance().getTextureByName("capC.png")));
+        CAP.push_back(std::make_shared<sf::Texture>(ResourceManager::getInstance().getTextureByName("capB.png")));
+        CAP.push_back(std::make_shared<sf::Texture>(ResourceManager::getInstance().getTextureByName("capL.png")));
+        CAP.push_back(std::make_shared<sf::Texture>(ResourceManager::getInstance().getTextureByName("capR.png")));
         for (int i = 0; i <= 9; ++i) {
             std::string path = "player0" + std::to_string(i) + ".png";
             std::shared_ptr<sf::Texture> tex = std::make_shared<sf::Texture>(
@@ -132,11 +142,17 @@ public:
 
         tilePos = { x, y };
         targetWorldPos = static_cast<sf::Vector2f>(tilePos) * static_cast<float>(tileSize);
-
         if (!downFrames.empty() && downFrames[0]->getSize().x > 0) {
             sprite.emplace(*downFrames[0]);
             sprite->setPosition(targetWorldPos);
             sprite->setScale({ 1.f, 1.f });
+        }
+        if (!CAP.empty() && CAP[0]->getSize().x > 0) {
+            sf::Vector2f pos = sprite->getPosition();
+            cap.emplace(*CAP[0]);
+            cap->setOrigin(cap->getGlobalBounds().getCenter());
+            cap->setPosition(pos);
+            cap->setScale({ 1.f,1.f });
         }
         currentDirection = Direction::Down;
     };
@@ -148,6 +164,7 @@ public:
         lose(other.lose),
         colorMode(other.colorMode),
         exp(other.exp),
+        CAP(other.CAP),
         downFrames(other.downFrames),
         leftFrames(other.leftFrames),
         rightFrames(other.rightFrames),
@@ -180,6 +197,12 @@ public:
             sprite->setPosition(targetWorldPos);
             sprite->setScale({ 1.f, 1.f });
         }
+        if (!CAP.empty() && CAP[0]->getSize().x > 0) {
+            sf::Vector2f pos = sprite->getPosition();
+            cap.emplace(*CAP[0]);
+            cap->setPosition(pos);
+            cap->setScale({ 1.f,1.f });
+        }
     }
     Player& operator=(const Player& other) {
         if (this == &other) return *this;
@@ -189,6 +212,7 @@ public:
         lose = other.lose;
         colorMode = other.colorMode;
         exp = other.exp;
+        CAP = other.CAP;
         downFrames = other.downFrames;
         leftFrames = other.leftFrames;
         rightFrames = other.rightFrames;
@@ -226,6 +250,12 @@ public:
         }
         else {
             sprite.reset();
+        }
+        if (!CAP.empty() && CAP[0]->getSize().x > 0) {
+            sf::Vector2f pos = sprite->getPosition();
+            cap.emplace(*CAP[0]);
+            cap->setPosition(pos);
+            cap->setScale({ 1.f,1.f });
         }
 
         return *this;
