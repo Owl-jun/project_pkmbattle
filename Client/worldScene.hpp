@@ -10,25 +10,19 @@
 #include "BaseScene.hpp"
 #include "UITextBox.hpp"
 
-// 테스트임
-#include "UIChatIcon.hpp"
-
 class worldScene : public BaseScene {
 private:
     sf::Font font;
     UIManager uiManager;
     AnimationManager aniManager;
     float keyCooldown = 0.f;
-    
 
-    // 채팅 UI 보정
+    // 채팅 UI
     UITextBox* chatBox;
     bool isChatting = false;
-    // CAM 보정
+
+    // CAM
     sf::View camera;
-    // 말풍선 보정
-    UIChatIcon* chatIcon = nullptr;
-    bool isChatBubbleActive = false;
 
 
 public:
@@ -69,63 +63,35 @@ public:
                     }
                     chatBox->clear();
                     isChatting = false;
-                    chatBox->setFocus(false);
                 }
             }
             return;
         }
 
-        // 채팅모드 진입
+        // 채팅창이 비활성일 때 Enter를 누르면 채팅모드 진입
         if (event.is<sf::Event::KeyPressed>()) {
             auto key = event.getIf<sf::Event::KeyPressed>();
-
             if (key && key->code == sf::Keyboard::Key::Enter) {
                 isChatting = true;
                 chatBox->setFocus(true);
                 return;
             }
-        
-         // 말풍선 생성 (1번 키) 보정
-        if (key && key->code == sf::Keyboard::Key::Num1) {
-            if (!isChatBubbleActive) {
-                sf::Vector2f playerPos = PlayerManager::getInstance().getMyPlayer().getPosition();
-                sf::Vector2f iconSize = { 100.f, 40.f };
-                sf::Vector2f iconPos = playerPos + sf::Vector2f(-iconSize.x / 2.f, -80.f);
-
-                chatIcon = new UIChatIcon(iconPos, iconSize, 20);
-                isChatBubbleActive = true;
-            }
-            return;
         }
-        }
-            PlayerManager::getInstance().handleInput(event, window);
+        PlayerManager::getInstance().getChatUI().handleInput(event,window);
+        PlayerManager::getInstance().handleInput(event,window);
     }
-
 
     void update(sf::RenderWindow& window) override {
         float dt = TimeManager::getInstance().getDeltaTime();
         keyCooldown -= dt;
-        
         PlayerManager::getInstance().update(dt);
 
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
         chatBox->setPos({ camera.getCenter().x -300.f , camera.getCenter().y + 200.f});
+        PlayerManager::getInstance().getChatUI().update(window);
         PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
         chatBox->update(window);
         window.setView(camera);     
-
-        // 채팅창 위치 업데이트 보정
-        chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 180.f });
-        chatBox->update(window);
-    
-        // 💬 말풍선 위치 & 애니메이션 갱신 보정
-        if (isChatBubbleActive && chatIcon) {
-            sf::Vector2f playerPos = PlayerManager::getInstance().getMyPlayer().getPosition();
-            sf::Vector2f iconSize = { 100.f, 40.f };
-            sf::Vector2f iconPos = playerPos + sf::Vector2f(-iconSize.x / 2.f, -80.f);
-            chatIcon->setPos(iconPos);
-            chatIcon->update(window);
-        }
 
     }
 
@@ -137,10 +103,6 @@ public:
         PlayerManager::getInstance().getChatUI().render(window);
         if (isChatting)
             chatBox->render(window);
-
-        // 말풍선 렌더링 보정
-        if (isChatBubbleActive && chatIcon)
-            chatIcon->render(window);
     }
     // ---------------------------------------------------------------------------------
 

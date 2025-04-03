@@ -166,7 +166,7 @@
     <ClInclude Include="CharacterSelectOverlay.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="ChattingOverlay.hpp" />
+    <ClInclude Include="UIChattingBox.hpp" />
     <ClInclude Include="EventManager.hpp" />
     <ClInclude Include="GameManager.hpp" />
     <ClInclude Include="KeyManager.hpp" />
