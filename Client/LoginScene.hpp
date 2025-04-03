@@ -158,13 +158,13 @@ public:
             else if (response == "EXIST") {
                 std::cout << "이미 로그인중인 유저!\n";
                 warningVisible = true;
-                timer = 5.f;
+                timer = 2.f;
                 warningInt = 1;
             }
             else {
                 std::cout << "로그인 실패!\n";
                 warningVisible = true;
-                timer = 5.f;
+                timer = 2.f;
                 warningInt = 2;
             }
             EventManager::getInstance().clearEvents(tag);

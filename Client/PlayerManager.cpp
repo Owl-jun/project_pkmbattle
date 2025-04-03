@@ -97,6 +97,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         std::istringstream iss(msg);
         int id, x, y, win, lose, level, exp;
         std::string name;
+        std::cout << "PlayerManager : NewUser 수신!" << std::endl;
         iss >> id >> name >> x >> y >> win >> lose >> level >> exp;
         if (id == NetworkManager::getInstance().getSocketID()) {}
         else { addPlayer(id, name, x, y, win, lose, level, exp); }
@@ -107,6 +108,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         std::istringstream iss(msg);
         int id;
         iss >> id;
+        std::cout << "PlayerManager : ExitUser 수신!" << std::endl;
         removePlayer(id);
         EventManager::getInstance().clearEvents(tag);
     }

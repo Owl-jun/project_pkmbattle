@@ -89,6 +89,12 @@ bool canMoveTo(int x, int y) {
 // --- LOGIN 태그 헬퍼함수 ---
 std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int, Player>& players) {
     std::ostringstream oss;
+
+    if (players.count(playerId) == 0) {
+        oss << "LOGIN FALSE\n";
+        return oss.str();
+    }
+
     const auto& myPlayer = players.at(playerId);
 
     // 첫 줄: LOGIN TRUE
@@ -102,7 +108,7 @@ std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int,
         << myPlayer.win << " "
         << myPlayer.lose << " "
         << myPlayer.level << " "
-        << myPlayer.EXP << "\n";
+        << myPlayer.EXP << " ";
 
     // 나 이외의 모든 플레이어 정보
     for (const auto& [id, p] : players) {
@@ -114,9 +120,9 @@ std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int,
             << p.win << " "
             << p.lose << " "
             << p.level << " "
-            << p.EXP << "\n";
+            << p.EXP << " ";
     }
-
+    oss << "\n";
     return oss.str();
 }
 
@@ -146,6 +152,9 @@ void processMessage(const std::string& msg, int playerId) {
                 for (const auto& [id, sock] : clientSockets) {
                     asio::write(*sock, asio::buffer(broadRes));
                 }
+                users.erase(playerId);
+                players.erase(playerId);
+                clientSockets.erase(playerId);
             }
             catch (std::exception& e) {
                 response = "EXIT EXIT_FAIL\n";
@@ -252,7 +261,7 @@ void processMessage(const std::string& msg, int playerId) {
         std::getline(iss, chatmsg); // 공백 포함 전체 읽기
         if (!chatmsg.empty() && chatmsg[0] == ' ') chatmsg.erase(0, 1);  // 앞에 공백 제거
         
-        std::string response = "CHAT " + std::to_string(playerId) + " "+ players[playerId].name + " " + chatmsg + "\n";
+        std::string response = "CHAT " + std::to_string(playerId) + " "+ players[playerId].name + " : " + chatmsg + "\n";
         for (const auto& [id, sock] : clientSockets) {
             asio::write(*sock, asio::buffer(response));
         }
@@ -296,6 +305,11 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
         users.erase(playerId);
         players.erase(playerId);
         clientSockets.erase(playerId);
+
+        std::string broadRes = "EXITUSER " + std::to_string(playerId) + "\n";
+        for (const auto& [id, sock] : clientSockets) {
+            asio::write(*sock, asio::buffer(broadRes));
+        }
     }
 
     std::string response = "PLAYERS\n";
