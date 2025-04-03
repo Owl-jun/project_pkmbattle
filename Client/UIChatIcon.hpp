@@ -85,9 +85,9 @@ public:
         rectangle.setPosition(pos);
         sf::Vector2f size = rectangle.getSize();
 
-        float tailX = pos.x + size.x / 2.f - 15.f;
+        float tailX = pos.x + (size.x / 2.f) - 20.f;
         float tailY = pos.y + size.y;
-        triangle.setPosition(sf::Vector2f(tailX, tailY));
+        triangle.setPosition({ tailX, tailY });
 
         // 텍스트 중앙 정렬
         sf::FloatRect textBounds = text.getLocalBounds();
