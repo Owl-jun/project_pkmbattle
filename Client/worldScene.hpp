@@ -6,6 +6,7 @@
 #include "AnimationManager.hpp"
 #include "TimeManager.hpp"
 #include "PlayerManager.hpp"
+#include "SettingsOverlay.hpp"
 
 #include "BaseScene.hpp"
 #include "UITextBox.hpp"
@@ -15,6 +16,7 @@ private:
     sf::Font font;
     UIManager uiManager;
     AnimationManager aniManager;
+    SettingsOverlay settingsOverlay;
     float keyCooldown = 0.f;
 
     // 채팅 UI
@@ -29,6 +31,7 @@ public:
     worldScene()
         : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
         , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, 24))
+        , settingsOverlay({ 800.f, 600.f }, font) // 수정된 부분: SettingsOverlay 초기화
     {
         chatBox->setFocus(false);
     }
@@ -76,8 +79,14 @@ public:
                 chatBox->setFocus(true);
                 return;
             }
+            // ESC 키를 누르면 설정 화면을 토글
+            if (key && key->code == sf::Keyboard::Key::Escape) {
+                settingsOverlay.toggle();
+                return;
+            }
         }
         PlayerManager::getInstance().handleInput(event,window);
+        settingsOverlay.handleEvent(event, window); // SettingsOverlay 입력 핸들링
     }
 
     void update(sf::RenderWindow& window) override {
@@ -91,6 +100,8 @@ public:
         chatBox->update(window);
         window.setView(camera);     
 
+        settingsOverlay.setCenter(camera.getCenter()); // 설정 화면을 중앙에 위치시킴
+        settingsOverlay.update(window); // SettingsOverlay 업데이트
     }
 
     void render(sf::RenderWindow& window) override {
@@ -101,6 +112,7 @@ public:
 
         if (isChatting)
             chatBox->render(window);
+        settingsOverlay.render(window); // SettingsOverlay 렌더링
     }
     // ---------------------------------------------------------------------------------
 
