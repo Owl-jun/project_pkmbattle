@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Dev\mysql-connector-c++-9.2.0-winx64\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Dev\mysql-connector-c++-9.2.0-winx64\include;C:\Program Files\mysql-connector-c++-9.2.0-winx64\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Dev\mysql-connector-c++-9.2.0-winx64\lib64\vs14;C:\Program Files\mysql-connector-c++-9.2.0-winx64\lib64\debug\vs14;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
