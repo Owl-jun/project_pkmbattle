@@ -75,6 +75,9 @@ public:
 
         uiManager.addElement(idBox);
         uiManager.addElement(pwBox);       
+        uiManager.addElement(new UIButton({ 300.f , 272.f + 90.f }, { 200.f, 40.f }, L"회원가입", 36,
+            sf::Color::Color(20, 20, 20, 50), []() { SceneManager::getInstance().changeScene("account");}
+        ));
         uiManager.addElement(new UIButton(
             { 505.f, 300.f },
             { 150.f, 56.f },
@@ -102,7 +105,9 @@ public:
                 std::cout << "[LoginScene] 로그인 요청 전송완료 "<< "\n";
             }
         ));
+
         
+
         AnimatedObject Seokjun("seokjun.png", { 700, 100 }, 20.f, 0.f, -1);
         Seokjun.setScale({ 2.f,2.f });
         aniManager.add(Seokjun, [](AnimatedObject& obj, float dt) { obj.move(dt); });

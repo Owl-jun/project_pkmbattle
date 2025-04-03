@@ -20,6 +20,16 @@ public:
             focusStep(shiftHeld ? -1 : 1);
             return;
         }
+        if (event.is<sf::Event::KeyPressed>()) {
+            if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Up)) {
+                focusStep(-1);
+                return;
+            }
+            else if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Down)) {
+                focusStep(1);
+                return;
+            }
+        }
         for (auto& elem : uiElements)
             elem->handleInput(event, window);
     }

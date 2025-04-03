@@ -5,7 +5,7 @@ using namespace sql;
 
 #define SERVER_IP "127.0.0.1:3306"
 #define USERNAME "root"
-#define PASSWORD "root"
+#define PASSWORD "12345"
 #define DATABASE "Pokemon"
 
 struct skill {
@@ -152,5 +152,19 @@ public:
 		}
 	}
 	//--------------------------------------
-
+	bool createAccount(const std::string& nickname,const std::string& id,const std::string& pw) {
+		try {
+			unique_ptr<Statement> stmt(conn->createStatement());
+			std::string query = "INSERT INTO Player (Player_name, Login_id, Login_password) VALUES('" +
+				nickname + "', '" + id + "', '" + pw +"')";
+				
+			stmt->executeUpdate(query);
+			std::cout << "[CREATE DATA] DONE NICKNAME : " << nickname << std::endl;
+			return true;
+		}
+		catch (SQLException& e) {
+			std::cerr << "Failed to CREATE player data: " << e.what() << "\n";
+			return false;
+		}
+	}
 };

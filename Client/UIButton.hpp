@@ -85,7 +85,7 @@ public:
 
         if (event.is<sf::Event::KeyPressed>()) {
             if (KeyManager::getInstance().isKeyPressed(sf::Keyboard::Key::Enter)) {
-                if (onClick) onClick();
+                if (onClick && isFocused()) { onClick(); }
             }
         }
     }

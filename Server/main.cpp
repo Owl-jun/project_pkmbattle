@@ -279,9 +279,9 @@ void processMessage(const std::string& msg, int playerId) {
     }
 
     else if (command == "GETCAP") {
+        std::lock_guard<std::mutex> lock(playerMutex);
         std::string com;
         iss >> com;
-        std::lock_guard<std::mutex> lock(playerMutex);
         std::cout << "GETCAP 수신" << std::endl;
         
         if (com == "GET")
@@ -295,6 +295,19 @@ void processMessage(const std::string& msg, int playerId) {
                 asio::write(*sock, asio::buffer("GETCAP -1 LOST\n"));
             }
         }
+    }
+
+    else if (command == "CREATEACCOUNT") {
+        std::lock_guard<std::mutex> lock(playerMutex);
+        std::string nickname, id, pw;
+        iss >> nickname >> id >> pw;
+        std::cout << "CREATEACCOUNT 수신" << std::endl;
+        std::string response;
+        if (DBM.createAccount(nickname, id, pw)) {
+            response = "CREATEACCOUNT OK\n";
+        }
+        else { response = "CREATEACCOUNT FALSE\n"; }
+        asio::write(*clientSockets[playerId], asio::buffer(response));
     }
 
     iss.clear();
