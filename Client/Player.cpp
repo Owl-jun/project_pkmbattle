@@ -22,7 +22,7 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
         if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             currentDirection = lastHeldDirection;
             sendDirectionToServer(currentDirection);
-            moveCooldown = 0.15f;
+            moveCooldown = 0.f;
             updateSpriteTexture();
         }
     }

@@ -176,8 +176,8 @@
       <Filter>MANAGERS\SceneManager</Filter>
     </ClInclude>
     <ClInclude Include="UIChatIcon.hpp" />
-    <ClInclude Include="ChattingOverlay.hpp">
-      <Filter>UI\Overlays</Filter>
+    <ClInclude Include="UIChattingBox.hpp">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

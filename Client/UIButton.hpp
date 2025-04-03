@@ -14,6 +14,10 @@ private:
     bool focused = false;
 
 public:
+    UIButton()
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
+        , text(font, "", 24)
+    {}
 
     UIButton(const sf::Vector2f& pos,
         const sf::Vector2f& size,
@@ -75,7 +79,7 @@ public:
             if (mouse &&
                 mouse->button == sf::Mouse::Button::Left &&
                 shape.getGlobalBounds().contains(mousePos)) {
-                if (onClick) onClick();
+                if (onClick) { onClick(); }
             }
         }
 
@@ -110,12 +114,33 @@ public:
         return shape.getSize();
     }
 
+    sf::RectangleShape& getShape() {
+        return shape;
+    }
+
+    void setFunc(std::function<void()> onClickFunc)
+    {
+        onClick = onClickFunc;
+    }
+
     void setPosition(const sf::Vector2f& position) {
         shape.setPosition(position);
         text.setPosition(
             { shape.getPosition().x + shape.getSize().x / 2.f,
             shape.getPosition().y + shape.getSize().y / 2.f }
         );
+    }
+
+    void setFillColor(sf::Color color) {
+        shape.setFillColor(color);
+    }
+
+    void setString(const std::string& string) {
+        text.setString(string);
+    }
+
+    void setString(const std::wstring& wstring) {
+        text.setString(wstring);
     }
 
     void click() {

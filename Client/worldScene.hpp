@@ -77,17 +77,18 @@ public:
                 return;
             }
         }
+        PlayerManager::getInstance().getChatUI().handleInput(event,window);
         PlayerManager::getInstance().handleInput(event,window);
     }
 
     void update(sf::RenderWindow& window) override {
         float dt = TimeManager::getInstance().getDeltaTime();
         keyCooldown -= dt;
-        
         PlayerManager::getInstance().update(dt);
 
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
         chatBox->setPos({ camera.getCenter().x -300.f , camera.getCenter().y + 200.f});
+        PlayerManager::getInstance().getChatUI().update(window);
         PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
         chatBox->update(window);
         window.setView(camera);     
