@@ -5,7 +5,7 @@ using namespace sql;
 
 #define SERVER_IP "127.0.0.1:3306"
 #define USERNAME "root"
-#define PASSWORD "root"
+#define PASSWORD "12345"
 #define DATABASE "Pokemon"
 
 struct skill {
@@ -22,7 +22,7 @@ struct Poketmon {
 	vector<skill> skills;
 };
 
-struct Player{
+struct Player {
 	string id;
 	string password;
 	int x = 2;
@@ -37,7 +37,8 @@ struct Player{
 	Player() {}
 	Player(int x, int y, string dir = "DOWN")
 		: x(x), y(y), dir(dir)
-	{}
+	{
+	}
 	Player(string id, string password, int x, int y, string name, int win, int lose, int level, double EXP, string dir = "DOWN")
 		: id(id)
 		, password(password)
@@ -85,7 +86,7 @@ public:
 
 
 	bool canLogin(string _id, string _pswd) {
-		try 
+		try
 		{
 			unique_ptr<Statement> stmt(conn->createStatement());
 			unique_ptr<ResultSet> res(stmt->executeQuery("SELECT * FROM Player WHERE Login_ID = '" + _id + "'"));

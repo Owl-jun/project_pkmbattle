@@ -98,7 +98,7 @@ public:
 
                 std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
-                NetworkManager::getInstance().send(msg);
+                NetworkManager::getInstance().send(msg);    //================송신
                 std::cout << "[LoginScene] 로그인 요청 전송완료 "<< "\n";
             }
         ));
@@ -182,7 +182,7 @@ public:
         uiManager.handleInput(event, window);
     }
 
-    void update(sf::RenderWindow& window) override {
+    void update(sf::RenderWindow& window) override {    //================수신
         // 수신 패킷이름 지정
         for (const std::string& tag : { "LOGIN" }) {
             auto events = EventManager::getInstance().getEvents(tag);

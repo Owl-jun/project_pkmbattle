@@ -56,7 +56,7 @@ const std::vector<std::vector<int>> collisionMap = {
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
             {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1} 
+            {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
 const int MAP_WIDTH = collisionMap[0].size();
@@ -125,12 +125,6 @@ bool canMoveTo(int x, int y) {
 // --- LOGIN 태그 헬퍼함수 ---
 std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int, Player>& players) {
     std::ostringstream oss;
-
-    if (players.count(playerId) == 0) {
-        oss << "LOGIN FALSE\n";
-        return oss.str();
-    }
-
     const auto& myPlayer = players.at(playerId);
 
     // 첫 줄: LOGIN TRUE
@@ -144,7 +138,7 @@ std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int,
         << myPlayer.win << " "
         << myPlayer.lose << " "
         << myPlayer.level << " "
-        << myPlayer.EXP << " ";
+        << myPlayer.EXP << "\n";
 
     // 나 이외의 모든 플레이어 정보
     for (const auto& [id, p] : players) {
@@ -156,9 +150,9 @@ std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int,
             << p.win << " "
             << p.lose << " "
             << p.level << " "
-            << p.EXP << " ";
+            << p.EXP << "\n";
     }
-    oss << "\n";
+
     return oss.str();
 }
 
@@ -171,7 +165,55 @@ void processMessage(const std::string& msg, int playerId) {
     std::string id, password;
     iss >> command;
 
+    
+    if (command == "EXIT") {
+        std::cout << "[EXIT] 수신 메시지 처리 시작\n";
+        std::string response;
+        std::string broadRes;
+
+        {
+            std::lock_guard<std::mutex> lock(playerMutex);
+            if (players.count(playerId)) {
+                try {
+                    const auto& p = players[playerId];
+                    DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
+                    response = "EXIT " + std::to_string(playerId) + " EXIT_OK\n";
+                    broadRes = "EXITUSER " + std::to_string(playerId) + "\n";
+                }
+                catch (const std::exception& e) {
+                    std::cerr << "[EXIT 처리 오류] " << e.what() << "\n";
+                    response = "EXIT " + std::to_string(playerId) + " EXIT_FAIL\n";
+                }
+            }
+        }
+
+        // 1. 응답 먼저 전송
+        enqueueSend([playerId, response]() {
+            std::lock_guard<std::mutex> lock(playerMutex);
+            if (clientSockets.count(playerId)) {
+                asio::write(*clientSockets[playerId], asio::buffer(response));
+            }
+         });
+
+        // 2. 다른 유저에게 브로드캐스트
+        if (!broadRes.empty()) {
+            broadcast(broadRes);
+        }
+
+        // 3. 데이터 정리 (조금 딜레이 줘도 됨)
+        enqueueSend([playerId]() {
+            std::lock_guard<std::mutex> lock(playerMutex);
+            users.erase(playerId);
+            players.erase(playerId);
+            clientSockets.erase(playerId);
+            });
+
+        return;
+    }
+
+
     //--------------------------------------
+    /*
     if (command == "EXIT") {
         std::cout << "EXIT 수신 메시지 처리시작" << std::endl;
         std::string response;
@@ -183,17 +225,6 @@ void processMessage(const std::string& msg, int playerId) {
                 DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.level, p.EXP);
                 response = "EXIT " + std::to_string(playerId) + " EXIT_OK\n";
                 broadRes = "EXITUSER " + std::to_string(playerId) + '\n';
-<<<<<<< HEAD
-=======
-                asio::write(*clientSockets[playerId], asio::buffer(response));
-                // 브로드 캐스트
-                for (const auto& [id, sock] : clientSockets) {
-                    asio::write(*sock, asio::buffer(broadRes));
-                }
-                users.erase(playerId);
-                players.erase(playerId);
-                clientSockets.erase(playerId);
->>>>>>> ReFactoring/석준
             }
             catch (std::exception& e) {
                 response = "EXIT EXIT_FAIL\n";
@@ -204,10 +235,10 @@ void processMessage(const std::string& msg, int playerId) {
             if (clientSockets.count(playerId)) {
                 asio::write(*clientSockets[playerId], asio::buffer(response));
             }
-        });
+            });
         broadcast(broadRes);
         //=======================================================
-    }
+    }*/
 
     //=======================================================
     else if (command == "LOGIN") {
@@ -277,31 +308,34 @@ void processMessage(const std::string& msg, int playerId) {
         broadcast(response);
     }
     else if (command == "CHAT") {
-       
+
         std::getline(iss, chatmsg); // 공백 포함 전체 읽기
         if (!chatmsg.empty() && chatmsg[0] == ' ') chatmsg.erase(0, 1);  // 앞에 공백 제거
-        
-<<<<<<< HEAD
-        std::string response = "CHAT " + std::to_string(playerId) + " "+ players[playerId].name + " " + chatmsg + "\n";
+
+        std::string response = "CHAT " + std::to_string(playerId) + " " + players[playerId].name + " " + chatmsg + "\n";
         broadcast(response);
         //=======================================================
 
-=======
-        std::string response = "CHAT " + std::to_string(playerId) + " "+ players[playerId].name + " : " + chatmsg + "\n";
-        for (const auto& [id, sock] : clientSockets) {
-            asio::write(*sock, asio::buffer(response));
-        }
->>>>>>> ReFactoring/석준
     }
 }
 
 
 // --- 클라이언트 처리 스레드 ---
-void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
+void handleClient(std::shared_ptr<tcp::socket> socket) {
     char temp[128];
     std::string buffer;
+    int playerId = nextPlayerId++;
 
     try {
+
+        std::lock_guard<std::mutex> lock(playerMutex);
+        // id랑 socket 구분 지어서 key:value 형식으로 (map함수) sendQueue에 바로 보내도록.
+        clientSockets[playerId] = socket;
+
+        std::cout << "[Server] Player " << playerId << " 접속!\n";
+
+
+
         // 클라이언트에게 본인 ID 전송
         std::string idMsg = "ID " + std::to_string(playerId) + "\n";
         asio::write(*socket, asio::buffer(idMsg));
@@ -331,16 +365,18 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
     }
     catch (std::exception& e) {
         std::cerr << "[Server] Player " << playerId << " disconnected: " << e.what() << "\n";
-        
+
         // 연결 종료 시 클린업
         std::lock_guard<std::mutex> lock(playerMutex);
-        users.erase(playerId);
-        players.erase(playerId);
-        clientSockets.erase(playerId);
+        if (users.count(playerId)) {
+            users.erase(playerId);
+            players.erase(playerId);
+            clientSockets.erase(playerId);
 
-        std::string broadRes = "EXITUSER " + std::to_string(playerId) + "\n";
-        for (const auto& [id, sock] : clientSockets) {
-            asio::write(*sock, asio::buffer(broadRes));
+            std::string broadRes = "EXITUSER " + std::to_string(playerId) + "\n";
+            for (const auto& [id, sock] : clientSockets) {
+                asio::write(*sock, asio::buffer(broadRes));
+            }
         }
     }
     /*
@@ -358,14 +394,19 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
 }
 
 //=======================================================
-void LogicWorker(int id) {
+void LogicWorker() {
     while (isRunning) {
         std::tuple<std::string, int, std::function<void()>> task;
+
+        // task  <line, id, 함수>
         {
             std::unique_lock<std::mutex> lock(eventMutex);
             eventCV.wait(lock, [] { return !eventQueue.empty() || !isRunning; });
             if (!isRunning && eventQueue.empty()) break;
             task = std::move(eventQueue.front());
+
+
+
             eventQueue.pop();
         }
         std::get<2>(task)();
@@ -408,14 +449,8 @@ int main() {
             auto socket = std::make_shared<tcp::socket>(io);
             acceptor.accept(*socket);
 
-            std::lock_guard<std::mutex> lock(playerMutex);
-            int id = nextPlayerId++;
-            
-            clientSockets[id] = socket;
 
-            std::cout << "[Server] Player " << id << " 접속!\n";
-
-            std::thread(handleClient, id, socket).detach();
+            // std::thread(handleClient, socket).detach();
         }
 
         isRunning = false;
