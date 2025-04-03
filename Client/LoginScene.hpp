@@ -96,7 +96,7 @@ public:
                 id = clean(id);
                 pw = clean(pw);
 
-                std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
+                //std::cout << "[LOGIN] ID: " << id << ", PW: " << pw << "\n";
                 std::string msg = "LOGIN " + id + " " + pw + "\n";
                 NetworkManager::getInstance().send(msg);    //================송신
                 std::cout << "[LoginScene] 로그인 요청 전송완료 "<< "\n";

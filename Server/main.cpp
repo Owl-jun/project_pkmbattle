@@ -449,6 +449,9 @@ int main() {
             auto socket = std::make_shared<tcp::socket>(io);
             acceptor.accept(*socket);
 
+            std::lock_guard<std::mutex> lock(playerMutex);
+            int id = nextPlayerId++;
+            clientSockets[id] = socket;
 
             // std::thread(handleClient, socket).detach();
         }
