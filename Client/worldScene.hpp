@@ -88,6 +88,7 @@ public:
 
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
         chatBox->setPos({ camera.getCenter().x -300.f , camera.getCenter().y + 200.f});
+        PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
         chatBox->update(window);
         window.setView(camera);     
 
@@ -98,7 +99,7 @@ public:
         window.setView(camera);
         aniManager.renderAll(window);
         PlayerManager::getInstance().draw(window);
-
+        PlayerManager::getInstance().getChatUI().render(window);
         if (isChatting)
             chatBox->render(window);
     }

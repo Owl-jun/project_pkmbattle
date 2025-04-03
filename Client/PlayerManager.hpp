@@ -1,12 +1,13 @@
 #pragma once
 #include "pch.h"
 #include "Player.hpp"
+#include "ChattingOverlay.hpp"
 
 class PlayerManager {
 private:
     Player MyPlayer;
     std::unordered_map<int, Player> otherPlayers;
-    
+    ChattingOverlay chatting;
     PlayerManager() = default;
 
 public:
@@ -33,6 +34,6 @@ public:
     void addPlayer(int id, std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp);
     void removePlayer(int id);
     Player* getPlayer(int id);
-
     Player& getMyPlayer();
+    ChattingOverlay& getChatUI() { return chatting; }
 };
