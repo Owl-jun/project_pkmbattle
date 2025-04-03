@@ -79,7 +79,7 @@ public:
         {
             bounds = box.getGlobalBounds();
             x = bounds.position.x + 5.f;
-            y = bounds.position.y;
+            y = bounds.position.y + 8.f;
         }
         else 
         {

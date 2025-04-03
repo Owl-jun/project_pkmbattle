@@ -11,7 +11,7 @@ private:
     std::vector<std::shared_ptr<sf::Texture>> downFrames, leftFrames, rightFrames, upFrames;
     std::optional<sf::Sprite> sprite;
     
-    float speed = 250.f;
+    float speed = 350.f;
     float frameTime = 0.01f;
     float elapsedTime = 0.f;
     int currentFrame = 0;
