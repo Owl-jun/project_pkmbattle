@@ -19,10 +19,10 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
             else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
         }
 
-        if (lastHeldDirection != Direction::None /*moveCooldown <= 0.f*/) {
+        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             currentDirection = lastHeldDirection;
             sendDirectionToServer(currentDirection);
-            // moveCooldown = 0.05f;
+            moveCooldown = 0.15f;
             updateSpriteTexture();
         }
     }
@@ -31,7 +31,7 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
 
 void Player::update(float dt) {
     if (!sprite.has_value()) return;
-    //moveCooldown -= dt;
+    moveCooldown -= dt;
 
     if (isMoving) {
         sf::Vector2f pos = sprite->getPosition();
@@ -73,7 +73,7 @@ void Player::draw(sf::RenderWindow& window) {
         sf::Vector2f size = bounds.size;
         sf::Vector2f pos = getPosition(); // 머리 위에 띄우기
         speechBubble.setPosition({ (pos.x + 30.f) - (size.x/2.f) , pos.y - 35.f });
-        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - size.y });
+        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - (size.y - 5.f) });
 
         window.draw(speechBubble);
         window.draw(speechText);

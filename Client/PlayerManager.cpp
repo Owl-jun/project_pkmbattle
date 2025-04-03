@@ -2,7 +2,6 @@
 #include "PlayerManager.hpp"
 #include "Player.hpp"
 
-
 void PlayerManager::addPlayer(int id, std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp) {
     if (otherPlayers.contains(id)) return;
     Player p(nickname, _x, _y, _win, _lose, _level, _exp);
@@ -124,6 +123,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
             message = message.substr(1); // 앞 공백 제거
         }
         std::cout << "현재 도착 메시지" << message << std::endl;
+        chatting.addMessage(message);
         if (id == NetworkManager::getInstance().getSocketID())
         {
             MyPlayer.showSpeechBubble(message);
