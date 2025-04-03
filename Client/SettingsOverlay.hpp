@@ -153,7 +153,7 @@ public:
         }
     }
 
-    void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) {
         if (!visible) return;
         for (auto& ui : uiElements)
             ui->handleEvent(event, window);
