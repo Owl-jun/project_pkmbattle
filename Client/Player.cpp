@@ -51,7 +51,7 @@ void Player::update(float dt) {
     }
     else {
         currentFrame = 0;
-        if (auto* frames = getCurrentFrameSet(); frames && !frames->empty()) {
+        if (auto* frames = getCurrentFrameSet(colorMode); frames && !frames->empty()) {
             sprite->setTexture(*(*frames)[0]);
         }
     }
@@ -116,7 +116,7 @@ void Player::move(const sf::Vector2i& pos, Direction dir) {
 // 애니메이션 관련
 void Player::animate(float dt) {
     elapsedTime += dt;
-    auto* frames = getCurrentFrameSet();
+    auto* frames = getCurrentFrameSet(colorMode);
     if (!frames || frames->empty()) return;
     if (currentFrame >= frames->size()) currentFrame = 0;
     if (elapsedTime >= frameTime) {
@@ -128,7 +128,7 @@ void Player::animate(float dt) {
 }
 
 void Player::updateSpriteTexture() {
-    auto* frames = getCurrentFrameSet();
+    auto* frames = getCurrentFrameSet(colorMode);
     if (!frames || frames->empty()) return;
 
     if (currentFrame >= frames->size()) {
@@ -138,14 +138,35 @@ void Player::updateSpriteTexture() {
     sprite->setTexture(*(*frames)[currentFrame]);
 }
 
-std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet() {
-    switch (currentDirection) {
-    case Direction::Down:  return &downFrames;
-    case Direction::Left:  return &leftFrames;
-    case Direction::Right: return &rightFrames;
-    case Direction::Up:    return &upFrames;
-    default:               return nullptr;
+std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet(int colorMode) {
+    if (colorMode == 0) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames;
+        case Direction::Left:  return &leftFrames;
+        case Direction::Right: return &rightFrames;
+        case Direction::Up:    return &upFrames;
+        default:               return nullptr;
+        }
     }
+    else if (colorMode == 1) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames2;
+        case Direction::Left:  return &leftFrames2;
+        case Direction::Right: return &rightFrames2;
+        case Direction::Up:    return &upFrames2;
+        default:               return nullptr;
+        }
+    }
+    else if (colorMode == 2) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames3;
+        case Direction::Left:  return &leftFrames3;
+        case Direction::Right: return &rightFrames3;
+        case Direction::Up:    return &upFrames3;
+        default:               return nullptr;
+        }
+    }
+    
 }
 // ----------------------------------------------------------
 
@@ -208,6 +229,10 @@ sf::String Player::wrapText(const sf::String& str, unsigned int maxWidth, const 
 
 // ----------------------------------------------------------
 // 게터 세터
+void Player::setColor(int num) {
+    colorMode = num;
+}
+
 void Player::setTile(sf::Vector2i& pos) {
     tilePos = pos;
 }

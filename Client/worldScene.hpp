@@ -9,6 +9,7 @@
 
 #include "BaseScene.hpp"
 #include "UITextBox.hpp"
+#include "UiChatIcon.hpp"
 
 class worldScene : public BaseScene {
 private:
@@ -21,6 +22,9 @@ private:
     UITextBox* chatBox;
     bool isChatting = false;
 
+    UIChatIcon chaticon;
+    bool isPChat = false;
+
     // CAM
     sf::View camera;
 
@@ -29,6 +33,7 @@ public:
     worldScene()
         : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
         , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, 24))
+        , chaticon({0.f,0.f}, {120.f,50.f},24)
     {
         chatBox->setFocus(false);
     }
@@ -76,7 +81,13 @@ public:
                 chatBox->setFocus(true);
                 return;
             }
+            if (key && key->code == sf::Keyboard::Key::Space) {
+                isPChat = !isPChat;
+                return;
+            }
         }
+
+
         PlayerManager::getInstance().getChatUI().handleInput(event,window);
         PlayerManager::getInstance().handleInput(event,window);
     }
@@ -85,11 +96,15 @@ public:
         float dt = TimeManager::getInstance().getDeltaTime();
         keyCooldown -= dt;
         PlayerManager::getInstance().update(dt);
-
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
-        chatBox->setPos({ camera.getCenter().x -300.f , camera.getCenter().y + 200.f});
+        
         PlayerManager::getInstance().getChatUI().update(window);
         PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
+        chaticon.setPos({ 
+            PlayerManager::getInstance().getMyPlayer().getPosition().x - 60.f
+            , PlayerManager::getInstance().getMyPlayer().getPosition().y - 70.f
+            });
+        chaticon.update(window);
         chatBox->update(window);
         window.setView(camera);     
 
@@ -101,6 +116,11 @@ public:
         aniManager.renderAll(window);
         PlayerManager::getInstance().draw(window);
         PlayerManager::getInstance().getChatUI().render(window);
+        if (isPChat)
+        {
+            chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 200.f });
+            chaticon.render(window);
+        }
         if (isChatting)
             chatBox->render(window);
     }

@@ -122,8 +122,8 @@ public:
     }
 
     void setPos(sf::Vector2f pos) {
-        box.setPosition(pos);
         text.setPosition({ pos.x + 10.f, pos.y - 12.f });
+        box.setPosition(pos);
     }
     // ------------------------------------------------------------------------
 

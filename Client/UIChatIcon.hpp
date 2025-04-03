@@ -1,7 +1,6 @@
 #pragma once
 #include "pch.h"
 #include "BaseUI.hpp"
-#include "ResourceManager.hpp"
 #include "UIButton.hpp"
 #include "UIManager.hpp"
 #include "KeyManager.hpp"
@@ -14,15 +13,17 @@ private:
     sf::Text text;
     sf::Font font;
 
-
     float elapsed = 0.f;
     int dotCount = 0;
     float animationInterval = 0.5f;
 
+    bool isOpen = false;
+
 public:
     UIChatIcon(const sf::Vector2f& pos, const sf::Vector2f& size, int fontSize)
-        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF")),text(font,"", fontSize)
-            {
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
+        , text(font,"", fontSize)
+    {
         // 말풍선 스타일 박스
         rectangle.setPosition(pos);
         rectangle.setSize(size);
@@ -38,18 +39,15 @@ public:
         triangle.setFillColor(sf::Color::White);
         triangle.setOutlineThickness(3.0f);
         triangle.setOutlineColor(sf::Color::Black);
-        sf::Vector2f tailPos = sf::Vector2f(pos.x + size.x / 2.f - 15.f, pos.y + size.y); // 인자 안맞아서바꿈
+        sf::Vector2f tailPos = { pos.x + size.x / 2.f - 15.f, pos.y + size.y }; // 인자 안맞아서바꿈
         triangle.setPosition(tailPos);
-        
         
         text.setFont(font);
         text.setCharacterSize(fontSize);
         text.setFillColor(sf::Color::Black);
         text.setString(std::wstring(L"개인 대화창 생성"));
 
-
         centerText(pos, size);
-
     }
 
     void centerText(const sf::Vector2f& pos, const sf::Vector2f& size) {
@@ -59,10 +57,10 @@ public:
     }
 
 
-    virtual void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
     }
 
-    virtual void update(sf::RenderWindow& window) override {
+    void update(sf::RenderWindow& window) override {
         
         elapsed += TimeManager::getInstance().getDeltaTime();
 
@@ -77,6 +75,11 @@ public:
 
     }
 
+    void render(sf::RenderWindow& window) override {
+        window.draw(triangle);
+        window.draw(rectangle);
+        window.draw(text);
+    }
 
     void setPos(const sf::Vector2f& pos) {
         rectangle.setPosition(pos);
@@ -96,11 +99,7 @@ public:
     }
 
 
-    virtual void render(sf::RenderWindow& window) override {
-        window.draw(triangle); 
-        window.draw(rectangle); 
-        window.draw(text);
-    }
+    
 
     virtual bool isFocusable() const override { return false; }
     virtual bool isFocused() const override { return false; }

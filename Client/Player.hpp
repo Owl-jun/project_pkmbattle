@@ -8,9 +8,12 @@ enum class Direction {
 
 class Player {
 private:
-    std::vector<std::shared_ptr<sf::Texture>> downFrames, leftFrames, rightFrames, upFrames;
-    std::optional<sf::Sprite> sprite;
+    std::vector<std::shared_ptr<sf::Texture>> downFrames, leftFrames, rightFrames, upFrames;        // 기본
+    std::vector<std::shared_ptr<sf::Texture>> downFrames2, leftFrames2, rightFrames2, upFrames2;    // 초록
+    std::vector<std::shared_ptr<sf::Texture>> downFrames3, leftFrames3, rightFrames3, upFrames3;    // 보라
+    std::optional<sf::Sprite> sprite;   
     
+    int colorMode = 0;
     float speed = 350.f;
     float frameTime = 0.01f;
     float elapsedTime = 0.f;
@@ -59,6 +62,7 @@ public:
 
 
     // 게터 세터
+    void setColor(int);
     void setPosition(const sf::Vector2f& pos);
     void setTile(sf::Vector2i& pos);
     sf::Vector2f getPosition() const;
@@ -67,7 +71,7 @@ public:
 private:
     void animate(float dt);
     void updateSpriteTexture();
-    std::vector<std::shared_ptr<sf::Texture>>* getCurrentFrameSet();
+    std::vector<std::shared_ptr<sf::Texture>>* getCurrentFrameSet(int colorMode);
     sf::Vector2f normalize(const sf::Vector2f& v);
 
 public:
