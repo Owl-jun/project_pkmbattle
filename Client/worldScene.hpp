@@ -21,6 +21,8 @@ private:
     std::unordered_map<int, Player>& otherPlayers = PlayerManager::getInstance().getPlayers();
     Player& myPlayer = PlayerManager::getInstance().getMyPlayer();
     sf::Texture capTex = ResourceManager::getInstance().getTextureByName("capC.png");
+    sf::Sprite desk = sf::Sprite(ResourceManager::getInstance().getTextureByName("desk.png"));
+    sf::Sprite teacher = sf::Sprite(ResourceManager::getInstance().getTextureByName("teachernormal.png"));
     sf::Sprite cap = sf::Sprite(capTex);
     bool capView = true;
     
@@ -41,7 +43,10 @@ public:
         , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, 24))
         , chaticon({0.f,0.f}, {60.f,30.f},24)
     {
-        cap.setPosition({ 6 * 60.f,5 * 60.f });
+        teacher.setPosition({ 6 * 60.f , 5 * 60.f + 30 });
+        desk.setPosition({ 4 * 60.f, 5 * 60.f +  5.f });
+        cap.setPosition({ 6 * 60.f + 5.f,5 * 60.f +10.f});
+        cap.setScale({ 0.9f,0.9f });
         chatBox->setFocus(false);
     }
 
@@ -120,7 +125,6 @@ public:
         keyCooldown -= dt;
         PlayerManager::getInstance().update(dt);
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
-
         PlayerManager::getInstance().getChatUI().update(window);
         PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
         chaticon.setPos({ 
@@ -130,7 +134,15 @@ public:
         chaticon.update(window);
         chatBox->update(window);
         window.setView(camera);     
+        
+        if (PlayerManager::getInstance().getCapHolderId() != -1) {
+            teacher.setTexture(ResourceManager::getInstance().getTextureByName("teacherangry.png"));
+        }
+        else
+        {
+            teacher.setTexture(ResourceManager::getInstance().getTextureByName("teachernormal.png"));
 
+        }
     }
 
     void render(sf::RenderWindow& window) override {
@@ -139,7 +151,8 @@ public:
         aniManager.renderAll(window);
         PlayerManager::getInstance().draw(window);
         PlayerManager::getInstance().getChatUI().render(window);
-
+        window.draw(teacher);
+        window.draw(desk);
         if (PlayerManager::getInstance().getCapHolderId() == -1) {
             // 누구도 안가졌을 때
             myPlayer.setGetCap(false);
