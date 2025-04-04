@@ -11,8 +11,11 @@
 #include "UITextBox.hpp"
 #include "UiChatIcon.hpp"
 
+
+
 class worldScene : public BaseScene {
 private:
+
     sf::Font font = ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF");
     UIManager uiManager;
     AnimationManager aniManager;
@@ -36,16 +39,14 @@ private:
     sf::View camera;
     
     // 모자돌리기 게임
+    sf::Sprite gameTitle = sf::Sprite(ResourceManager::getInstance().getTextureByName("gametitle.png"));
     bool gameOn = false;
-    sf::Text gameTitle = sf::Text(font, std::wstring(L"죽음의 모자돌리기 시작"), 48);
-    sf::Text gameInfo = sf::Text(font, std::wstring(L"60초 후 모자를 들고있는 사람은 패배합니다!"), 24);
-    float gameTimer;
+    float gameTimer = 60.f;
     sf::Text gameTimerText = sf::Text(font, std::wstring(L""), 60);
 
 public:
     worldScene()
-        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF"))
-        , chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, 24))
+        : chatBox(new UITextBox({ 100.f,500.f }, { 600.f,40.f }, 24))
         , chaticon({0.f,0.f}, {60.f,30.f},24)
     {
         teacher.setPosition({ 6 * 60.f , 5 * 60.f + 30 });
@@ -139,7 +140,6 @@ public:
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
 
         gameTitle.setPosition({ camera.getCenter().x - 100.f , camera.getCenter().y - 290.f });
-        gameInfo.setPosition({ camera.getCenter().x - 100.f , camera.getCenter().y - 230.f });
         gameTimerText.setPosition({ camera.getCenter().x - 100.f , camera.getCenter().y - 170.f });
 
         PlayerManager::getInstance().getChatUI().update(window);
@@ -176,10 +176,16 @@ public:
         // 모자돌리기 시작...
         if (gameOn) {
             window.draw(gameTitle);
-            window.draw(gameInfo);
             gameTimer -= TimeManager::getInstance().getDeltaTime();
-            gameTimerText.setString(std::to_wstring(roundToDecimalPlaces(gameTimer,2)));
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(2) << gameTimer;
+            gameTimerText.setString(sf::String(oss.str()));
             window.draw(gameTimerText);
+
+            if (gameTimer <= 10.f) { gameTimerText.setFillColor(sf::Color::Red); }
+            else { gameTimerText.setFillColor(sf::Color::White); }
+
+            // 게임 끝 로직
             if (gameTimer <= 0.f) { 
                 int loser = PlayerManager::getInstance().getCapHolderId();
                 if (loser == NetworkManager::getInstance().getSocketID()) { std::cout << "MyPlayer is Loser" << std::endl; }
