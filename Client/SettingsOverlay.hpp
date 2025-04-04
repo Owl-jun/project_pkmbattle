@@ -6,6 +6,8 @@
 #include "GameManager.hpp"
 #include "UIManager.hpp"
 #include "ResourceManager.hpp"
+#include "AnimatedObject.hpp"
+#include "AnimationManager.hpp"
 
 #include <functional>
 #include <memory>
@@ -26,7 +28,10 @@ private:
     int yesButtonIndex = -1;
     int noButtonIndex = -1;
     int exitButtonIndex = -1;
+    int backButtonIndex = -1;
 
+    AnimationManager aniManager;
+    sf::Sprite back = sf::Sprite(ResourceManager::getInstance().getTextureByName("settingsback.png"));
 public:
     SettingsOverlay(const sf::Vector2f& size, const sf::Font& sharedFont)
         : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF")), title(font, "Settings", 36), window(GameManager::getInstance().getWindow())
@@ -38,11 +43,30 @@ public:
         title.setFillColor(sf::Color::Black);
         title.setPosition({ 30.f, 20.f });
 
+        back.setPosition({ background.getPosition().x + 400.f, background.getPosition().y + 300.f });
+
+        // "Back" 이미지 버튼 생성
+        auto backButton = std::make_unique<UIButton>(
+            sf::Vector2f(0.f, 0.f), // 버튼 위치
+            sf::Vector2f(30.f, 30.f), // 버튼 크기
+            "",
+            24, // 텍스트 크기
+            sf::Color(214, 181, 106, 0), // 버튼 색상
+            [this]() { // 클릭 시 실행될 함수
+                std::cout << "Back 이미지 버튼 눌림" << std::endl;
+                toggle(); // 세팅 화면을 닫기
+            }
+        );
+        backButton->setHoverEffect(false);
+        // addElement로 "Back" 이미지 버튼 추가
+        addElement(std::move(backButton));
+        backButtonIndex = uiElements.size() - 1;
+
         // "Exit" 버튼 생성
         auto exitButton = std::make_unique<UIButton>(
             sf::Vector2f(0.f, 0.f), // 버튼 위치
             sf::Vector2f(120.f, 40.f), // 버튼 크기
-            "Exit", // 버튼 텍스트
+            "EXIT", // 버튼 텍스트
             24, // 텍스트 크기
             sf::Color(214, 181, 106, 255), // 버튼 색상
             [this]() { // 클릭 시 실행될 함수
@@ -93,10 +117,18 @@ public:
                     button->setPosition({
                         center.x - button->getSize().x / 2.f ,
                         center.y - button->getSize().y / 2.f + 200.f
-                    });
+                        });
+                }
+                else if (i == backButtonIndex) {
+                    // "Back" 이미지 버튼의 위치 설정
+                    button->setPosition({
+                        background.getPosition().x + 30.f,
+                        background.getPosition().y + 20.f
+                        });
                 }
             }
         }
+        back.setPosition({ background.getPosition().x + 30.f, background.getPosition().y + 20.f });
     }
 
     void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
@@ -115,6 +147,7 @@ public:
         if (!visible) return;
         window.draw(background);
         window.draw(title);
+        window.draw(back);
         for (auto& ui : uiElements)
             ui->render(window);
     }
