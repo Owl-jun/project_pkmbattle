@@ -13,7 +13,7 @@
 
 #include "SettingsOverlay.hpp"
 
-#define TIME 60.f;
+#define TIME 20.f;
 
 class worldScene : public BaseScene {
 private:
