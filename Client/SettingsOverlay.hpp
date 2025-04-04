@@ -131,7 +131,7 @@ public:
         back.setPosition({ background.getPosition().x + 30.f, background.getPosition().y + 20.f });
     }
 
-    void handleEvent(const sf::Event& event, sf::RenderWindow& window) {
+    void handleInput(const sf::Event& event, sf::RenderWindow& window) {
         if (!visible) return;
         for (auto& ui : uiElements)
             ui->handleInput(event, window);

@@ -2,7 +2,6 @@
 #include "PlayerManager.hpp"
 #include "Player.hpp"
 
-
 void PlayerManager::addPlayer(int id, std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp) {
     if (otherPlayers.contains(id)) return;
     Player p(nickname, _x, _y, _win, _lose, _level, _exp);
@@ -25,7 +24,7 @@ void PlayerManager::handleInput(const sf::Event& event, sf::RenderWindow& window
 
 void PlayerManager::update(float dt) {
     // 수신 패킷이름 지정
-    for (const std::string& tag : { "MOVE" , "NEWUSER" , "EXITUSER", "CHAT"}) {
+    for (const std::string& tag : { "MOVE" , "NEWUSER" , "EXITUSER", "CHAT" , "CHCOLOR", "GETCAP"}) {
         auto events = EventManager::getInstance().getEvents(tag);
         for (const auto& msg : events) {
             handleEvent(tag, msg);
@@ -97,7 +96,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         std::istringstream iss(msg);
         int id, x, y, win, lose, level, exp;
         std::string name;
-        std::cout << "PlayerManager : NewUser 수신!" << std::endl;
+        //std::cout << "PlayerManager : NewUser 수신!" << std::endl;
         iss >> id >> name >> x >> y >> win >> lose >> level >> exp;
         if (id == NetworkManager::getInstance().getSocketID()) {}
         else { addPlayer(id, name, x, y, win, lose, level, exp); }
@@ -108,7 +107,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         std::istringstream iss(msg);
         int id;
         iss >> id;
-        std::cout << "PlayerManager : ExitUser 수신!" << std::endl;
+        //std::cout << "PlayerManager : ExitUser 수신!" << std::endl;
         removePlayer(id);
         EventManager::getInstance().clearEvents(tag);
     }
@@ -118,12 +117,13 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         int id;
         std::string message;
         iss >> id; 
-        std::cout << "id파싱 : " << id << std::endl;
+        //std::cout << "id파싱 : " << id << std::endl;
         std::getline(iss,message);
         if (!message.empty() && message[0] == ' ') {
             message = message.substr(1); // 앞 공백 제거
         }
-        std::cout << "현재 도착 메시지" << message << std::endl;
+        //std::cout << "현재 도착 메시지" << message << std::endl;
+        chatting.addMessage(message);
         if (id == NetworkManager::getInstance().getSocketID())
         {
             MyPlayer.showSpeechBubble(message);
@@ -131,6 +131,44 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         else
         {
             otherPlayers[id].showSpeechBubble(message);
+        }
+        EventManager::getInstance().clearEvents(tag);
+    }
+
+    else if (tag == "CHCOLOR") {
+        
+        std::istringstream iss(msg);
+        int id, set;
+        iss >> id >> set;
+
+        if (id == NetworkManager::getInstance().getSocketID()) { getMyPlayer().setColor(set); }
+        else {
+            otherPlayers[id].setColor(set);
+        }
+        EventManager::getInstance().clearEvents(tag);
+    }
+    else if (tag == "GETCAP") {
+        std::istringstream iss(msg);
+        int id;
+        std::string com;
+        iss >> id >> com;
+
+        if (com == "GET")
+        {
+            PlayerManager::getInstance().setCapHolderId(id);
+        }
+        else if (com == "SEND")
+        {
+            int recvID;
+            iss >> recvID;
+            if (recvID != -1) {
+                PlayerManager::getInstance().setLostId(id);
+                PlayerManager::getInstance().setCapHolderId(recvID);
+            }
+        }
+        else if (com == "LOST")
+        {
+            PlayerManager::getInstance().setCapHolderId(-1);
         }
         EventManager::getInstance().clearEvents(tag);
     }
@@ -148,5 +186,10 @@ Player* PlayerManager::getPlayer(int id) {
 
 Player& PlayerManager::getMyPlayer() {
     return MyPlayer;
+}
+
+std::unordered_map<int, Player>& PlayerManager::getPlayers()
+{
+    return otherPlayers;
 }
 

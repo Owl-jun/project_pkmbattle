@@ -11,7 +11,7 @@
 
 
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
+    : window(sf::VideoMode({ 800, 600 }), "PROJECT KHSJ") 
 {
 }
 

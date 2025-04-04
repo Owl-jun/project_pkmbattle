@@ -19,10 +19,12 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
             else if (keyMgr.isKeyPressed(sf::Keyboard::Key::Down))  lastHeldDirection = Direction::Down;
         }
 
-        if (lastHeldDirection != Direction::None /*moveCooldown <= 0.f*/) {
+        if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             currentDirection = lastHeldDirection;
+
             sendDirectionToServer(currentDirection);
-            // moveCooldown = 0.05f;
+            moveCooldown = 0.05f;
+            setCapDir();
             updateSpriteTexture();
         }
     }
@@ -31,7 +33,7 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
 
 void Player::update(float dt) {
     if (!sprite.has_value()) return;
-    //moveCooldown -= dt;
+    moveCooldown -= dt;
 
     if (isMoving) {
         sf::Vector2f pos = sprite->getPosition();
@@ -46,16 +48,17 @@ void Player::update(float dt) {
             sf::Vector2f norm = normalize(dir);
             sprite->move(norm * dist);
         }
+        setCapDir();
         animate(dt);
         return;
     }
     else {
         currentFrame = 0;
-        if (auto* frames = getCurrentFrameSet(); frames && !frames->empty()) {
+        if (auto* frames = getCurrentFrameSet(colorMode); frames && !frames->empty()) {
             sprite->setTexture(*(*frames)[0]);
         }
     }
-
+    cap->setPosition({ sprite->getGlobalBounds().getCenter() });
     if (speechTimer > 0.f)
         speechTimer -= dt;
 }
@@ -64,8 +67,9 @@ void Player::draw(sf::RenderWindow& window) {
     if (sprite.has_value()) {
         window.draw(*sprite);
     }
-    //nickname.setPosition({ sprite->getPosition().x - 60.f , sprite->getPosition().y - 60.f });
-    //window.draw(nickname);  // 예외 발생지점
+    if (getCap) {
+        window.draw(*cap);
+    }
 
     if (speechTimer > 0.f) {
         // 위치 설정
@@ -73,7 +77,7 @@ void Player::draw(sf::RenderWindow& window) {
         sf::Vector2f size = bounds.size;
         sf::Vector2f pos = getPosition(); // 머리 위에 띄우기
         speechBubble.setPosition({ (pos.x + 30.f) - (size.x/2.f) , pos.y - 35.f });
-        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - size.y });
+        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - (size.y - 5.f) });
 
         window.draw(speechBubble);
         window.draw(speechText);
@@ -116,7 +120,7 @@ void Player::move(const sf::Vector2i& pos, Direction dir) {
 // 애니메이션 관련
 void Player::animate(float dt) {
     elapsedTime += dt;
-    auto* frames = getCurrentFrameSet();
+    auto* frames = getCurrentFrameSet(colorMode);
     if (!frames || frames->empty()) return;
     if (currentFrame >= frames->size()) currentFrame = 0;
     if (elapsedTime >= frameTime) {
@@ -128,7 +132,7 @@ void Player::animate(float dt) {
 }
 
 void Player::updateSpriteTexture() {
-    auto* frames = getCurrentFrameSet();
+    auto* frames = getCurrentFrameSet(colorMode);
     if (!frames || frames->empty()) return;
 
     if (currentFrame >= frames->size()) {
@@ -138,14 +142,45 @@ void Player::updateSpriteTexture() {
     sprite->setTexture(*(*frames)[currentFrame]);
 }
 
-std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet() {
-    switch (currentDirection) {
-    case Direction::Down:  return &downFrames;
-    case Direction::Left:  return &leftFrames;
-    case Direction::Right: return &rightFrames;
-    case Direction::Up:    return &upFrames;
-    default:               return nullptr;
+std::vector<std::shared_ptr<sf::Texture>>* Player::getCurrentFrameSet(int colorMode) {
+    // colorMode 0 : default || 1 : Blue || 2 : Green || 3 : pink
+    if (colorMode == 0) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames;
+        case Direction::Left:  return &leftFrames;
+        case Direction::Right: return &rightFrames;
+        case Direction::Up:    return &upFrames;
+        default:               return nullptr;
+        }
     }
+    else if (colorMode == 1) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames2;
+        case Direction::Left:  return &leftFrames2;
+        case Direction::Right: return &rightFrames2;
+        case Direction::Up:    return &upFrames2;
+        default:               return nullptr;
+        }
+    }
+    else if (colorMode == 2) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames3;
+        case Direction::Left:  return &leftFrames3;
+        case Direction::Right: return &rightFrames3;
+        case Direction::Up:    return &upFrames3;
+        default:               return nullptr;
+        }
+    }
+    else if (colorMode == 3) {
+        switch (currentDirection) {
+        case Direction::Down:  return &downFrames4;
+        case Direction::Left:  return &leftFrames4;
+        case Direction::Right: return &rightFrames4;
+        case Direction::Up:    return &upFrames4;
+        default:               return nullptr;
+        }
+    }
+    
 }
 // ----------------------------------------------------------
 
@@ -206,8 +241,30 @@ sf::String Player::wrapText(const sf::String& str, unsigned int maxWidth, const 
 }
 // ----------------------------------------------------------
 
+
+
 // ----------------------------------------------------------
 // 게터 세터
+
+void Player::setGetCap(bool isGet)
+{
+    getCap = isGet;
+}
+
+void Player::setCapDir()
+{
+    switch (currentDirection) {
+    case Direction::Down:  cap->setTexture(*CAP[0]); break;
+    case Direction::Left:  cap->setTexture(*CAP[2]); break;
+    case Direction::Right: cap->setTexture(*CAP[3]); break;
+    case Direction::Up:    cap->setTexture(*CAP[1]); break;
+    default:               break;
+    }
+}
+void Player::setColor(int num) {
+    colorMode = num;
+}
+
 void Player::setTile(sf::Vector2i& pos) {
     tilePos = pos;
 }
@@ -229,6 +286,11 @@ void Player::setCurDir(std::string d) {
 
 sf::Vector2i Player::getTilePosition() const {
     return tilePos;
+}
+
+bool Player::isGetCap()
+{
+    return getCap;
 }
 
 sf::Vector2f Player::getPosition() const {

@@ -175,5 +175,14 @@
     <ClInclude Include="SceneManager.hpp">
       <Filter>MANAGERS\SceneManager</Filter>
     </ClInclude>
+    <ClInclude Include="UIChattingBox.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UIChatIcon.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="AccountScene.hpp">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

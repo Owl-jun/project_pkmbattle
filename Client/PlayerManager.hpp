@@ -1,13 +1,16 @@
 #pragma once
 #include "pch.h"
 #include "Player.hpp"
+#include "UIChattingBox.hpp"
 
 class PlayerManager {
 private:
     Player MyPlayer;
     std::unordered_map<int, Player> otherPlayers;
-    
+    UIChattingBox chatting;
     PlayerManager() = default;
+    int capHolderId = -1;
+    int lostId = -1;
 
 public:
     // 싱글톤 접근자
@@ -32,7 +35,18 @@ public:
     // 플레이어 관리
     void addPlayer(int id, std::string nickname, int _x, int _y, int _win, int _lose, int _level, int _exp);
     void removePlayer(int id);
-    Player* getPlayer(int id);
 
+    Player* getPlayer(int id);
     Player& getMyPlayer();
+    std::unordered_map<int, Player>& getPlayers();
+    UIChattingBox& getChatUI() { return chatting; }
+
+    int getCapHolderId() { return capHolderId; }
+    int getLostId() { return lostId; }
+    void setLostId(int id) {
+        lostId = id;
+    }
+    void setCapHolderId(int id) {
+        capHolderId = id;
+    }
 };

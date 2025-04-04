@@ -4,6 +4,7 @@
 #include "OpeningScene.hpp"
 #include "TitleScene.hpp"
 #include "LoginScene.hpp"
+#include "AccountScene.hpp"
 #include "worldScene.hpp"
 
 void SceneManager::handleEvent(std::string tag, std::string msg)
@@ -40,6 +41,9 @@ void SceneManager::registerAll() {
 
 	std::cout << "[Register] LoginScene\n";
 	registerScene("login", new LoginScene);
+
+	std::cout << "[Register] accountScene\n";
+	registerScene("account", new AccountScene);
 
 	std::cout << "[Register] WorldScene\n";
 	registerScene("world", new worldScene);
