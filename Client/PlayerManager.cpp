@@ -96,7 +96,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         std::istringstream iss(msg);
         int id, x, y, win, lose, level, exp;
         std::string name;
-        std::cout << "PlayerManager : NewUser 수신!" << std::endl;
+        //std::cout << "PlayerManager : NewUser 수신!" << std::endl;
         iss >> id >> name >> x >> y >> win >> lose >> level >> exp;
         if (id == NetworkManager::getInstance().getSocketID()) {}
         else { addPlayer(id, name, x, y, win, lose, level, exp); }
@@ -107,7 +107,7 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         std::istringstream iss(msg);
         int id;
         iss >> id;
-        std::cout << "PlayerManager : ExitUser 수신!" << std::endl;
+        //std::cout << "PlayerManager : ExitUser 수신!" << std::endl;
         removePlayer(id);
         EventManager::getInstance().clearEvents(tag);
     }
@@ -117,12 +117,12 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         int id;
         std::string message;
         iss >> id; 
-        std::cout << "id파싱 : " << id << std::endl;
+        //std::cout << "id파싱 : " << id << std::endl;
         std::getline(iss,message);
         if (!message.empty() && message[0] == ' ') {
             message = message.substr(1); // 앞 공백 제거
         }
-        std::cout << "현재 도착 메시지" << message << std::endl;
+        //std::cout << "현재 도착 메시지" << message << std::endl;
         chatting.addMessage(message);
         if (id == NetworkManager::getInstance().getSocketID())
         {
@@ -156,7 +156,15 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         if (com == "GET")
         {
             PlayerManager::getInstance().setCapHolderId(id);
-
+        }
+        else if (com == "SEND")
+        {
+            int recvID;
+            iss >> recvID;
+            if (recvID != -1) {
+                PlayerManager::getInstance().setLostId(id);
+                PlayerManager::getInstance().setCapHolderId(recvID);
+            }
         }
         else if (com == "LOST")
         {

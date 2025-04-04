@@ -11,7 +11,7 @@
 
 
 GameManager::GameManager()
-    : window(sf::VideoMode({ 800, 600 }), "PKM BATTLE") // 윈도우 타이틀 및 해상도설정
+    : window(sf::VideoMode({ 800, 600 }), "PROJECT KHSJ") 
 {
 }
 
@@ -29,7 +29,7 @@ void GameManager::init() {
     // 서버 연결 및 메시지 수신스레드 RUN // 
     // TEST시 : localhost , 서버주소 210.119.12.82 //
     NetworkManager::getInstance();
-    NetworkManager::getInstance().connect("localhost", "9000");
+    NetworkManager::getInstance().connect("210.119.12.82", "9000");
     NetworkManager::getInstance().startReceiveLoop();
     // ------------------------------------------------------------------------
     // 리소스 매니저 (Assets 폴더 모든 파일 등록)

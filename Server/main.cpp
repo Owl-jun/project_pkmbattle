@@ -290,6 +290,18 @@ void processMessage(const std::string& msg, int playerId) {
                 asio::write(*sock, asio::buffer("GETCAP " + std::to_string(playerId) + " GET\n"));
             }
         }
+        else if (com == "SEND") 
+        {
+            int x, y;
+            iss >> x >> y;
+            int sendid = -1;
+            for (const auto& [id, p] : players) {
+                if (x == p.x && y == p.y) { sendid = id; break; }
+            }
+            for (const auto& [id, sock] : clientSockets) {
+                asio::write(*sock, asio::buffer("GETCAP " + std::to_string(playerId) + " SEND " + std::to_string(sendid) + "\n"));
+            }
+        }
         else if (com == "LOST") {
             for (const auto& [id, sock] : clientSockets) {
                 asio::write(*sock, asio::buffer("GETCAP -1 LOST\n"));

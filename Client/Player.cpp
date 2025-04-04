@@ -21,8 +21,9 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
 
         if (lastHeldDirection != Direction::None && moveCooldown <= 0.f) {
             currentDirection = lastHeldDirection;
+
             sendDirectionToServer(currentDirection);
-            moveCooldown = 0.f;
+            moveCooldown = 0.05f;
             setCapDir();
             updateSpriteTexture();
         }
@@ -69,8 +70,6 @@ void Player::draw(sf::RenderWindow& window) {
     if (getCap) {
         window.draw(*cap);
     }
-    //nickname.setPosition({ sprite->getPosition().x - 60.f , sprite->getPosition().y - 60.f });
-    //window.draw(nickname);  // 예외 발생지점
 
     if (speechTimer > 0.f) {
         // 위치 설정

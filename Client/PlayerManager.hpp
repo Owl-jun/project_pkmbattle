@@ -10,6 +10,7 @@ private:
     UIChattingBox chatting;
     PlayerManager() = default;
     int capHolderId = -1;
+    int lostId = -1;
 
 public:
     // ΩÃ±€≈Ê ¡¢±Ÿ¿⁄
@@ -41,6 +42,10 @@ public:
     UIChattingBox& getChatUI() { return chatting; }
 
     int getCapHolderId() { return capHolderId; }
+    int getLostId() { return lostId; }
+    void setLostId(int id) {
+        lostId = id;
+    }
     void setCapHolderId(int id) {
         capHolderId = id;
     }
