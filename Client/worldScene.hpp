@@ -139,8 +139,8 @@ public:
         PlayerManager::getInstance().update(dt);
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
 
-        gameTitle.setPosition({ camera.getCenter().x - 100.f , camera.getCenter().y - 290.f });
-        gameTimerText.setPosition({ camera.getCenter().x - 100.f , camera.getCenter().y - 170.f });
+        gameTitle.setPosition({ camera.getCenter().x - 215.f , camera.getCenter().y - 290.f });
+        gameTimerText.setPosition({ camera.getCenter().x - 70.f , camera.getCenter().y - 170.f });
 
         PlayerManager::getInstance().getChatUI().update(window);
         PlayerManager::getInstance().getChatUI().setPos({ camera.getCenter().x - 400.f , camera.getCenter().y + 60.f});
