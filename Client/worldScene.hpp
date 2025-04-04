@@ -42,6 +42,7 @@ private:
     sf::View camera;
     
     // 모자돌리기 게임
+    float cooldown = 1.f;
     sf::Sprite gameTitle = sf::Sprite(ResourceManager::getInstance().getTextureByName("gametitle.png"));
     bool gameOn = false;
     float gameTimer = 20.f;
@@ -128,7 +129,7 @@ public:
                 chatBox->setFocus(true);
                 return;
             }
-            if (key && key->code == sf::Keyboard::Key::Space) {
+            if (key && key->code == sf::Keyboard::Key::Space && cooldown <= 0.f) {
                 int x = 16;
                 for (int i = 0; i < 4; ++i) {
                     if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(x + i, 8))
@@ -161,6 +162,8 @@ public:
                         NetworkManager::getInstance().send(toSend);
                     }
                 }
+                cooldown = 1.f;
+
             }
         }
 
@@ -179,6 +182,7 @@ public:
         }
         float dt = TimeManager::getInstance().getDeltaTime();
         keyCooldown -= dt;
+        cooldown -= dt;
         PlayerManager::getInstance().update(dt);
 
         // 모자관련 로직
