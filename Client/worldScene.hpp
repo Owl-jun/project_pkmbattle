@@ -80,8 +80,8 @@ public:
 
             if (state == "ON") {
                 iss >> time;
-                gameOn = true;
                 gameTimer = time;
+                gameOn = true;
                 gameTimerText.setFillColor(sf::Color::White); // 초기화
             }
         }   
@@ -147,16 +147,17 @@ public:
                 if (PlayerManager::getInstance().getCapHolderId() != -1) {
                     std::string Send = "GETCAP SEND "
                         + std::to_string(PlayerManager::getInstance().getMyPlayer().getTileInFront().x) + " "
-                        + std::to_string(PlayerManager::getInstance().getMyPlayer().getTileInFront().y) + "\n";
+                        + std::to_string(PlayerManager::getInstance().getMyPlayer().getTileInFront().y) + " \n";
                     NetworkManager::getInstance().send(Send);
                 }
+
                 if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(6, 5)) {
                     if (PlayerManager::getInstance().getCapHolderId() == -1) {
-                        std::string toSend = "GETCAP GET\n";
+                        std::string toSend = "GETCAP GET \n";
                         NetworkManager::getInstance().send(toSend);
                     }
                     else if (PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
-                        std::string toSend = "GETCAP LOST\n";
+                        std::string toSend = "GETCAP LOST \n";
                         NetworkManager::getInstance().send(toSend);
                     }
                 }
@@ -238,7 +239,6 @@ public:
                 std::string toSend = "LOSER " + std::to_string(loser) + "\n";
                 NetworkManager::getInstance().send(toSend);
                 
-                PlayerManager::getInstance().setLostId(loser);
                 PlayerManager::getInstance().setCapHolderId(-1);
                 gameOn = false; 
             }

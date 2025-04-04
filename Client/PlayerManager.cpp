@@ -171,7 +171,6 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
             int recvID;
             iss >> recvID;
             if (recvID != -1) {
-                PlayerManager::getInstance().setLostId(id);
                 PlayerManager::getInstance().setCapHolderId(recvID);
             }
         }
