@@ -180,6 +180,33 @@ public:
         float dt = TimeManager::getInstance().getDeltaTime();
         keyCooldown -= dt;
         PlayerManager::getInstance().update(dt);
+
+        // 모자관련 로직
+        if (PlayerManager::getInstance().getCapHolderId() == -1) {
+            myPlayer.setGetCap(false);
+            for (auto& [id, p] : otherPlayers) {
+                p.setGetCap(false);
+            }
+        }
+        else if (PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
+            // 내가 소유자일 때
+            myPlayer.setGetCap(true);
+            for (auto& [id, p] : otherPlayers) {
+                p.setGetCap(false);
+            }
+        }
+        else {
+            // 다른 사람이 가졌을 때
+            myPlayer.setGetCap(false);
+            for (auto& [id, p] : otherPlayers) {
+                if (id == PlayerManager::getInstance().getCapHolderId()) {
+                    p.setGetCap(true);
+                }
+                else { p.setGetCap(false); }
+            }
+        }
+        // 
+
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
 
         
@@ -221,6 +248,7 @@ public:
         PlayerManager::getInstance().draw(window);
         PlayerManager::getInstance().getChatUI().render(window);
 
+
         // 모자돌리기 시작...
         if (gameOn) {
             window.draw(gameTitle);
@@ -244,38 +272,11 @@ public:
             }
         }
         
+        
 
-        // 모자관련 로직
-        if (PlayerManager::getInstance().getCapHolderId() == -1) {
-            myPlayer.setGetCap(false);
-            for (auto& [id, p] : otherPlayers) {    
-                p.setGetCap(false);
-                
-            }
+        if (!gameOn) {
             window.draw(cap);
         }
-        else if (PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
-            // 내가 소유자일 때
-            myPlayer.setGetCap(true);
-            for (auto& [id, p] : otherPlayers) {
-                p.setGetCap(false);    
-            }
-        }
-        else {
-            // 다른 사람이 가졌을 때
-            myPlayer.setGetCap(false);
-            for (auto& [id, p] : otherPlayers) {
-                if (id == PlayerManager::getInstance().getCapHolderId()) {
-                    p.setGetCap(true);
-                }
-                if (id == PlayerManager::getInstance().getLostId()) {
-                    p.setGetCap(false);
-                }
-            }
-        }
-        // 
-
-        
         settings.render(window);
         
 
