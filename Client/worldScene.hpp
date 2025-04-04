@@ -212,7 +212,6 @@ public:
                 p.setGetCap(false);
                 
             }
-            // 모자돌리기 중단...
 
             window.draw(cap);
         }

@@ -175,6 +175,9 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
 }
 
 void PlayerManager::removePlayer(int id) {
+    if (capHolderId == id) {
+        capHolderId = -1;
+    }
     otherPlayers.erase(id);
 }
 
