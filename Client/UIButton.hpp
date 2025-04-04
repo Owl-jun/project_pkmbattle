@@ -12,6 +12,7 @@ private:
 
     sf::Color defaultColor;
     bool focused = false;
+    bool enableHoverEffect = true;
 
 public:
     UIButton()
@@ -90,8 +91,14 @@ public:
         }
     }
 
+    void setHoverEffect(bool enable) {
+        enableHoverEffect = enable;
+    }
+
     // hover 기능
     void update(sf::RenderWindow& window) override {
+        if (!enableHoverEffect) return;
+
         sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
         sf::Vector2f mousePos = window.mapPixelToCoords(pixelPos);
         if (shape.getGlobalBounds().contains(mousePos)) {

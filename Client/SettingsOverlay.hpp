@@ -1,15 +1,19 @@
 #pragma once
 #include "pch.h"
-#include "TimeManager.hpp"
 #include "BaseUI.hpp"
-#include "UISlider.hpp"
+#include "UIButton.hpp"
 #include "KeyManager.hpp"
-#include "UImuteControl.hpp"
-#include "FPSControl.hpp"
-#include <functional>
-#include "SoundManager.hpp"
 #include "GameManager.hpp"
+#include "UIManager.hpp"
+#include "ResourceManager.hpp"
+#include "AnimatedObject.hpp"
+#include "AnimationManager.hpp"
+
+#include <functional>
 #include <memory>
+#include <vector>
+#include <iostream> // 디버깅 메시지를 위해 추가
+#include <stdexcept> // 예외 처리를 위해 추가
 
 class SettingsOverlay {
 private:
@@ -20,12 +24,17 @@ private:
     std::vector<std::unique_ptr<BaseUI>> uiElements;
     bool visible = false;
 
-    /* 초기 볼륨 */
-    float volume = 50.f;
+    // Yes와 No 버튼의 인덱스를 저장할 변수
+    int yesButtonIndex = -1;
+    int noButtonIndex = -1;
+    int exitButtonIndex = -1;
+    int backButtonIndex = -1;
 
+    AnimationManager aniManager;
+    sf::Sprite back = sf::Sprite(ResourceManager::getInstance().getTextureByName("settingsback.png"));
 public:
     SettingsOverlay(const sf::Vector2f& size, const sf::Font& sharedFont)
-        : font(sharedFont), title(font, "Settings", 36), window(GameManager::getInstance().getWindow())
+        : font(ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF")), title(font, "Settings", 36), window(GameManager::getInstance().getWindow())
     {
         background.setSize(size);
         background.setFillColor(sf::Color(50, 50, 50, 180));
@@ -34,75 +43,44 @@ public:
         title.setFillColor(sf::Color::Black);
         title.setPosition({ 30.f, 20.f });
 
-        /*----------------------------------------------------------------------*/
-        // 나가기 버튼
+        back.setPosition({ background.getPosition().x + 400.f, background.getPosition().y + 300.f });
+
+        // "Back" 이미지 버튼 생성
+        auto backButton = std::make_unique<UIButton>(
+            sf::Vector2f(0.f, 0.f), // 버튼 위치
+            sf::Vector2f(30.f, 30.f), // 버튼 크기
+            "",
+            24, // 텍스트 크기
+            sf::Color(214, 181, 106, 0), // 버튼 색상
+            [this]() { // 클릭 시 실행될 함수
+                std::cout << "Back 이미지 버튼 눌림" << std::endl;
+                toggle(); // 세팅 화면을 닫기
+            }
+        );
+        backButton->setHoverEffect(false);
+        // addElement로 "Back" 이미지 버튼 추가
+        addElement(std::move(backButton));
+        backButtonIndex = uiElements.size() - 1;
+
+        // "Exit" 버튼 생성
         auto exitButton = std::make_unique<UIButton>(
             sf::Vector2f(0.f, 0.f), // 버튼 위치
             sf::Vector2f(120.f, 40.f), // 버튼 크기
-            "Exit", // 버튼 텍스트
+            "EXIT", // 버튼 텍스트
+            24, // 텍스트 크기
             sf::Color(214, 181, 106, 255), // 버튼 색상
-            font, // 폰트
             [this]() { // 클릭 시 실행될 함수
-                std::cout << "나가기 버튼 눌림" << std::endl;
-                window.close(); // 게임 닫기
+                if (yesButtonIndex == -1 && noButtonIndex == -1) {
+                    std::cout << "나가기 버튼 눌림" << std::endl;
+                    // "Yes"와 "No" 버튼 표시
+                    showYesNoButtons();
+                }
             }
         );
 
-        // 볼륨 슬라이더 버튼
-        auto volumeSlider = std::make_unique<UISlider>(
-            sf::Vector2f(0.f, 0.f),
-            sf::Vector2f(150.f, 10.f),
-            &this->volume
-        );
-
-        // 볼륨 뮤트 버튼
-        auto muteControl = std::make_unique<UImuteControl>(sf::Vector2f(720, 10.f));
-
-        /* FPS 설정 버튼 추가 */
-        auto fps10 = std::make_unique<FPSControl>(
-            "",
-            sf::Vector2f(100.f, 50.f),
-            sf::Vector2f(1.f, 1.f),
-            sf::Color(100, 100, 100, 255),
-            font,
-            [](int fps) { TimeManager::getInstance().setFPS(fps); }
-        );
-
-        auto fps20 = std::make_unique<FPSControl>(
-            "",
-            sf::Vector2f(100.f, 100.f),
-            sf::Vector2f(1.f, 1.f),
-            sf::Color(100, 100, 100, 255),
-            font,
-            [](int fps) { TimeManager::getInstance().setFPS(fps); }
-        );
-
-        auto fps30 = std::make_unique<FPSControl>(
-            "FPS 30",
-            sf::Vector2f(100.f, 150.f),
-            sf::Vector2f(1.f, 1.f),
-            sf::Color(100, 100, 100, 255),
-            font,
-            [](int fps) { TimeManager::getInstance().setFPS(fps); }
-        );
-
-        // addElement로 보내기
+        // addElement로 "Exit" 버튼 추가
         addElement(std::move(exitButton));
-        addElement(std::move(muteControl));
-        addElement(std::move(volumeSlider));
-        addElement(std::move(fps10));
-        addElement(std::move(fps20));
-        addElement(std::move(fps30));
-
-        // 노래 파일 위치
-        if (!SoundManager::getInstance().playMusic("C:\\Source\\project_pkmbattle\\Client\\assets\\track1.mp3")) {
-            std::cerr << "음악 파일 로드 실패!" << std::endl;
-        }
-
-        // 초기 볼륨 설정
-        SoundManager::getInstance().setVolume(true);
-        /*----------------------------------------------------------------------*/
-
+        exitButtonIndex = uiElements.size() - 1;
     }
 
     void toggle() {
@@ -117,48 +95,46 @@ public:
         background.setPosition({ center - background.getSize() / 2.f });
         title.setPosition({ center.x - title.getLocalBounds().size.x / 2.f, center.y - background.getSize().y / 2.f + 20.f });
 
-        float offsetY = center.y - background.getSize().y / 2.f + 80.f;
-
-        for (auto& ui : uiElements) {
-            // exit 버튼 좌표
-            if (auto* exit = dynamic_cast<UIButton*>(ui.get())) {
-                exit->setPosition({
-                    center.x + background.getSize().x / 2.f - exit->getSize().x - 10.f,
-                    center.y + background.getSize().y / 2.f - exit->getSize().y - 10.f
-                    });
-            }
-            // mute 버튼 좌표
-            else if (auto* mute = dynamic_cast<UImuteControl*>(ui.get())) {
-                mute->setPosition({
-                    center.x + background.getSize().x / 2.f - 57.f,
-                    center.y - background.getSize().y / 2.f - 10.f
-                    });
-            }
-            // volume slider 좌표
-            else if (auto* slider = dynamic_cast<UISlider*>(ui.get())) {
-                slider->setPosition({
-                    center.x + background.getSize().x / 2.f - 43.f,
-                    center.y - background.getSize().y / 2.f + 90.f
-                    });
-            }
-
-            // FPS 버튼
-            for (auto& ui : uiElements) {
-                if (auto* fps = dynamic_cast<FPSControl*>(ui.get())) {
-                    float offsetX = (background.getSize().x - fps->getSize().x) / 2.f;  // 중앙 정렬
-                    float offsetY = uiElements.size() * 25.f;  // 아래로 간격을 두고 배치
-                    fps->setPosition({ center.x - background.getSize().x / 2.f + offsetX, center.y - background.getSize().y / 2.f + offsetY });
+        // 버튼 위치를 설정
+        for (size_t i = 0; i < uiElements.size(); ++i) {
+            if (auto* button = dynamic_cast<UIButton*>(uiElements[i].get())) {
+                if (i == yesButtonIndex) {
+                    // "Yes" 버튼의 위치 설정
+                    button->setPosition({
+                        center.x - 130.f,
+                        center.y + 10.f
+                        });
+                }
+                else if (i == noButtonIndex) {
+                    // "No" 버튼의 위치 설정
+                    button->setPosition({
+                        center.x + 10.f,
+                        center.y + 10.f
+                        });
+                }
+                else if (i == exitButtonIndex) {
+                    // "Exit" 버튼의 위치 설정
+                    button->setPosition({
+                        center.x - button->getSize().x / 2.f ,
+                        center.y - button->getSize().y / 2.f + 200.f
+                        });
+                }
+                else if (i == backButtonIndex) {
+                    // "Back" 이미지 버튼의 위치 설정
+                    button->setPosition({
+                        background.getPosition().x + 30.f,
+                        background.getPosition().y + 20.f
+                        });
                 }
             }
         }
+        back.setPosition({ background.getPosition().x + 30.f, background.getPosition().y + 20.f });
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) {
         if (!visible) return;
         for (auto& ui : uiElements)
-            ui->handleEvent(event, window);
-
-        SoundManager::getInstance().setVolume(volume >= SoundManager::getInstance().getVolume());
+            ui->handleInput(event, window);
     }
 
     void update(sf::RenderWindow& window) {
@@ -171,11 +147,73 @@ public:
         if (!visible) return;
         window.draw(background);
         window.draw(title);
+        window.draw(back);
         for (auto& ui : uiElements)
             ui->render(window);
     }
 
     void addElement(std::unique_ptr<BaseUI> ui) {
         uiElements.push_back(std::move(ui));
+    }
+
+    // "Yes"와 "No" 버튼을 표시하는 함수
+    void showYesNoButtons() {
+        if (yesButtonIndex == -1 && noButtonIndex == -1) { // "Yes"와 "No" 버튼이 이미 있는 경우 중복 추가 방지
+            // "Yes" 버튼 생성
+            auto yesButton = std::make_unique<UIButton>(
+                sf::Vector2f(0.f, 0.f), // 버튼 위치
+                sf::Vector2f(120.f, 40.f), // 버튼 크기
+                "Yes", // 버튼 텍스트
+                24, // 텍스트 크기
+                sf::Color(100, 200, 100, 255), // 버튼 색상
+                [this]() { // 클릭 시 실행될 함수
+                    std::cout << "Yes 버튼 눌림" << std::endl;
+                    try {
+                        // 창만 닫기
+                        window.close();
+                        std::cout << "창이 닫혔습니다." << std::endl;
+                    }
+                    catch (const std::exception& e) {
+                        std::cerr << "예외 발생: " << e.what() << std::endl;
+                    }
+                }
+            );
+
+            // "No" 버튼 생성
+            auto noButton = std::make_unique<UIButton>(
+                sf::Vector2f(0.f, 0.f), // 버튼 위치
+                sf::Vector2f(120.f, 40.f), // 버튼 크기
+                "No", // 버튼 텍스트
+                24, // 텍스트 크기
+                sf::Color(200, 100, 100, 255), // 버튼 색상
+                [this]() { // 클릭 시 실행될 함수
+                    std::cout << "No 버튼 눌림" << std::endl;
+                    hideYesNoButtons(); // "Yes"와 "No" 버튼 숨기기
+                }
+            );
+
+            // addElement로 "Yes"와 "No" 버튼 추가하고 인덱스 저장
+            addElement(std::move(yesButton));
+            yesButtonIndex = uiElements.size() - 1; // 인덱스 저장
+
+            addElement(std::move(noButton));
+            noButtonIndex = uiElements.size() - 1; // 인덱스 저장
+
+            // "Yes"와 "No" 버튼의 위치 설정
+            setCenter({ window.getSize().x / 2.f, window.getSize().y / 2.f });
+        }
+    }
+
+    // "Yes"와 "No" 버튼을 숨기는 함수
+    void hideYesNoButtons() {
+        if (noButtonIndex != -1 && noButtonIndex < uiElements.size()) {
+            uiElements.erase(uiElements.begin() + noButtonIndex);
+            noButtonIndex = -1; // 인덱스 초기화
+        }
+
+        if (yesButtonIndex != -1 && yesButtonIndex < uiElements.size()) {
+            uiElements.erase(uiElements.begin() + yesButtonIndex);
+            yesButtonIndex = -1; // 인덱스 초기화
+        }
     }
 };
