@@ -144,7 +144,7 @@ public:
                     NetworkManager::getInstance().send(toSend);
                 }
 
-                if (PlayerManager::getInstance().getCapHolderId() != -1) {
+                if (PlayerManager::getInstance().getCapHolderId() != -1 && PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
                     std::string Send = "GETCAP SEND "
                         + std::to_string(PlayerManager::getInstance().getMyPlayer().getTileInFront().x) + " "
                         + std::to_string(PlayerManager::getInstance().getMyPlayer().getTileInFront().y) + " \n";
