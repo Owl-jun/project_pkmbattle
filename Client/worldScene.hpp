@@ -34,7 +34,7 @@ private:
     // 채팅 UI
     UITextBox* chatBox;
     bool isChatting = false;
-
+    bool sended = true;
     UIChatIcon chaticon;
 
     bool isControl = true;
@@ -84,6 +84,7 @@ public:
                 gameTimer = time;
                 gameOn = true;
                 gameTimerText.setFillColor(sf::Color::White); // 초기화
+                sended = false;
             }
         }   
         EventManager::getInstance().clearEvents(tag);
@@ -266,13 +267,13 @@ public:
             else { gameTimerText.setFillColor(sf::Color::White); }
 
             // 게임 끝 로직
-            if (gameTimer <= 0.f) { 
+            if (gameTimer <= 0.f && !sended) { 
                 int loser = PlayerManager::getInstance().getCapHolderId();
                 std::string toSend = "LOSER " + std::to_string(loser) + "\n";
                 NetworkManager::getInstance().send(toSend);
-                
                 PlayerManager::getInstance().setCapHolderId(-1);
                 gameOn = false; 
+                sended = true;
             }
         }
         
