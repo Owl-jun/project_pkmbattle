@@ -162,7 +162,7 @@ public:
                         NetworkManager::getInstance().send(toSend);
                     }
                 }
-                cooldown = 1.f;
+                cooldown = 0.1f;
 
             }
         }
