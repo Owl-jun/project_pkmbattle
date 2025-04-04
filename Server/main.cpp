@@ -302,11 +302,13 @@ void processMessage(const std::string& msg, int playerId) {
                 asio::write(*sock, asio::buffer("GETCAP " + std::to_string(playerId) + " SEND " + std::to_string(sendid) + "\n"));
             }
         }
+
         else if (com == "LOST") {
             for (const auto& [id, sock] : clientSockets) {
                 asio::write(*sock, asio::buffer("GETCAP -1 LOST\n"));
             }
         }
+        
     }
 
     else if (command == "CREATEACCOUNT") {
@@ -320,6 +322,38 @@ void processMessage(const std::string& msg, int playerId) {
         }
         else { response = "CREATEACCOUNT FALSE\n"; }
         asio::write(*clientSockets[playerId], asio::buffer(response));
+    }
+
+    else if (command == "LOSER") {
+        int loser;
+        iss >> loser;
+        auto& p = players[loser];
+        p.x = 1;
+        p.y = 1;
+        p.dir = "DOWN";
+        std::string response = "MOVE TRUE ";
+        response += std::to_string(loser) + " DOWN "
+            + std::to_string(p.x) + " "
+            + std::to_string(p.y) + "\n";
+        for (const auto& [id, sock] : clientSockets) {
+            asio::write(*sock, asio::buffer(response));
+        }
+    }
+
+    else if (command == "SAFE") {
+        for (auto& [id, p] : players) {
+            if (p.x == 1 && p.y == 1) 
+            { 
+                p.x = 1; p.y = 3; p.dir = "DOWN"; 
+                std::string response = "MOVE TRUE ";
+                response += std::to_string(id) + " DOWN "
+                    + std::to_string(p.x) + " "
+                    + std::to_string(p.y) + "\n";
+                for (const auto& [id, sock] : clientSockets) {
+                    asio::write(*sock, asio::buffer(response));
+                }
+            }
+        }
     }
 
     iss.clear();

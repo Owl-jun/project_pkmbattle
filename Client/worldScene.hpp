@@ -11,7 +11,7 @@
 #include "UITextBox.hpp"
 #include "UiChatIcon.hpp"
 
-
+#define TIME 60.f;
 
 class worldScene : public BaseScene {
 private:
@@ -41,7 +41,7 @@ private:
     // 모자돌리기 게임
     sf::Sprite gameTitle = sf::Sprite(ResourceManager::getInstance().getTextureByName("gametitle.png"));
     bool gameOn = false;
-    float gameTimer = 60.f;
+    float gameTimer = TIME;
     sf::Text gameTimerText = sf::Text(font, std::wstring(L""), 60);
 
 public:
@@ -108,6 +108,11 @@ public:
                         NetworkManager::getInstance().send(toSend);
                         //std::cout << "CHCOLOR 송신완료" << std::endl;
                     }
+                }
+
+                if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(1, 2)) {
+                    std::string toSend = "SAFE\n";
+                    NetworkManager::getInstance().send(toSend);
                 }
 
                 if (PlayerManager::getInstance().getCapHolderId() != -1) {
@@ -188,29 +193,24 @@ public:
             // 게임 끝 로직
             if (gameTimer <= 0.f) { 
                 int loser = PlayerManager::getInstance().getCapHolderId();
-                if (loser == NetworkManager::getInstance().getSocketID()) { std::cout << "MyPlayer is Loser" << std::endl; }
-                else {
-                    for (auto& [id, p] : otherPlayers) {
-                        if (id == loser) {
-                            std::cout << id << " is Lose" << std::endl;
-                        }
-                    }
-                }
+                std::string toSend = "LOSER " + std::to_string(loser) + "\n";
+                NetworkManager::getInstance().send(toSend);
+                
+                PlayerManager::getInstance().setLostId(loser);
                 PlayerManager::getInstance().setCapHolderId(-1);
                 gameOn = false; 
             }
         }
         else {
-            gameTimer = 60.f;
+            gameTimer = TIME;
         }
 
         // 모자관련 로직
         if (PlayerManager::getInstance().getCapHolderId() == -1) {
             myPlayer.setGetCap(false);
-            for (auto& [id, p] : otherPlayers) {
-                if (id == PlayerManager::getInstance().getCapHolderId()) {
-                    p.setGetCap(false);
-                }
+            for (auto& [id, p] : otherPlayers) {    
+                p.setGetCap(false);
+                
             }
             // 모자돌리기 중단...
 
@@ -220,9 +220,7 @@ public:
             // 내가 소유자일 때
             myPlayer.setGetCap(true);
             for (auto& [id, p] : otherPlayers) {
-                if (id == PlayerManager::getInstance().getLostId()) {
-                    p.setGetCap(false);
-                }
+                p.setGetCap(false);    
             }
         }
         else {
