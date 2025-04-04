@@ -133,7 +133,9 @@ public:
             if (key && key->code == sf::Keyboard::Key::Space && cooldown <= 0.f) {
                 int x = 16;
                 for (int i = 0; i < 4; ++i) {
-                    if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(x + i, 8))
+                    if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(x + i, 8)
+                        || PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(x + i, 7)
+                        )
                     {
                         std::string toSend = "CHCOLOR " + std::to_string(i) + "\n";
                         NetworkManager::getInstance().send(toSend);
@@ -250,8 +252,7 @@ public:
         aniManager.renderAll(window);
         window.draw(teacher);
         window.draw(desk);
-        PlayerManager::getInstance().draw(window);
-        PlayerManager::getInstance().getChatUI().render(window);
+        
 
 
         // 모자돌리기 시작...
@@ -283,14 +284,16 @@ public:
             window.draw(cap);
         }
         settings.render(window);
-        
-
         if (isChatting)
         {
-            chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 200.f });
+            chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 170.f });
             chatBox->render(window);
-            // chaticon.render(window);
+            chaticon.render(window);
         }
+        
+        PlayerManager::getInstance().draw(window);
+        PlayerManager::getInstance().getChatUI().render(window);
+
     }
 
 

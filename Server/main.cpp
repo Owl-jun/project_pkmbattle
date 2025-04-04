@@ -399,6 +399,9 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
         std::cerr << "[Server] Player " << playerId << " disconnected: " << e.what() << "\n";
         
         // 연결 종료 시 클린업
+        const auto& p = players[playerId];
+        DBM.savePlayer(p.id, p.x, p.y, p.win, p.lose, p.colNum, p.EXP);
+
         std::lock_guard<std::mutex> lock(playerMutex);
         users.erase(playerId);
         players.erase(playerId);
