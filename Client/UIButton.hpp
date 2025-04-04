@@ -90,12 +90,7 @@ public:
             }
         }
     }
-
-    void setHoverEffect(bool enable) {
-        enableHoverEffect = enable;
-    }
-
-    // hover 기능
+    
     void update(sf::RenderWindow& window) override {
         if (!enableHoverEffect) return;
 
@@ -117,6 +112,11 @@ public:
     // ---------------------------------------------------------------------------
 
     // 게터 및 세터, Click
+
+    void setHoverEffect(bool enable) {
+        enableHoverEffect = enable;
+    }
+
     sf::Vector2f getSize() const {
         return shape.getSize();
     }

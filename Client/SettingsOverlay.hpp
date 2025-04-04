@@ -51,13 +51,12 @@ public:
             sf::Vector2f(30.f, 30.f), // 버튼 크기
             "",
             24, // 텍스트 크기
-            sf::Color(214, 181, 106, 0), // 버튼 색상
+            sf::Color(214, 181, 106, 50), // 버튼 색상
             [this]() { // 클릭 시 실행될 함수
-                std::cout << "Back 이미지 버튼 눌림" << std::endl;
                 toggle(); // 세팅 화면을 닫기
             }
         );
-        backButton->setHoverEffect(false);
+        backButton->setHoverEffect(true);
         // addElement로 "Back" 이미지 버튼 추가
         addElement(std::move(backButton));
         backButtonIndex = uiElements.size() - 1;
@@ -92,7 +91,7 @@ public:
     }
 
     void setCenter(const sf::Vector2f& center) {
-        background.setPosition({ center - background.getSize() / 2.f });
+        background.setPosition({ center - (background.getSize() / 2.f) });
         title.setPosition({ center.x - title.getLocalBounds().size.x / 2.f, center.y - background.getSize().y / 2.f + 20.f });
 
         // 버튼 위치를 설정
@@ -147,9 +146,9 @@ public:
         if (!visible) return;
         window.draw(background);
         window.draw(title);
-        window.draw(back);
         for (auto& ui : uiElements)
             ui->render(window);
+        window.draw(back);
     }
 
     void addElement(std::unique_ptr<BaseUI> ui) {
@@ -168,14 +167,7 @@ public:
                 sf::Color(100, 200, 100, 255), // 버튼 색상
                 [this]() { // 클릭 시 실행될 함수
                     std::cout << "Yes 버튼 눌림" << std::endl;
-                    try {
-                        // 창만 닫기
-                        window.close();
-                        std::cout << "창이 닫혔습니다." << std::endl;
-                    }
-                    catch (const std::exception& e) {
-                        std::cerr << "예외 발생: " << e.what() << std::endl;
-                    }
+                    NetworkManager::getInstance().send("EXIT\n");
                 }
             );
 

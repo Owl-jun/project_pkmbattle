@@ -11,12 +11,14 @@
 #include "UITextBox.hpp"
 #include "UiChatIcon.hpp"
 
+#include "SettingsOverlay.hpp"
+
 #define TIME 60.f;
 
 class worldScene : public BaseScene {
 private:
-
     sf::Font font = ResourceManager::getInstance().getFontByName("POKEMONGSKMONO.TTF");
+    SettingsOverlay settings = SettingsOverlay({ 800.f,600.f }, font);
     UIManager uiManager;
     AnimationManager aniManager;
     float keyCooldown = 0.f;
@@ -35,6 +37,7 @@ private:
 
     UIChatIcon chaticon;
 
+    bool isControl = true;
     // CAM
     sf::View camera;
     
@@ -73,6 +76,18 @@ public:
     }
 
     void handleInput(const sf::Event& event, sf::RenderWindow& window) override {
+        if (event.is<sf::Event::KeyPressed>()) {
+            auto key = event.getIf<sf::Event::KeyPressed>();
+            if (key && key->code == sf::Keyboard::Key::Escape) {
+                settings.toggle();
+            }
+        }
+        if (settings.isVisible()) {
+            settings.handleInput(event,window);
+            isControl = false;
+        }
+        else { isControl = true; }
+
         if (isChatting) {
             chatBox->handleInput(event, window);
 
@@ -110,7 +125,7 @@ public:
                     }
                 }
 
-                if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(1, 2)) {
+                if (PlayerManager::getInstance().getMyPlayer().getTileInFront() == sf::Vector2i(27, 3)) {
                     std::string toSend = "SAFE\n";
                     NetworkManager::getInstance().send(toSend);
                 }
@@ -134,8 +149,10 @@ public:
             }
         }
 
-        PlayerManager::getInstance().getChatUI().handleInput(event,window);
-        PlayerManager::getInstance().handleInput(event,window);
+        if (isControl) {
+            PlayerManager::getInstance().getChatUI().handleInput(event,window);
+            PlayerManager::getInstance().handleInput(event,window);
+        }
     }
 
     void update(sf::RenderWindow& window) override {
@@ -143,6 +160,11 @@ public:
         keyCooldown -= dt;
         PlayerManager::getInstance().update(dt);
         camera.setCenter(PlayerManager::getInstance().getMyPlayer().getPosition());
+
+        
+        settings.setCenter(camera.getCenter());
+        settings.update(window);
+        
 
         gameTitle.setPosition({ camera.getCenter().x - 215.f , camera.getCenter().y - 290.f });
         gameTimerText.setPosition({ camera.getCenter().x - 70.f , camera.getCenter().y - 170.f });
@@ -212,7 +234,6 @@ public:
                 p.setGetCap(false);
                 
             }
-
             window.draw(cap);
         }
         else if (PlayerManager::getInstance().getCapHolderId() == NetworkManager::getInstance().getSocketID()) {
@@ -235,6 +256,10 @@ public:
             }
         }
         // 
+
+        
+        settings.render(window);
+        
 
         if (isChatting)
         {
