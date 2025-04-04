@@ -66,6 +66,7 @@ public:
 
 
     // 게터 세터
+    void SetSpeed(float spd) { speed = spd; }
     void setGetCap(bool);
     void setCapDir();
     void setColor(int);
@@ -74,6 +75,7 @@ public:
     sf::Vector2f getPosition() const;
     sf::Vector2i getTilePosition() const;
     bool isGetCap();
+    bool isMove() { return isMoving; }
 
 private:
     void animate(float dt);

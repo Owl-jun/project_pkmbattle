@@ -40,7 +40,6 @@ public:
     Player& getMyPlayer();
     std::unordered_map<int, Player>& getPlayers();
     UIChattingBox& getChatUI() { return chatting; }
-
     int getCapHolderId() { return capHolderId; }
     int getLostId() { return lostId; }
     void setLostId(int id) {

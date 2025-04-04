@@ -33,6 +33,8 @@ void Player::handleInput(const sf::Event& event, sf::RenderWindow& window, bool 
 
 void Player::update(float dt) {
     if (!sprite.has_value()) return;
+    if (isGetCap()) { speed = 450.f; }
+    else { speed = 350.f; }
     moveCooldown -= dt;
 
     if (isMoving) {
@@ -99,8 +101,10 @@ void Player::sendDirectionToServer(Direction dir) {
     default: return;
     }
 
-    std::string msg = "MOVE " + directionStr + "\n";
-    NetworkManager::getInstance().send(msg);
+    if (!isMoving) {
+        std::string msg = "MOVE " + directionStr + "\n";
+        NetworkManager::getInstance().send(msg);
+    }
 }
 
 void Player::move(const sf::Vector2i& pos, Direction dir) {

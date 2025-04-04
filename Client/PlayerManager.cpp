@@ -68,29 +68,38 @@ void PlayerManager::handleEvent(std::string tag, std::string msg) {
         else if (dirStr == "RIGHT") dir = Direction::Right;
         else dir = Direction::None;
 
+        bool done = false;
         if (result == "TRUE") {
             int x, y;
             iss >> x >> y;
             if (id == NetworkManager::getInstance().getSocketID()) {
-                MyPlayer.move({ x, y }, dir);
+                if (!MyPlayer.isMove()) {
+                    MyPlayer.move({ x, y }, dir);
+                    done = true;
+                }
             }
             else {
                 if (auto* player = getPlayer(id)) {
-                    player->move({ x, y }, dir);
+                    if (!player->isMove()) {
+                        player->move({ x, y }, dir);
+                        done = true;
+                    }
                 }
             }
         }
         else if (result == "FALSE") {
             if (id == NetworkManager::getInstance().getSocketID()) {
                 MyPlayer.setCurDir(dirStr);
+                done = true;
             }
             else {
                 if (auto* player = getPlayer(id)) {
                     player->setCurDir(dirStr);
+                    done = true;
                 }
             }
         }
-        EventManager::getInstance().clearEvents(tag);
+        if (done) { EventManager::getInstance().clearEvents(tag); }
     }
     else if (tag == "NEWUSER") {
         std::istringstream iss(msg);
