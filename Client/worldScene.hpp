@@ -13,7 +13,7 @@
 
 #include "SettingsOverlay.hpp"
 
-#define TIME 20.f;
+//#define TIME 20.f;
 
 class worldScene : public BaseScene {
 private:
@@ -44,7 +44,7 @@ private:
     // 모자돌리기 게임
     sf::Sprite gameTitle = sf::Sprite(ResourceManager::getInstance().getTextureByName("gametitle.png"));
     bool gameOn = false;
-    float gameTimer = TIME;
+    float gameTimer = 20.f;
     sf::Text gameTimerText = sf::Text(font, std::wstring(L""), 60);
 
 public:
@@ -72,6 +72,20 @@ public:
     // ----------------------------------------------------------------------------------
     // 4종세트
     void handleEvent(std::string tag, std::string line) {
+        if (tag == "GAMESTATE") {
+            std::istringstream iss(line);
+            std::string state;
+            float time;
+            iss >> state;
+
+            if (state == "ON") {
+                iss >> time;
+                gameOn = true;
+                gameTimer = time;
+                gameTimerText.setFillColor(sf::Color::White); // 초기화
+            }
+        }   
+        EventManager::getInstance().clearEvents(tag);
         PlayerManager::getInstance().handleEvent(tag, line);
     }
 
@@ -156,6 +170,12 @@ public:
     }
 
     void update(sf::RenderWindow& window) override {
+        for (const std::string& tag : { "GAMESTATE" }) {
+            auto events = EventManager::getInstance().getEvents(tag);
+            for (const auto& msg : events) {
+                handleEvent(tag, msg);
+            }
+        }
         float dt = TimeManager::getInstance().getDeltaTime();
         keyCooldown -= dt;
         PlayerManager::getInstance().update(dt);
@@ -223,9 +243,7 @@ public:
                 gameOn = false; 
             }
         }
-        else {
-            gameTimer = TIME;
-        }
+        
 
         // 모자관련 로직
         if (PlayerManager::getInstance().getCapHolderId() == -1) {

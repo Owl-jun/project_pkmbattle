@@ -86,6 +86,14 @@ bool canMoveTo(int x, int y) {
     return (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT && collisionMap[y][x] == 0);
 }
 
+// --- 게임 시작 트리거 ---
+void broadcastGameStart(float timeInSeconds = 20.0f) {
+    std::string msg = "GAMESTATE ON " + std::to_string(timeInSeconds) + "\n";
+    for (const auto& [id, sock] : clientSockets) {
+        asio::write(*sock, asio::buffer(msg));
+    }
+}
+
 // --- LOGIN 태그 헬퍼함수 ---
 std::string makeLoginSuccessResponse(int playerId, const std::unordered_map<int, Player>& players) {
     std::ostringstream oss;
@@ -289,6 +297,8 @@ void processMessage(const std::string& msg, int playerId) {
             for (const auto& [id, sock] : clientSockets) {
                 asio::write(*sock, asio::buffer("GETCAP " + std::to_string(playerId) + " GET\n"));
             }
+
+            broadcastGameStart(20.0f);
         }
         else if (com == "SEND") 
         {
