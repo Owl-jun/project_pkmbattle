@@ -298,7 +298,7 @@ void processMessage(const std::string& msg, int playerId) {
                 asio::write(*sock, asio::buffer("GETCAP " + std::to_string(playerId) + " GET\n"));
             }
 
-            broadcastGameStart(20.0f);
+            broadcastGameStart(60.0f);
         }
         else if (com == "SEND") 
         {
@@ -426,12 +426,10 @@ void handleClient(int playerId, std::shared_ptr<tcp::socket> socket) {
 
 }
 
-// --- 서버 메인 ---
-int main() {
-
+void RunChannel(int port){
     try {
         asio::io_context io;
-        tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), 9000));
+        tcp::acceptor acceptor(io, tcp::endpoint(tcp::v4(), port));
         std::cout << "[Server] 대기 중...\n";
 
         while (true) {
@@ -440,7 +438,7 @@ int main() {
 
             std::lock_guard<std::mutex> lock(playerMutex);
             int id = nextPlayerId++;
-            
+
             clientSockets[id] = socket;
 
             std::cout << "[Server] Player " << id << " 접속!\n";
@@ -451,7 +449,17 @@ int main() {
     catch (std::exception& e) {
         std::cerr << "[Server 오류] " << e.what() << "\n";
     }
+}
 
+
+// --- 서버 메인 ---
+int main() {
+    std::thread ch1(RunChannel, 9000);
+    std::thread ch2(RunChannel, 9001);
+
+    ch1.join();
+    ch2.join();
+    
     return 0;
 }
 

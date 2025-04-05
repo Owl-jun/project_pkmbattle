@@ -13,7 +13,7 @@
 
 #include "SettingsOverlay.hpp"
 
-//#define TIME 20.f;
+//#define TIME 60.f;
 
 class worldScene : public BaseScene {
 private:
@@ -45,7 +45,7 @@ private:
     float cooldown = 1.f;
     sf::Sprite gameTitle = sf::Sprite(ResourceManager::getInstance().getTextureByName("gametitle.png"));
     bool gameOn = false;
-    float gameTimer = 20.f;
+    float gameTimer = 60.f;
     sf::Text gameTimerText = sf::Text(font, std::wstring(L""), 60);
 
 public:
@@ -286,7 +286,7 @@ public:
         settings.render(window);
         if (isChatting)
         {
-            chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 170.f });
+            chatBox->setPos({ camera.getCenter().x - 300.f , camera.getCenter().y + 150.f });
             chatBox->render(window);
             chaticon.render(window);
         }

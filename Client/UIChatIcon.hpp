@@ -45,7 +45,7 @@ public:
         text.setFont(font);
         text.setCharacterSize(fontSize);
         text.setFillColor(sf::Color::Black);
-        text.setString(std::wstring(L"개인 대화창 생성"));
+        text.setString(std::wstring(L"입력중"));
 
         centerText(pos, size);
     }

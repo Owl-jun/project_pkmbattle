@@ -66,11 +66,11 @@ void Player::update(float dt) {
 }
 
 void Player::draw(sf::RenderWindow& window) {
-    if (sprite.has_value()) {
-        window.draw(*sprite);
-    }
     if (getCap) {
         window.draw(*cap);
+    }
+    if (sprite.has_value()) {
+        window.draw(*sprite);
     }
 
     if (speechTimer > 0.f) {
@@ -79,7 +79,7 @@ void Player::draw(sf::RenderWindow& window) {
         sf::Vector2f size = bounds.size;
         sf::Vector2f pos = getPosition(); // 머리 위에 띄우기
         speechBubble.setPosition({ (pos.x + 30.f) - (size.x/2.f) , pos.y - 35.f });
-        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - (size.y - 5.f) });
+        speechText.setPosition({ speechBubble.getPosition().x + 2.f, speechBubble.getPosition().y - (size.y) });
 
         window.draw(speechBubble);
         window.draw(speechText);
